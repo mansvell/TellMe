@@ -15,7 +15,6 @@ export default function HomePage() {
 
         <main className="min-h-screen bg-slate-50 flex flex-col">
 
-            {/* HEADER */}
 
             <header className="bg-white px-5 pt-5 pb-4 shadow-sm">
 
@@ -65,17 +64,9 @@ export default function HomePage() {
 
             <section className="flex-1 px-1 pt-6 pb-28">
 
-                <div className="flex items-center justify-between mb-5">
-
-                    <h2 className="font-bold text-2xl">
-                        Groupes
-                    </h2>
-
-                    <button className="text-sky-600 font-semibold">
-                        Voir tout
-                    </button>
-
-                </div>
+                <h2 className="font-bold text-2xl">
+                    Groupes
+                </h2>
 
                 <div className="mt-1">
 

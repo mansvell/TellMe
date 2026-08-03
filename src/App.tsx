@@ -6,6 +6,9 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import NotificationPage from "./pages/NotificationPage.tsx";
 import ChooseGroupPage from "./pages/ChooseGroupePage.tsx";
 import HomePage from "./pages/HomePage.tsx";
+import ChatPage from "./pages/ChatPage.tsx";
+import GroupDetailsPage from "./pages/GroupDetailsPage.tsx";
+import MembersPage from "./pages/MembersPage.tsx";
 
 export default function App() {
 
@@ -20,6 +23,9 @@ export default function App() {
           <Route path="/notif" element={<NotificationPage />} />
           <Route path="/choosegp" element={<ChooseGroupPage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/gdetailp" element={<GroupDetailsPage />} />
+          <Route path="/members" element={<MembersPage />} />
       </Routes>
 
   );
