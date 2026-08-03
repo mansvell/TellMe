@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 
 import SplashPage from "./pages/SplashPage.tsx";
 import WelcomePage from "./pages/WelcomePage";
-
+import RegisterPage from "./pages/RegisterPage.tsx";
 
 export default function App() {
 
@@ -13,6 +13,7 @@ export default function App() {
         <Route path="/" element={<SplashPage />} />
 
         <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
       </Routes>
 
