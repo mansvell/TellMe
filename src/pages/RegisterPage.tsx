@@ -1,38 +1,166 @@
 import { useState } from "react";
-import { ArrowRight, Check, Globe2, Sparkles, UserRound } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {ArrowRight, Check, Globe2, LoaderCircle, UserRound} from "lucide-react";
+import {useLocation, useNavigate} from "react-router-dom";
 import icon from "../assets/icon.png";
+import { supabase } from "../lib/supabase";
 
 const colors = [
     "#0EA5E9",
-    "#6366F1",
+    "#22C55E",
     "#8B5CF6",
-    "#EC4899",
     "#F97316",
-    "#10B981",
+    "#EC4899",
+    "#64748B",
+    "#EF4444",
+    "#EAB308",
+    "#B45309"
 ];
+
+type RegisterLocationState = {
+    inviteToken?: string;
+};
 
 export default function RegisterPage() {
     const navigate = useNavigate();
+
     const [pseudo, setPseudo] = useState("");
     const [language, setLanguage] = useState("fr");
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [accepted, setAccepted] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const canContinue = pseudo.trim().length >= 3 && accepted;
+    const location = useLocation();
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const { inviteToken } =
+    (location.state as RegisterLocationState | null) ?? {};
+
+    const cleanPseudo = pseudo.trim();
+    const canContinue =
+        cleanPseudo.length >= 3 &&
+        cleanPseudo.length <= 24 &&
+        accepted &&
+        !loading;
+
+    async function handleSubmit(
+        event: React.FormEvent<HTMLFormElement>,
+    ) {
         event.preventDefault();
 
         if (!canContinue) return;
 
-        navigate("/notifications");
+        setLoading(true);
+        setErrorMessage("");
+
+        //pseudo unique et la constrainte citext dans supab
+        const { data: existingUser } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("display_name", cleanPseudo)
+            .maybeSingle();
+
+        if (existingUser) {
+
+            setErrorMessage(
+                "Ce pseudo est déjà utilisé."
+            );
+
+            setLoading(false);
+
+            return;
+
+        }
+        try {
+            /*
+             * Évite de créer un deuxième utilisateur si une session
+             * anonyme existe déjà dans le navigateur.
+             */
+            const {
+                data: { session: existingSession },
+                error: sessionError,
+            } = await supabase.auth.getSession();
+
+            if (sessionError) {
+                throw sessionError;
+            }
+
+            let user = existingSession?.user ?? null;
+
+            if (!user) {
+                const {
+                    data,
+                    error: authError,
+                } = await supabase.auth.signInAnonymously();
+
+                if (authError) {
+                    throw authError;
+                }
+
+                user = data.user;
+            }
+
+            if (!user) {
+                throw new Error(
+                    "Supabase n’a pas retourné d’utilisateur.",
+                );
+            }
+
+            const { error: profileError } = await supabase
+                .from("profiles")
+                .upsert(
+                    {
+                        id: user.id,
+                        display_name: cleanPseudo,
+                        default_color: selectedColor,
+                        language,
+                        receive_invitations: true,
+                        terms_accepted_at: new Date().toISOString(),
+                    },
+                    {
+                        onConflict: "id",
+                    },
+                );
+
+            if (profileError) {
+                throw profileError;
+            }
+
+            /*
+             * Le token sera traité plus tard lorsque nous connecterons
+             * les invitations. Pour l'instant, on conserve le parcours.
+             */
+            if (inviteToken) {
+                navigate(`/join/preview?token=${inviteToken}`, {
+                    replace: true,
+                });
+                return;
+            }
+
+            navigate("/notif", { replace: true });
+        } catch (error) {
+            console.error("Registration error:", error);
+
+            if (
+                typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === "23505"
+            ) {
+                setErrorMessage("Ce pseudo est déjà utilisé.");
+            } else if (error instanceof Error) {
+                setErrorMessage(error.message);
+            } else {
+                setErrorMessage("Impossible de créer ton identité.");
+            }
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50 px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center justify-center">
-                <section className="grid w-full overflow-hidden rounded-[2rem] border border-sky-100 bg-white shadow-[0_24px_70px_rgba(14,165,233,0.14)] lg:grid-cols-[0.9fr_1.1fr]">
+                <section className="grid w-full overflow-hidden rounded-[2rem] border border-sky-100 bg-white lg:grid-cols-[0.9fr_1.1fr]">
 
                     <div className="hidden min-h-[650px] flex-col justify-between bg-gradient-to-br from-sky-500 to-blue-600 p-10 text-white lg:flex">
                         <img
@@ -54,46 +182,29 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="flex items-center gap-3 text-sm text-sky-100">
-                            <Sparkles size={18} />
                             Aucun email ni mot de passe nécessaire
                         </div>
                     </div>
 
-                    <form
-                        onSubmit={handleSubmit}
-                        className="flex flex-col justify-center p-6 sm:p-10 lg:p-14"
-                    >
-                        <div className="flex items-center gap-4 lg:hidden">
+                    <form onSubmit={handleSubmit} className="flex flex-col justify-center p-6 sm:p-10 lg:p-14">
+                        <div className="flex items-center justify-center gap-4 lg:hidden">
                             <img
                                 src={icon}
                                 alt="TellMe"
-                                className="h-16 w-16 rounded-2xl object-contain"
+                                className="h-18 w-18 rounded-2xl object-contain"
                                 draggable={false}
                             />
 
-                            <div>
-                                <p className="text-sm font-semibold text-sky-600">
-                                    TellMe
-                                </p>
-                                <p className="text-sm text-slate-500">
-                                    Un seul enregistrement
-                                </p>
-                            </div>
+                            <p className="text-2xl font-semibold text-sky-600">
+                                TellMe
+                            </p>
                         </div>
 
                         <div className="mt-8 lg:mt-0">
-                            <span className="inline-flex rounded-full bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-700">
-                                Création de ton identité
+                            <span
+                                className="inline-flex text-center rounded-full bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-700">
+                                Choisissez un nom au hasard pour garder l'anonymat
                             </span>
-
-                            <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                                Comment veux-tu être appelé ?
-                            </h1>
-
-                            <p className="mt-3 max-w-xl leading-7 text-slate-500">
-                                Tu pourras utiliser un pseudo différent dans
-                                chaque groupe.
-                            </p>
                         </div>
 
                         <div className="mt-8">
@@ -104,7 +215,8 @@ export default function RegisterPage() {
                                 Pseudo principal
                             </label>
 
-                            <div className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 transition focus-within:border-sky-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-100">
+                            <div
+                                className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 transition focus-within:border-sky-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-100">
                                 <UserRound
                                     size={20}
                                     className="shrink-0 text-slate-400"
@@ -141,7 +253,7 @@ export default function RegisterPage() {
                                             setSelectedColor(color)
                                         }
                                         className="flex h-11 w-11 items-center justify-center rounded-full border-4 border-white shadow-md transition hover:scale-110 active:scale-95"
-                                        style={{ backgroundColor: color }}
+                                        style={{backgroundColor: color}}
                                         aria-label={`Choisir la couleur ${color}`}
                                     >
                                         {selectedColor === color && (
@@ -164,7 +276,8 @@ export default function RegisterPage() {
                                 Langue
                             </label>
 
-                            <div className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-100">
+                            <div
+                                className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-100">
                                 <Globe2
                                     size={20}
                                     className="text-slate-400"
@@ -201,13 +314,33 @@ export default function RegisterPage() {
                             </span>
                         </label>
 
+                        {errorMessage && (
+                            <div
+                                role="alert"
+                                className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+                            >
+                                {errorMessage}
+                            </div>
+                        )}
                         <button
                             type="submit"
                             disabled={!canContinue}
                             className="mt-8 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
                         >
-                            Créer mon identité
-                            <ArrowRight size={20} />
+                            {loading ? (
+                                <>
+                                    <LoaderCircle
+                                        size={20}
+                                        className="animate-spin"
+                                    />
+                                    Création...
+                                </>
+                            ) : (
+                                <>
+                                    Créer mon identité
+                                    <ArrowRight size={20}/>
+                                </>
+                            )}
                         </button>
                     </form>
                 </section>

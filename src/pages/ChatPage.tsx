@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import {ArrowLeft, Copy, Paperclip, Send, Settings, Smile, UserPlus, X,
+import {ArrowLeft, Copy, Paperclip, Send,Reply, Settings, Smile, UserPlus, X,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import icon from "../assets/icon.png";
@@ -14,6 +14,11 @@ type Message = {
     seen?: boolean;
     views?: number;
     color?: string;
+    replyTo?: {
+        id: number;
+        name: string;
+        text: string;
+    };
 };
 
 type ContextMenu = {
@@ -56,13 +61,29 @@ const messages: Message[] = [
         seen: true,
         views: 5,
     },
+    {
+        id: 5,
+        me: true,
+        text: "Oui, on commence bien à 20h.",
+        time: "16:12",
+        seen: true,
+        views: 7,
+        replyTo: {
+            id: 3,
+            name: "Emma",
+            text: "On commence à 20h ?",
+        },
+    }
 ];
 
 export default function ChatPage() {
+
     const [menu, setMenu] = useState<ContextMenu | null>(null);
     const [inviteMessage, setInviteMessage] = useState<Message | null>(null);
     const [conversationName, setConversationName] = useState("");
     const touchTimer = useRef<number | null>(null);
+    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+
 
     function openMenu(x: number, y: number, message: Message) {
         const menuWidth = 210;
@@ -91,6 +112,12 @@ export default function ChatPage() {
             window.clearTimeout(touchTimer.current);
             touchTimer.current = null;
         }
+    }
+    function answerMessage() {
+        if (!menu) return;
+
+        setReplyingTo(menu.message);
+        setMenu(null);
     }
 
     async function copyMessage() {
@@ -213,6 +240,31 @@ export default function ChatPage() {
                                         </p>
                                     )}
 
+                                    {message.replyTo && ( //message auquel je reponds
+                                        <div
+                                            className={`mb-2 rounded-xl border-l-4 px-3 py-2 ${
+                                                message.me
+                                                    ? "border-white/70 bg-white/15"
+                                                    : "border-sky-500 bg-slate-100"
+                                            }`}
+                                        >
+                                            <p
+                                                className={`text-xs font-bold ${
+                                                    message.me ? "text-white" : "text-sky-600"
+                                                }`}
+                                            >
+                                                {message.replyTo.name}
+                                            </p>
+
+                                            <p
+                                                className={`mt-0.5 line-clamp-2 text-xs ${
+                                                    message.me ? "text-sky-100" : "text-slate-500"
+                                                }`}
+                                            >
+                                                {message.replyTo.text}
+                                            </p>
+                                        </div>
+                                    )}
                                     <p className="whitespace-pre-wrap break-words text-sm leading-6 sm:text-base">
                                         {message.text}
                                     </p>
@@ -249,6 +301,29 @@ export default function ChatPage() {
                 </div>
             </section>
 
+            {replyingTo && (
+                <div className="mx-auto mb-2 flex w-full max-w-4xl items-center gap-3 rounded-2xl border-l-4 border-sky-500 bg-sky-50 px-4 py-3">
+                    <Reply size={18} className="shrink-0 text-sky-500" />
+
+                    <div className="min-w-0 flex-1">
+                        <p className="text-sm font-bold text-sky-600">
+                            Réponse à {replyingTo.me ? "vous" : replyingTo.name}
+                        </p>
+
+                        <p className="truncate text-sm text-slate-500">
+                            {replyingTo.text}
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => setReplyingTo(null)}
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-white hover:text-slate-700"
+                    >
+                        <X size={18} />
+                    </button>
+                </div>
+            )}
             <footer className="z-20 shrink-0 border-t border-slate-200 bg-white p-3 sm:p-4">
                 <div className="mx-auto flex w-full max-w-4xl items-end gap-2 rounded-[1.75rem] bg-slate-100 px-3 py-2">
                     <button
@@ -298,10 +373,19 @@ export default function ChatPage() {
                     >
                         <button
                             type="button"
+                            onClick={answerMessage}
+                            className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-medium text-slate-700 transition hover:bg-slate-100"
+                        >
+                            <Reply size={19} className="text-sky-500"/>
+                            Répondre
+                        </button>
+
+                        <button
+                            type="button"
                             onClick={copyMessage}
                             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-medium text-slate-700 transition hover:bg-slate-100"
                         >
-                            <Copy size={19} className="text-sky-500" />
+                            <Copy size={19} className="text-sky-500"/>
                             Copier
                         </button>
 

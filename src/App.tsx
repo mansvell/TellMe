@@ -13,6 +13,8 @@ import MediaPage from "./pages/MediaPage.tsx";
 import CustomizationPage from "./pages/CustomizationPage.tsx";
 import InvitationsPage from "./pages/InvitationsPage.tsx";
 import SettingsPage from "./pages/SettingsPage.tsx";
+import JoinByLinkPage from "./pages/joinByLinkpage.tsx";
+import JoinPreviewPage from "./pages/JoinPreviewPage.tsx";
 
 
 export default function App() {
@@ -39,6 +41,8 @@ export default function App() {
               path="*"
               element={<Navigate to="/" replace />}
           />
+          <Route path="/join" element={<JoinByLinkPage/>} />
+          <Route path="/join/preview" element={<JoinPreviewPage/>} />
       </Routes>
 
   );

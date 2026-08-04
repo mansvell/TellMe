@@ -1,20 +1,93 @@
-import { BellRing, Check, LockKeyhole, MessageCircle } from "lucide-react";
+import {BellRing, Check, LoaderCircle, LockKeyhole, MessageCircle} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
+import { supabase } from "../lib/supabase";
+import {useState} from "react";
+
 
 export default function NotificationPage() {
     const navigate = useNavigate();
 
-    function continueToHome() {
-        navigate("/home");
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    async function savePreference(enabled: boolean) {
+        const {
+            data: { user },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        if (!user) {
+            throw new Error("Utilisateur introuvable.");
+        }
+
+        const { error: updateError } = await supabase
+            .from("profiles")
+            .update({
+                notifications_enabled: enabled,
+            })
+            .eq("id", user.id);
+
+        if (updateError) throw updateError;
     }
 
     async function enableNotifications() {
-        if ("Notification" in window) {
-            await Notification.requestPermission();
-        }
+        setLoading(true);
+        setErrorMessage("");
 
-        continueToHome();
+        try {
+            if (!("Notification" in window)) {
+                throw new Error(
+                    "Les notifications ne sont pas prises en charge par ce navigateur.",
+                );
+            }
+
+            const permission = await Notification.requestPermission();
+            const enabled = permission === "granted";
+
+            await savePreference(enabled);
+
+            if (!enabled) {
+                setErrorMessage(
+                    "L’autorisation n’a pas été accordée. Tu pourras l’activer plus tard.",
+                );
+                return;
+            }
+
+            navigate("/home", { replace: true });
+        } catch (error) {
+            console.error("Notification error:", error);
+
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : "Impossible d’enregistrer ce choix.",
+            );
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function skipNotifications() {
+        setLoading(true);
+        setErrorMessage("");
+
+        try {
+            await savePreference(false);
+            navigate("/home", { replace: true });
+        } catch (error) {
+            console.error("Notification preference error:", error);
+
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : "Impossible d’enregistrer ce choix.",
+            );
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (
@@ -77,16 +150,33 @@ export default function NotificationPage() {
                             </p>
                         </div>
 
-                        <button
+                        {errorMessage && (
+                            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                                {errorMessage}
+                            </div>
+                        )}
+                        <button disabled={loading}
                             onClick={enableNotifications}
                             className="mt-8 flex h-14 items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-600 active:scale-[0.98]"
                         >
-                            <BellRing size={20} />
-                            Autoriser les notifications
+                            {loading ? (
+                                <>
+                                    <LoaderCircle
+                                        size={20}
+                                        className="animate-spin"
+                                    />
+                                    Chargement...
+                                </>
+                            ) : (
+                                <>
+                                    <BellRing size={20} />
+                                    Autoriser les notifications
+                                </>
+                            )}
                         </button>
 
                         <button
-                            onClick={continueToHome}
+                            onClick={skipNotifications}
                             className="mt-3 h-12 rounded-2xl font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
                         >
                             Pas maintenant
