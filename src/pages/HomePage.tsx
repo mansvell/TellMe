@@ -1,6 +1,11 @@
-import {MailPlus, Bell, Search, Plus, Settings, House, Users, ChevronRight
+import { Bell, Search, Plus, Users, ChevronRight
 } from "lucide-react";
 import icon from "../assets/icon.png";
+import {useState} from "react";
+import NewGroup from "./NewGroup.tsx";
+import BottomNavigation from "../components/BottomNavigation";
+
+
 
 export default function HomePage() {
 
@@ -10,6 +15,8 @@ export default function HomePage() {
         {name:"Football",members:15,color:"bg-orange-500"},
         {name:"Voyages",members:12,color:"bg-violet-500"},
     ];
+    //const navigate = useNavigate();
+    const [showNewGroup, setShowNewGroup] = useState(false);
 
     return (
 
@@ -108,52 +115,22 @@ export default function HomePage() {
 
             </section>
 
-
-            <button
-                className="fixed bottom-24 right-6 w-16 h-16 rounded-full bg-sky-500 text-white shadow-2xl flex items-center justify-center active:scale-95 transition"
-            >
-
+            <button onClick={() => setShowNewGroup(true)} className="fixed bottom-24 right-6 w-16 h-16 rounded-full bg-sky-500 text-white shadow-2xl flex
+                items-center justify-center active:scale-95 transition">
                 <Plus size={30}/>
-
             </button>
 
 
-            <nav className="fixed bottom-0 left-0 right-0 h-20 bg-white border-t flex justify-around items-center">
 
-                <NavItem icon={<House size={22}/>} title="Accueil" active/>
+            <BottomNavigation active="home"/>
 
-                <NavItem icon={<MailPlus size={22}/>} title="Invitations"/>
-
-                <NavItem icon={<Settings size={22}/>} title="Paramètres" />
-
-            </nav>
-
+            <NewGroup
+                open={showNewGroup}
+                onClose={() => setShowNewGroup(false)}
+            />
         </main>
 
     );
 
 }
 
-type NavProps={
-    icon:React.ReactNode;
-    title:string;
-    active?:boolean;
-}
-
-function NavItem({icon,title,active}:NavProps){
-
-    return(
-
-        <button className={`flex flex-col items-center gap-1 ${active?"text-sky-500":"text-slate-400"}`}>
-
-            {icon}
-
-            <span className="text-xs font-medium">
-                {title}
-            </span>
-
-        </button>
-
-    )
-
-}

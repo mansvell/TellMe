@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import {Routes, Route, Navigate} from "react-router-dom";
 
 import SplashPage from "./pages/SplashPage.tsx";
 import WelcomePage from "./pages/WelcomePage";
@@ -9,6 +9,11 @@ import HomePage from "./pages/HomePage.tsx";
 import ChatPage from "./pages/ChatPage.tsx";
 import GroupDetailsPage from "./pages/GroupDetailsPage.tsx";
 import MembersPage from "./pages/MembersPage.tsx";
+import MediaPage from "./pages/MediaPage.tsx";
+import CustomizationPage from "./pages/CustomizationPage.tsx";
+import InvitationsPage from "./pages/InvitationsPage.tsx";
+import SettingsPage from "./pages/SettingsPage.tsx";
+
 
 export default function App() {
 
@@ -26,6 +31,14 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/gdetailp" element={<GroupDetailsPage />} />
           <Route path="/members" element={<MembersPage />} />
+          <Route path="/media" element={<MediaPage />} />
+          <Route path="/custom" element={<CustomizationPage />} />
+          <Route path="/invit" element={<InvitationsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+          />
       </Routes>
 
   );

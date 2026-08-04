@@ -1,7 +1,21 @@
-import { ArrowLeft, ChevronRight, Users, Images, Palette, Link2, Star, LogOut} from "lucide-react";
+import {ArrowLeft, ChevronRight, Users, Images, Palette, LogOut, Clock3} from "lucide-react";
 import icon from "../assets/icon.png";
+import {Link} from "react-router-dom";
+import {useState} from "react";
+
+
+const durations = [
+    "5 minutes",
+    "30 minutes",
+    "1 heure",
+    "24 heures",
+    "3 jours",
+    "Jamais"
+];
 
 export default function GroupDetailsPage() {
+    const isDominus = true; //plus tard depuis Supabase
+    const [duration, setDuration] = useState("Jamais");
 
     return (
 
@@ -11,9 +25,9 @@ export default function GroupDetailsPage() {
 
                 <div className="max-w-3xl mx-auto h-16 px-5 flex items-center justify-between">
 
-                    <button>
+                    <Link to="/chat">
                         <ArrowLeft />
-                    </button>
+                    </Link>
 
                     <h1 className="font-bold text-lg">
                         Informations
@@ -60,23 +74,75 @@ export default function GroupDetailsPage() {
                     <Item icon={<Users size={21}/>} title="Membres"/>
                     <Item icon={<Images size={21}/>} title="Médias"/>
                     <Item icon={<Palette size={21}/>} title="Personnalisation"/>
-                    <Item icon={<Link2 size={21}/>} title="Invitation"/>
-                    <Item icon={<Star size={21}/>} title="Messages favoris"/>
 
                 </div>
+                <div className="mt-6 bg-white rounded-3xl shadow-sm p-6">
 
-                <button
-                    className="mt-8 w-full h-14 rounded-2xl bg-red-500 text-white font-bold hover:bg-red-600 transition"
-                >
+                    <h3 className="font-bold text-lg">
+                        Invite tes ami(e)s à la discussion
+                    </h3>
 
-                    <div className="flex items-center justify-center gap-3">
+                    <div className="mt-5 h-14 rounded-2xl bg-slate-100 flex items-center justify-between px-4 gap-4">
 
-                        <LogOut size={20}/>
+                        <p className="truncate text-slate-700">
+                            https://tellme.app/invite/4F8JKQ
+                        </p>
 
-                        Quitter le groupe
+                        <button
+                            className="h-9 px-4 rounded-xl bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition"
+                        >
+                            Copier
+                        </button>
 
                     </div>
 
+                </div>
+                {isDominus && (
+                    <div className="mt-6 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-100 text-sky-600">
+                                <Clock3 size={21} />
+                            </div>
+
+                            <div>
+                                <h3 className="font-bold text-slate-900">
+                                    Durée de vie du groupe
+                                </h3>
+                                <p className="text-sm text-slate-500">
+                                    Visible uniquement par le Dominus-Createur du groupe
+                                </p>
+                                <p className="text-sm text-gray-400">(une fois le temps ecoulé le groupe sera supprimé
+                                    automatiquement et les liens deviendront obselètes)</p>
+
+                            </div>
+                        </div>
+
+                        <select
+                            value={duration}
+                            onChange={(event) =>
+                                setDuration(event.target.value)
+                            }
+                            className="mt-5 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 outline-none focus:border-sky-500"
+                        >
+                            {durations.map((item) => (
+                                <option key={item} value={item}>
+                                    {item}
+                                </option>
+                            ))}
+                        </select>
+
+                        <p className="mt-3 text-sm text-slate-500">
+                            Durée actuelle : {duration}
+                        </p>
+                    </div>
+                )}
+
+                <button
+                    className="mt-8 w-full h-14 rounded-2xl bg-red-500 text-white font-bold hover:bg-red-600 transition">
+                    <div className="flex items-center justify-center gap-3">
+                        <LogOut size={20}/>
+                        Quitter le groupe
+                    </div>
                 </button>
 
             </section>
@@ -92,9 +158,9 @@ type ItemProps = {
     title: string;
 };
 
-function Item({icon,title}:ItemProps){
+function Item({icon, title}: ItemProps) {
 
-    return(
+    return (
 
         <button
             className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 transition border-b last:border-0"
