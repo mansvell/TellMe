@@ -1,22 +1,44 @@
-import { Bell, Search, Plus, Users, ChevronRight
+import { Bell, Search, Plus, ChevronRight
 } from "lucide-react";
 import icon from "../assets/icon.png";
-import {useState} from "react";
+import { useEffect, useState } from "react";
 import NewGroup from "./NewGroup.tsx";
 import BottomNavigation from "../components/BottomNavigation";
 
+import {getMyGroups, type Group,} from "../services/group.ts";
 
 
 export default function HomePage() {
 
-    const groups = [
-        {name:"Développeurs React",members:24,color:"bg-sky-500"},
-        {name:"Famille",members:8,color:"bg-emerald-500"},
-        {name:"Football",members:15,color:"bg-orange-500"},
-        {name:"Voyages",members:12,color:"bg-violet-500"},
-    ];
+    const [groups, setGroups] = useState<Group[]>([]);
     //const navigate = useNavigate();
     const [showNewGroup, setShowNewGroup] = useState(false);
+
+    const [reloadGroups, setReloadGroups] = useState(0);
+
+// Charge les groupes depuis Supabase.
+    useEffect(() => {
+
+        async function fetchGroups() {
+
+            try {
+
+                const data = await getMyGroups();
+
+                setGroups(data);
+
+            } catch (error) {
+
+                console.error(error);
+
+            }
+
+        }
+
+        void fetchGroups();
+
+    }, [reloadGroups]);
+
 
     return (
 
@@ -85,9 +107,17 @@ export default function HomePage() {
 
                             <div className="flex items-center gap-4">
 
-                                <div className={`w-14 h-14 rounded-2xl ${g.color} flex items-center justify-center text-white`}>
+                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                                    style={{
+                                        backgroundColor: g.color,
+                                    }}>
 
-                                    <Users/>
+                                    <img
+                                        src={icon}
+                                        alt=""
+                                        className="w-10 h-10  "
+                                        draggable={false}
+                                    />
 
                                 </div>
 
@@ -98,7 +128,7 @@ export default function HomePage() {
                                     </h3>
 
                                     <p className="text-slate-500">
-                                        {g.members} membres
+                                        Groupe privé
                                     </p>
 
                                 </div>
@@ -127,6 +157,7 @@ export default function HomePage() {
             <NewGroup
                 open={showNewGroup}
                 onClose={() => setShowNewGroup(false)}
+                onCreated={() => setReloadGroups((value) => value + 1)}
             />
         </main>
 
