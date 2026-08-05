@@ -1,91 +1,80 @@
 import { useRef, useState } from "react";
 import {ArrowLeft, Copy, Paperclip, Send,Reply, Settings, Smile, UserPlus, X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link ,useParams } from "react-router-dom";
 import icon from "../assets/icon.png";
+import { supabase } from "../lib/supabase";
+import { useEffect } from "react";
+import {
+    getMessages,
+    sendMessage,
+    type ChatMessage,
+} from "../services/messages";
 
-type Message = {
-    id: number;
-    date?: string;
-    me: boolean;
-    name?: string;
-    text: string;
-    time: string;
-    seen?: boolean;
-    views?: number;
-    color?: string;
-    replyTo?: {
-        id: number;
-        name: string;
-        text: string;
-    };
-};
 
 type ContextMenu = {
     x: number;
     y: number;
-    message: Message;
+    message: ChatMessage;
+};
+type ChatGroup = {
+    id: string;
+    name: string;
+    color: string;
+    members: number;
 };
 
-const messages: Message[] = [
-    {
-        id: 1,
-        date: "Aujourd’hui",
-        me: false,
-        name: "Lucas",
-        text: "Salut tout le monde !",
-        time: "15:42",
-        color: "#8B5CF6",
-    },
-    {
-        id: 2,
-        me: true,
-        text: "Salut !",
-        time: "15:43",
-        seen: true,
-        views: 8,
-    },
-    {
-        id: 3,
-        me: false,
-        name: "Emma",
-        text: "On commence à 20h ?",
-        time: "16:08",
-        color: "#EC4899",
-    },
-    {
-        id: 4,
-        me: true,
-        text: "Oui, aucun problème.",
-        time: "16:09",
-        seen: true,
-        views: 5,
-    },
-    {
-        id: 5,
-        me: true,
-        text: "Oui, on commence bien à 20h.",
-        time: "16:12",
-        seen: true,
-        views: 7,
-        replyTo: {
-            id: 3,
-            name: "Emma",
-            text: "On commence à 20h ?",
-        },
-    }
-];
 
 export default function ChatPage() {
 
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const { groupId } = useParams(); //récupère l'id du groupe cliqué.
     const [menu, setMenu] = useState<ContextMenu | null>(null);
-    const [inviteMessage, setInviteMessage] = useState<Message | null>(null);
+    const [inviteMessage, setInviteMessage] = useState<ChatMessage | null>(null);
     const [conversationName, setConversationName] = useState("");
     const touchTimer = useRef<number | null>(null);
-    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
+    const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
 
+    const [message, setMessage] = useState(""); // AJOUT : contenu du message.
+    const [sending, setSending] = useState(false); // AJOUT : envoi en cours.
 
-    function openMenu(x: number, y: number, message: Message) {
+    // AJOUT : informations du groupe courant
+    const [group, setGroup] = useState<ChatGroup | null>(null);
+    // AJOUT : charge les informations du groupe
+    useEffect(() => {
+
+        async function loadGroup() {
+
+            if (!groupId) return;
+
+            const { data, error } = await supabase
+                .from("groups")
+                .select(`id,name,color,group_members(count)`)
+                .eq("id", groupId)
+                .single();
+
+            if (error) {
+
+                console.error(error);
+                return;
+
+            }
+
+            setGroup({
+                id: data.id,
+                name: data.name,
+                color: data.color,
+                members: data.group_members?.length ?? 0,
+            });
+            const groupMessages = await getMessages(groupId);// AJOUT : charge les messages du groupe.
+            setMessages(groupMessages);
+        }
+
+        void loadGroup();
+
+    }, [groupId]);
+
+    function openMenu(x: number, y: number, message: ChatMessage) {
         const menuWidth = 210;
         const menuHeight = 112;
 
@@ -98,7 +87,7 @@ export default function ChatPage() {
 
     function handleTouchStart(
         event: React.TouchEvent<HTMLDivElement>,
-        message: Message,
+        message: ChatMessage,
     ) {
         const touch = event.touches[0];
 
@@ -123,7 +112,7 @@ export default function ChatPage() {
     async function copyMessage() {
         if (!menu) return;
 
-        await navigator.clipboard.writeText(menu.message.text);
+        await navigator.clipboard.writeText(menu.message.content);
         setMenu(null);
     }
 
@@ -148,6 +137,32 @@ export default function ChatPage() {
         setInviteMessage(null);
     }
 
+    async function handleSendMessage() {
+
+        if (!groupId) return;
+
+        if (!message.trim()) return;
+
+        try {
+
+            setSending(true);
+
+            await sendMessage(groupId, message);
+
+            setMessage("");
+
+        } catch (error) {
+
+            console.error(error);
+
+        } finally {
+
+            setSending(false);
+
+        }
+
+    }
+
     return (
         <main className="flex h-screen min-h-0 flex-col overflow-hidden bg-slate-100">
             <header className="z-20 shrink-0 border-b border-slate-200 bg-white">
@@ -161,27 +176,36 @@ export default function ChatPage() {
                         </Link>
 
                         <Link to="/gdetailp" className="flex min-w-0 items-center gap-3">
-                            <img
-                                src={icon}
-                                alt="Développeurs React"
-                                className="h-11 w-11 shrink-0 rounded-2xl object-contain sm:h-12 sm:w-12"
-                                draggable={false}
-                            />
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl sm:h-12 sm:w-12"
+                                style={{
+                                    backgroundColor: group?.color ?? "#0EA5E9",
+                                }}
+                            >
+
+                                <img
+                                    src={icon}
+                                    alt=""
+                                    className="h-10 w-10 "
+                                    draggable={false}
+                                />
+
+                            </div>
 
                             <div className="min-w-0">
                                 <h1 className="truncate font-bold text-slate-900">
-                                    Développeurs React
+                                    {group?.name ?? "Chargement..."}
                                 </h1>
 
                                 <p className="truncate text-sm text-emerald-500">
-                                    24 membres
+                                    {group?.members ?? 0} membres
                                 </p>
                             </div>
                         </Link>
                     </div>
 
-                    <Link to="/gdetailp" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100">
-                        <Settings size={21} />
+                    <Link to="/gdetailp"
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100">
+                        <Settings size={21}/>
                     </Link>
                 </div>
             </header>
@@ -266,7 +290,7 @@ export default function ChatPage() {
                                         </div>
                                     )}
                                     <p className="whitespace-pre-wrap break-words text-sm leading-6 sm:text-base">
-                                        {message.text}
+                                        {message.content}
                                     </p>
 
                                     <div
@@ -279,19 +303,9 @@ export default function ChatPage() {
                                         <span>{message.time}</span>
 
                                         {message.me && (
-                                            <>
-                                                <span className="font-bold tracking-[-3px]">
-                                                    {message.seen ? "✓✓" : "✓"}
-                                                </span>
-
-                                                {message.seen &&
-                                                    typeof message.views ===
-                                                    "number" && (
-                                                        <span className="ml-1 flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                                                            {message.views}
-                                                        </span>
-                                                    )}
-                                            </>
+                                            <span className="font-bold tracking-[-3px]">
+        ✓
+    </span>
                                         )}
                                     </div>
                                 </div>
@@ -311,7 +325,7 @@ export default function ChatPage() {
                         </p>
 
                         <p className="truncate text-sm text-slate-500">
-                            {replyingTo.text}
+                            {replyingTo.content}
                         </p>
                     </div>
 
@@ -342,14 +356,19 @@ export default function ChatPage() {
 
                     <textarea
                         rows={1}
+                        value={message}
+                        onChange={(event) => setMessage(event.target.value)}
                         placeholder="Écrire un message..."
                         className="max-h-32 min-h-10 min-w-0 flex-1 resize-none bg-transparent py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400 sm:text-base"
                     />
 
-                    <button type="button"
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white shadow-md shadow-sky-200
-                        transition hover:bg-sky-600 active:scale-95">
-                        <Send size={19} />
+                    <button
+                        type="button"
+                        onClick={handleSendMessage}
+                        disabled={sending || !message.trim()}
+                        className="w-11 h-11 rounded-full bg-sky-500 text-white flex items-center justify-center disabled:opacity-50"
+                    >
+                        <Send size={19}/>
                     </button>
                 </div>
             </footer>

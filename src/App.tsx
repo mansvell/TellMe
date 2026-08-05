@@ -30,7 +30,7 @@ export default function App() {
           <Route path="/notif" element={<NotificationPage />} />
           <Route path="/choosegp" element={<ChooseGroupPage />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chat/:groupId" element={<ChatPage />} />
           <Route path="/gdetailp" element={<GroupDetailsPage />} />
           <Route path="/members" element={<MembersPage />} />
           <Route path="/media" element={<MediaPage />} />

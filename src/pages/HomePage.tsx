@@ -6,6 +6,7 @@ import NewGroup from "./NewGroup.tsx";
 import BottomNavigation from "../components/BottomNavigation";
 
 import {getMyGroups, type Group,} from "../services/group.ts";
+import {Link} from "react-router-dom";
 
 
 export default function HomePage() {
@@ -101,7 +102,7 @@ export default function HomePage() {
 
                     {groups.map((g)=>(
 
-                        <button key={g.name}
+                        <Link to={`/chat/${g.id}`} key={g.name}
                             className="w-full bg-white rounded-xl p-5 shadow-sm flex items-center justify-between hover:shadow-md transition"
                         >
 
@@ -137,7 +138,7 @@ export default function HomePage() {
 
                             <ChevronRight className="text-slate-400"/>
 
-                        </button>
+                        </Link>
 
                     ))}
 
