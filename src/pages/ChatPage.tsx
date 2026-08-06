@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
-import {ArrowLeft, Copy, Paperclip, Send,Reply, Settings, Smile, UserPlus, X,
+import {
+    ArrowLeft, Copy, Paperclip, FileText, Send, Reply, Settings,UserPlus, X, LoaderCircle,
 } from "lucide-react";
 import { Link ,useParams } from "react-router-dom";
 import icon from "../assets/icon.png";
 import { supabase } from "../lib/supabase";
 import { useEffect } from "react";
 import {
-    getMessages,
+    getMessages,getMessageById, formatMessageDate,
     sendMessage,
     type ChatMessage,
 } from "../services/messages";
@@ -28,19 +29,24 @@ type ChatGroup = {
 export default function ChatPage() {
 
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const { groupId } = useParams(); //récupère l'id du groupe cliqué.
+    const { groupId } = useParams<{ groupId: string }>();
     const [menu, setMenu] = useState<ContextMenu | null>(null);
     const [inviteMessage, setInviteMessage] = useState<ChatMessage | null>(null);
     const [conversationName, setConversationName] = useState("");
     const touchTimer = useRef<number | null>(null);
     const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
 
-    const [message, setMessage] = useState(""); // AJOUT : contenu du message.
-    const [sending, setSending] = useState(false); // AJOUT : envoi en cours.
+    //const [message, setMessage] = useState<ChatMessage[]>([]); // contenu du message.
+    const [sending, setSending] = useState(false); //envoi en cours.
+    const [messageText, setMessageText] = useState("");
 
-    // AJOUT : informations du groupe courant
-    const [group, setGroup] = useState<ChatGroup | null>(null);
-    // AJOUT : charge les informations du groupe
+    const [group, setGroup] = useState<ChatGroup | null>(null); //informations du groupe courant
+    const [loadingMessages, setLoadingMessages] = useState(true);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+    //charge les informations du groupe
     useEffect(() => {
 
         async function loadGroup() {
@@ -73,6 +79,120 @@ export default function ChatPage() {
         void loadGroup();
 
     }, [groupId]);
+// Recalcule uniquement les séparateurs de date.
+    function updateMessageDates(messages: ChatMessage[]): ChatMessage[] {
+
+        return messages.map((message, index) => {
+
+            const current = new Date(message.created_at);
+
+            const previous =
+                index > 0
+                    ? new Date(messages[index - 1].created_at)
+                    : null;
+
+            return {
+                ...message,
+                date:
+                    !previous ||
+                    previous.toDateString() !== current.toDateString()
+                        ? formatMessageDate(current)
+                        : null,
+            };
+
+        });
+
+    }
+    useEffect(() => { //initial + realTime
+        if (!groupId) return;
+
+        let active = true;
+
+        // Chargement initial.
+        getMessages(groupId)
+            .then((loadedMessages) => {
+                if (!active) return;
+
+                setMessages(updateMessageDates(loadedMessages));
+                setLoadingMessages(false);
+            })
+            .catch((error) => {
+                console.error(
+                    "Erreur chargement messages :",
+                    error,
+                );
+
+                if (active) {
+                    setLoadingMessages(false);
+                }
+            });
+
+        // Écoute les nouveaux messages du groupe.
+        const channel = supabase
+            .channel(`messages:${groupId}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "messages",
+                    filter: `group_id=eq.${groupId}`,
+                },
+                async (payload) => {
+                    try {
+                        const realtimeMessage =
+                            await getMessageById(
+                                String(payload.new.id),
+                            );
+
+                        setMessages((current) => {
+                            // Évite le doublon entre ajout immédiat et réception Realtime
+                            if (
+                                current.some(
+                                    (item) =>
+                                        item.id ===
+                                        realtimeMessage.id,
+                                )
+                            ) {
+                                return current;
+                            }
+
+                            const updatedMessages = [
+                                ...current,
+                                realtimeMessage,
+                            ];
+
+                            return updateMessageDates(updatedMessages);
+                        });
+                    } catch (error) {
+                        console.error(
+                            "Erreur Realtime :",
+                            error,
+                        );
+                    }
+                },
+            )
+            .subscribe((status, error) => {
+                if (error) {
+                    console.error(
+                        "Erreur abonnement Realtime :",
+                        status,
+                        error,
+                    );
+                }
+            });
+
+        return () => {
+            active = false;
+            void supabase.removeChannel(channel);
+        };
+    }, [groupId]);
+
+    useEffect(() => { //scroll automatique
+        messagesEndRef.current?.scrollIntoView({
+            behavior: "smooth",
+        });
+    }, [messages]);
 
     function openMenu(x: number, y: number, message: ChatMessage) {
         const menuWidth = 210;
@@ -138,30 +258,53 @@ export default function ChatPage() {
     }
 
     async function handleSendMessage() {
-
         if (!groupId) return;
 
-        if (!message.trim()) return;
-
-        try {
-
-            setSending(true);
-
-            await sendMessage(groupId, message);
-
-            setMessage("");
-
-        } catch (error) {
-
-            console.error(error);
-
-        } finally {
-
-            setSending(false);
-
+        if (!messageText.trim() && !selectedFile) {
+            return;
         }
 
+        setSending(true);
+
+        try {
+            const createdMessage = await sendMessage(
+                groupId,
+                messageText,
+                replyingTo?.id ?? null,
+                selectedFile,
+            );
+
+            // Affichage immédiat sans attendre Realtime.
+            setMessages((current) => {
+                if (
+                    current.some(
+                        (item) =>
+                            item.id === createdMessage.id,
+                    )
+                ) {
+                    return current;
+                }
+                const updatedMessages = [
+                    ...current,
+                    createdMessage,
+                ];
+
+                return updateMessageDates(updatedMessages);
+            });
+
+            setMessageText("");
+            setSelectedFile(null);
+            setReplyingTo(null);
+        } catch (error) {
+            console.error(
+                "Erreur envoi message :",
+                error,
+            );
+        } finally {
+            setSending(false);
+        }
     }
+
 
     return (
         <main className="flex h-screen min-h-0 flex-col overflow-hidden bg-slate-100">
@@ -293,6 +436,49 @@ export default function ChatPage() {
                                         {message.content}
                                     </p>
 
+                                    {message.attachments.map((attachment) => {
+                                        console.log("Attachment :", attachment);
+
+                                        const isImage =
+                                            attachment.fileType.startsWith("image/");
+
+                                        if (isImage) {
+                                            return (
+                                                <a
+                                                    key={attachment.id}
+                                                    href={attachment.signedUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="mt-3 block overflow-hidden rounded-2xl"
+                                                >
+                                                    <img
+                                                        src={attachment.signedUrl}
+                                                        alt={attachment.fileName}
+                                                        className="max-h-80 w-full object-cover"
+                                                    />
+                                                </a>
+                                            );
+                                        }
+
+                                        return (
+                                            <a
+                                                key={attachment.id}
+                                                href={attachment.signedUrl}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className={`mt-3 flex items-center gap-3 rounded-xl p-3 ${
+                                                    message.me
+                                                        ? "bg-white/15"
+                                                        : "bg-slate-100"
+                                                }`}
+                                            >
+                                                <FileText size={21} />
+
+                                                <span className="min-w-0 flex-1 truncate text-sm font-medium">{attachment.fileName}</span>
+                                            </a>
+                                        );
+                                    })}
+
                                     <div
                                         className={`mt-2 flex items-center justify-end gap-1.5 text-[11px] ${
                                             message.me
@@ -303,18 +489,27 @@ export default function ChatPage() {
                                         <span>{message.time}</span>
 
                                         {message.me && (
-                                            <span className="font-bold tracking-[-3px]">
-        ✓
-    </span>
+                                            <span className="font-bold tracking-[-3px]">✓</span>
                                         )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ))}
+                    <div ref={messagesEndRef} />
+
+                    {loadingMessages && (
+                        <div className="flex justify-center py-10">
+                            <LoaderCircle
+                                size={28}
+                                className="animate-spin text-sky-500"
+                            />
+                        </div>
+                    )}
                 </div>
             </section>
 
+            {/*affiche pour repondre à un msg*/}
             {replyingTo && (
                 <div className="mx-auto mb-2 flex w-full max-w-4xl items-center gap-3 rounded-2xl border-l-4 border-sky-500 bg-sky-50 px-4 py-3">
                     <Reply size={18} className="shrink-0 text-sky-500" />
@@ -339,36 +534,83 @@ export default function ChatPage() {
                 </div>
             )}
             <footer className="z-20 shrink-0 border-t border-slate-200 bg-white p-3 sm:p-4">
+
+                {/* Fichier sélectionné */}
+                {selectedFile && (
+                    <div className="mx-auto mb-2 flex w-full max-w-4xl items-center gap-3 rounded-2xl bg-slate-100 px-4 py-3">
+                        <FileText
+                            size={19}
+                            className="shrink-0 text-sky-500"
+                        />
+
+                        <p className="min-w-0 flex-1 truncate text-sm text-slate-600">
+                            {selectedFile.name}
+                        </p>
+
+                        <button
+                            type="button"
+                            onClick={() => setSelectedFile(null)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-white"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                )}
                 <div className="mx-auto flex w-full max-w-4xl items-end gap-2 rounded-[1.75rem] bg-slate-100 px-3 py-2">
-                    <button
-                        type="button"
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-white hover:text-sky-500"
-                    >
-                        <Smile size={21} />
-                    </button>
+
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        hidden
+                        accept="image/*,video/*,.pdf,.doc,.docx,.txt"
+                        onChange={(event) => {
+                            const file =
+                                event.target.files?.[0] ?? null;
+
+                            setSelectedFile(file);
+
+                            // Autorise la sélection du même fichier ensuite.
+                            event.target.value = "";
+                        }}
+                    />
 
                     <button
                         type="button"
-                        className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-white hover:text-sky-500 sm:flex"
+                        onClick={() =>
+                            fileInputRef.current?.click()
+                        }
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-white hover:text-sky-500"
                     >
-                        <Paperclip size={21} />
+                        <Paperclip size={21}/>
                     </button>
 
                     <textarea
                         rows={1}
-                        value={message}
-                        onChange={(event) => setMessage(event.target.value)}
+                        value={messageText}
+                        onChange={(event) => setMessageText(event.target.value)}
                         placeholder="Écrire un message..."
                         className="max-h-32 min-h-10 min-w-0 flex-1 resize-none bg-transparent py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400 sm:text-base"
                     />
 
                     <button
                         type="button"
-                        onClick={handleSendMessage}
-                        disabled={sending || !message.trim()}
+                        onClick={() =>
+                            void handleSendMessage()
+                        }
+                        disabled={
+                            sending ||
+                            (!messageText.trim() && !selectedFile)
+                        }
                         className="w-11 h-11 rounded-full bg-sky-500 text-white flex items-center justify-center disabled:opacity-50"
                     >
-                        <Send size={19}/>
+                        {sending ? (
+                            <LoaderCircle
+                                size={19}
+                                className="animate-spin"
+                            />
+                        ) : (
+                            <Send size={19} />
+                        )}
                     </button>
                 </div>
             </footer>
