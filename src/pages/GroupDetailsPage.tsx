@@ -2,7 +2,9 @@ import {ArrowLeft, ChevronRight, Users, Images, Palette, LogOut, Clock3} from "l
 import icon from "../assets/icon.png";
 import {Link} from "react-router-dom";
 import {useState} from "react";
-
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import {getGroupDetails, type GroupDetails} from "../services/group";
 
 const durations = [
     "5 minutes",
@@ -14,9 +16,34 @@ const durations = [
 ];
 
 export default function GroupDetailsPage() {
-    const isDominus = true; //plus tard depuis Supabase
-    const [duration, setDuration] = useState("Jamais");
 
+    const { groupId } = useParams();
+    const [group, setGroup] = useState<GroupDetails | null>(null);
+    console.log("groupId :", groupId);
+    const [isDominus, setIsDominus] = useState(false);
+    const [duration, setDuration] = useState("");
+
+    // AJOUT
+    useEffect(() => {
+
+        async function loadGroup() {
+
+            if (!groupId) return;
+
+            const data = await getGroupDetails(groupId);
+            console.log("Group Details :", data);
+
+            setGroup(data);
+
+            setDuration(data.duration);
+
+            setIsDominus(data.isDominus);
+
+        }
+
+        void loadGroup();
+
+    }, [groupId]);
     return (
 
         <main className="min-h-screen bg-slate-100">
@@ -25,7 +52,7 @@ export default function GroupDetailsPage() {
 
                 <div className="max-w-3xl mx-auto h-16 px-5 flex items-center justify-between">
 
-                    <Link to="/chat">
+                    <Link to="/home">
                         <ArrowLeft />
                     </Link>
 
@@ -47,22 +74,23 @@ export default function GroupDetailsPage() {
 
                     <div className="flex flex-col items-center">
 
-                        <img
-                            src={icon}
-                            alt=""
-                            className="w-28 h-28 rounded-3xl"
-                        />
+                        <div className="flex h-28 w-28 items-center justify-center rounded-3xl"
+                            style={{
+                                backgroundColor: group?.color,
+                            }}>
+                            <img src={icon} alt="" className="h-16 w-16"/>
+                        </div>
 
                         <h2 className="mt-5 text-3xl font-bold">
-                            Développeurs React
+                            {group?.name}
                         </h2>
 
                         <p className="text-slate-500 mt-2">
-                            24 membres
+                            {group?.membersCount} membres
                         </p>
 
                         <p className="text-sm text-slate-400 mt-1">
-                            Créé le 12 août 2026
+                            Créé le {group?.createdAt}
                         </p>
 
                     </div>
@@ -85,7 +113,7 @@ export default function GroupDetailsPage() {
                     <div className="mt-5 h-14 rounded-2xl bg-slate-100 flex items-center justify-between px-4 gap-4">
 
                         <p className="truncate text-slate-700">
-                            https://tellme.app/invite/4F8JKQ
+                            {group?.inviteLink}
                         </p>
 
                         <button

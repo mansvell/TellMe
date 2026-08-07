@@ -346,7 +346,7 @@ export default function ChatPage() {
                         </Link>
                     </div>
 
-                    <Link to="/gdetailp"
+                    <Link to="/gdetailp/:groupId"
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100">
                         <Settings size={21}/>
                     </Link>

@@ -6,13 +6,14 @@ import NewGroup from "./NewGroup.tsx";
 import BottomNavigation from "../components/BottomNavigation";
 
 import {getMyGroups, type Group,} from "../services/group.ts";
-import {Link} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
+
 
 
 export default function HomePage() {
 
     const [groups, setGroups] = useState<Group[]>([]);
-    //const navigate = useNavigate();
+    const navigate = useNavigate();
     const [showNewGroup, setShowNewGroup] = useState(false);
 
     const [reloadGroups, setReloadGroups] = useState(0);
@@ -100,45 +101,68 @@ export default function HomePage() {
 
                 <div className="mt-1">
 
-                    {groups.map((g)=>(
+                    {groups.map((group) => (
 
-                        <Link to={`/chat/${g.id}`} key={g.name}
-                            className="w-full bg-white rounded-xl p-5 shadow-sm flex items-center justify-between hover:shadow-md transition"
+                        <button onClick={() => navigate(`/chat/${group.id}`)}
+                            key={group.id}
+                            className="mb-3 w-full rounded-2xl bg-white p-4 shadow-sm transition hover:shadow-md"
                         >
 
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center">
 
-                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                                {/* Icône du groupe */}
+                                <div
+                                    className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl"
                                     style={{
-                                        backgroundColor: g.color,
-                                    }}>
-
+                                        backgroundColor: group.color,
+                                    }}
+                                >
                                     <img
                                         src={icon}
                                         alt=""
-                                        className="w-10 h-10  "
-                                        draggable={false}
+                                        className="h-9 w-9 object-contain"
                                     />
-
                                 </div>
 
-                                <div className="text-left">
+                                {/* Nom + membres */}
+                                <div className="ml-4 min-w-0 flex-1 text-left">
 
-                                    <h3 className="font-bold text-lg">
-                                        {g.name}
+                                    <h3 className="truncate text-lg font-bold text-slate-800">
+                                        {group.name}
                                     </h3>
 
-                                    <p className="text-slate-500">
-                                        Groupe privé
+                                    <p className="mt-1 text-sm text-slate-500">
+                                        {group.members_count} membres
                                     </p>
 
                                 </div>
 
+                                {/* Badge messages non lus */}
+                                <div className="mr-4">
+
+                                    {group.unread_count > 0 && (
+
+                                        <div className="flex h-7 min-w-7 items-center justify-center rounded-full bg-sky-500 px-2">
+
+                        <span className="text-xs font-bold text-white">
+                            {group.unread_count}
+                        </span>
+
+                                        </div>
+
+                                    )}
+
+                                </div>
+
+                                {/* Flèche */}
+                                <ChevronRight
+                                    className="text-slate-400"
+                                    size={22}
+                                />
+
                             </div>
 
-                            <ChevronRight className="text-slate-400"/>
-
-                        </Link>
+                        </button>
 
                     ))}
 

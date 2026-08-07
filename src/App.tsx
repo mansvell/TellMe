@@ -31,7 +31,7 @@ export default function App() {
           <Route path="/choosegp" element={<ChooseGroupPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/chat/:groupId" element={<ChatPage />} />
-          <Route path="/gdetailp" element={<GroupDetailsPage />} />
+          <Route path="/gdetailp/:groupId" element={<GroupDetailsPage />} />
           <Route path="/members" element={<MembersPage />} />
           <Route path="/media" element={<MediaPage />} />
           <Route path="/custom" element={<CustomizationPage />} />
