@@ -32,9 +32,11 @@ export default function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/chat/:groupId" element={<ChatPage />} />
           <Route path="/gdetailp/:groupId" element={<GroupDetailsPage />} />
-          <Route path="/members" element={<MembersPage />} />
-          <Route path="/media" element={<MediaPage />} />
-          <Route path="/custom" element={<CustomizationPage />} />
+
+          <Route path="/members/:groupId" element={<MembersPage />} />
+          <Route path="/media/:groupId" element={<MediaPage />} />
+          <Route path="/custom/:groupId" element={<CustomizationPage />} />
+
           <Route path="/invit" element={<InvitationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route
@@ -43,6 +45,10 @@ export default function App() {
           />
           <Route path="/join" element={<JoinByLinkPage/>} />
           <Route path="/join/preview" element={<JoinPreviewPage/>} />
+          <Route
+              path="/join/:inviteCode"
+              element={<JoinPreviewPage />}
+          />
       </Routes>
 
   );

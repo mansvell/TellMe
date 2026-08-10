@@ -318,7 +318,7 @@ export default function ChatPage() {
                             <ArrowLeft size={22} />
                         </Link>
 
-                        <Link to="/gdetailp" className="flex min-w-0 items-center gap-3">
+                        <Link to={`/gdetailp/${groupId}`} className="flex min-w-0 items-center gap-3">
                             <div className="flex h-14 w-14 items-center justify-center rounded-2xl sm:h-12 sm:w-12"
                                 style={{
                                     backgroundColor: group?.color ?? "#0EA5E9",
@@ -346,7 +346,7 @@ export default function ChatPage() {
                         </Link>
                     </div>
 
-                    <Link to="/gdetailp/:groupId"
+                    <Link to={`/gdetailp/${groupId}`}
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100">
                         <Settings size={21}/>
                     </Link>

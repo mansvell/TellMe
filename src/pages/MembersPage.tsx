@@ -1,15 +1,97 @@
-import { ArrowLeft, Search, Shield, Circle } from "lucide-react";
+import {
+    ArrowLeft,
+    LoaderCircle,
+    Search,
+} from "lucide-react";
+
+import {
+    Link,
+    useParams,
+} from "react-router-dom";
+
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    getGroupMembers,
+    type GroupMember,
+} from "../services/group";
+
 
 export default function MembersPage() {
 
-    const members = [
-        {name:"Lucas",online:true,admin:true},
-        {name:"Emma",online:false},
-        {name:"David",online:true},
-        {name:"Noah",online:false},
-        {name:"Sarah",online:true},
-        {name:"Tom",online:true},
-    ];
+    const { groupId } =
+        useParams<{ groupId: string }>();
+
+    const [members, setMembers] =
+        useState<GroupMember[]>([]);
+
+    const [search, setSearch] =
+        useState("");
+
+    const [loading, setLoading] =
+        useState(true);
+
+
+    // Charge uniquement les membres actifs.
+    useEffect(() => {
+
+        if (!groupId) return;
+
+        let active = true;
+
+        getGroupMembers(groupId)
+            .then((data) => {
+
+                if (!active) return;
+
+                setMembers(data);
+                setLoading(false);
+            })
+            .catch((error) => {
+
+                console.error(
+                    "Members error:",
+                    error,
+                );
+
+                if (active) {
+                    setLoading(false);
+                }
+            });
+
+        return () => {
+            active = false;
+        };
+
+    }, [groupId]);
+
+
+    // Recherche locale rapide.
+    const filteredMembers =
+        useMemo(() => {
+
+            const query =
+                search
+                    .trim()
+                    .toLocaleLowerCase();
+
+            if (!query) {
+                return members;
+            }
+
+            return members.filter(
+                (member) =>
+                    member.name
+                        .toLocaleLowerCase()
+                        .includes(query),
+            );
+
+        }, [members, search]);
+
 
     return (
 
@@ -17,91 +99,128 @@ export default function MembersPage() {
 
             <header className="bg-white shadow-sm">
 
-                <div className="max-w-3xl mx-auto h-16 flex items-center gap-4 px-5">
+                <div className="mx-auto flex h-16 max-w-3xl items-center gap-4 px-5">
 
-                    <ArrowLeft className="cursor-pointer"/>
+                    <Link
+                        to={`/gdetailp/${groupId}`}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100"
+                    >
+                        <ArrowLeft />
+                    </Link>
 
-                    <h1 className="font-bold text-xl">
-                        Membres
-                    </h1>
+                    <div>
+
+                        <h1 className="text-xl font-bold">
+                            Membres
+                        </h1>
+
+                        <p className="text-xs text-slate-400">
+                            {members.length}{" "}
+                            {members.length > 1
+                                ? "personnes"
+                                : "personne"}
+                        </p>
+
+                    </div>
 
                 </div>
 
             </header>
 
-            <section className="max-w-3xl mx-auto p-5">
 
-                <div className="bg-white rounded-2xl h-14 flex items-center px-4 gap-3">
+            <section className="mx-auto max-w-3xl p-5">
 
-                    <Search size={20} className="text-slate-400"/>
+                <div className="flex h-14 items-center gap-3 rounded-2xl bg-white px-4 shadow-sm">
+
+                    <Search
+                        size={20}
+                        className="text-slate-400"
+                    />
 
                     <input
+                        value={search}
+                        onChange={(event) =>
+                            setSearch(
+                                event.target.value,
+                            )
+                        }
                         placeholder="Rechercher un membre..."
-                        className="flex-1 outline-none"
+                        className="min-w-0 flex-1 outline-none"
                     />
 
                 </div>
 
-                <div className="mt-5 bg-white rounded-3xl overflow-hidden shadow-sm">
 
-                    {members.map((m,index)=>(
+                {loading ? (
 
-                        <div
-                            key={index}
-                            className="flex items-center justify-between p-5 border-b last:border-0"
-                        >
+                    <div className="flex min-h-64 items-center justify-center">
 
-                            <div className="flex items-center gap-4">
+                        <LoaderCircle
+                            size={30}
+                            className="animate-spin text-sky-500"
+                        />
 
-                                <div className="w-12 h-12 rounded-full bg-sky-500"/>
+                    </div>
 
-                                <div>
+                ) : (
 
-                                    <div className="flex items-center gap-2">
+                    <div className="mt-5 overflow-hidden rounded-3xl bg-white shadow-sm">
 
-                                        <h3 className="font-semibold">
+                        {filteredMembers.map(
+                            (member) => (
 
-                                            {m.name}
+                                <div
+                                    key={member.id}
+                                    className="flex items-center gap-4 border-b p-5 last:border-0"
+                                >
 
+                                    {/* Avatar totalement anonyme :
+                                        couleur uniquement */}
+
+                                    <div
+                                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-sm"
+                                        style={{
+                                            backgroundColor:
+                                            member.color,
+                                        }}
+                                    >
+                                        {member.name
+                                            .charAt(0)
+                                            .toUpperCase()}
+                                    </div>
+
+                                    <div className="min-w-0">
+
+                                        <h3 className="truncate font-semibold text-slate-900">
+                                            {member.name}
                                         </h3>
 
-                                        {m.admin && (
-
-                                            <Shield
-                                                size={15}
-                                                className="text-sky-500"
-                                            />
-
-                                        )}
+                                        <p className="mt-0.5 text-xs text-slate-400">
+                                            Membre du groupe
+                                        </p>
 
                                     </div>
 
-                                    <p className="text-sm text-slate-500">
-
-                                        {m.online ? "En ligne" : "Hors ligne"}
-
-                                    </p>
-
                                 </div>
 
+                            ),
+                        )}
+
+
+                        {filteredMembers.length === 0 && (
+
+                            <div className="p-10 text-center text-sm text-slate-400">
+                                Aucun membre trouvé.
                             </div>
 
-                            <Circle
-                                size={12}
-                                fill={m.online ? "#22c55e" : "#cbd5e1"}
-                                className={m.online ? "text-green-500":"text-slate-300"}
-                            />
+                        )}
 
-                        </div>
+                    </div>
 
-                    ))}
-
-                </div>
+                )}
 
             </section>
 
         </main>
-
     );
-
 }
