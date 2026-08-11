@@ -17,6 +17,7 @@ export type MessageReply = {
     id: string;
     name: string;
     text: string;
+    color: string;
 };
 
 export type ChatMessage = {
@@ -473,6 +474,9 @@ async function hydrateMessages(
                             replyProfile?.display_name ??
                             "Utilisateur",
                         text: replyRow.content,
+                        color:
+                            replyMembership?.local_color ??
+                            "#0EA5E9",
                     }
                     : null,
 

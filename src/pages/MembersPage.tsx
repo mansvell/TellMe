@@ -169,16 +169,8 @@ export default function MembersPage() {
                         {filteredMembers.map(
                             (member) => (
 
-                                <div
-                                    key={member.id}
-                                    className="flex items-center gap-4 border-b p-5 last:border-0"
-                                >
-
-                                    {/* Avatar totalement anonyme :
-                                        couleur uniquement */}
-
-                                    <div
-                                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-sm"
+                                <div key={member.id} className="flex items-center gap-4 border-b p-5 last:border-0">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold text-white shadow-sm"
                                         style={{
                                             backgroundColor:
                                             member.color,

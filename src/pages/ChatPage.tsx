@@ -70,7 +70,7 @@ export default function ChatPage() {
                 id: data.id,
                 name: data.name,
                 color: data.color,
-                members: data.group_members?.length ?? 0,
+                members: data.group_members?.[0]?.count ?? 0,
             });
             const groupMessages = await getMessages(groupId);// AJOUT : charge les messages du groupe.
             setMessages(groupMessages);
@@ -392,42 +392,33 @@ export default function ChatPage() {
                                     onTouchCancel={cancelLongPress}
                                     className={`max-w-[86%] cursor-pointer rounded-3xl px-4 py-3 shadow-sm select-none sm:max-w-[70%] sm:px-5 ${
                                         message.me
-                                            ? "rounded-br-lg bg-sky-500 text-white"
-                                            : "rounded-bl-lg bg-white text-slate-800"
-                                    }`}>
+                                            ? "rounded-br-lg text-white"
+                                            : "rounded-bl-lg text-white"
+                                    }`}
+                                    style={{
+                                        backgroundColor: message.color ?? "#0EA5E9",
+                                    }} >
                                     {!message.me && message.name && (
-                                        <p
-                                            className="mb-1 text-sm font-bold"
-                                            style={{
-                                                color:
-                                                    message.color ?? "#0EA5E9",
-                                            }}
-                                        >
+                                        <p className="mb-1 text-sm font-bold">
                                             {message.name}
                                         </p>
                                     )}
 
-                                    {message.replyTo && ( //message auquel je reponds
+                                    {message.replyTo && (
                                         <div
-                                            className={`mb-2 rounded-xl border-l-4 px-3 py-2 ${
-                                                message.me
-                                                    ? "border-white/70 bg-white/15"
-                                                    : "border-sky-500 bg-slate-100"
-                                            }`}
+                                            className="mb-2 rounded-xl border-l-4 px-3 py-2"
+                                            style={{
+                                                borderLeftColor: `bg-white`,
+                                                backgroundColor: message.replyTo.color,
+                                            }}
                                         >
                                             <p
-                                                className={`text-xs font-bold ${
-                                                    message.me ? "text-white" : "text-sky-600"
-                                                }`}
+                                                className="text-xs font-bold text-white"
                                             >
                                                 {message.replyTo.name}
                                             </p>
 
-                                            <p
-                                                className={`mt-0.5 line-clamp-2 text-xs ${
-                                                    message.me ? "text-sky-100" : "text-slate-500"
-                                                }`}
-                                            >
+                                            <p className="mt-0.5 line-clamp-2 text-xs text-white">
                                                 {message.replyTo.text}
                                             </p>
                                         </div>

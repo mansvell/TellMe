@@ -1,12 +1,10 @@
 import {
-    ArrowLeft,
     LoaderCircle,
     Lock,
     Users,
 } from "lucide-react";
 
 import {
-    Link,
     useLocation,
     useNavigate,
     useParams,
@@ -196,14 +194,6 @@ export default function JoinPreviewPage() {
         <main className="flex min-h-screen items-center justify-center bg-slate-100 p-5">
 
             <div className="w-full max-w-lg rounded-3xl bg-white p-7 shadow-sm sm:p-8">
-
-                <Link
-                    to="/join"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100"
-                >
-                    <ArrowLeft />
-                </Link>
-
 
                 {group ? (
 

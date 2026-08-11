@@ -66,7 +66,7 @@ export default function HomePage() {
                             </p>
 
                             <h1 className="font-bold text-2xl">
-                                Mansvell
+                                UserName
                             </h1>
 
                         </div>
