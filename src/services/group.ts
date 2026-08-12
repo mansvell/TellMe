@@ -39,6 +39,11 @@ type MembershipWithGroup = {
     group_id: string;
     groups: DatabaseGroup | DatabaseGroup[] | null;
 };
+type UnreadCountRow = {
+    group_id: string;
+    unread_count: number;
+};
+
 
 export type GroupDetails = {
     id: string;
@@ -153,12 +158,11 @@ export async function createGroup(
     return data as string;
 }
 
-
-// ============================================================
 // CHARGE LES GROUPES DU USER
 // Un groupe n'apparaît que si le user est membre actif.
-// ============================================================
 
+// Charge uniquement les groupes du user
+// + leur nombre de messages non lus.
 export async function getMyGroups(): Promise<Group[]> {
 
     const {
@@ -166,13 +170,25 @@ export async function getMyGroups(): Promise<Group[]> {
         error: userError,
     } = await supabase.auth.getUser();
 
-    if (userError) throw userError;
-
-    if (!user) {
-        throw new Error("Utilisateur introuvable.");
+    if (userError) {
+        throw userError;
     }
 
-    const { data, error } = await supabase
+    if (!user) {
+        throw new Error(
+            "Utilisateur introuvable.",
+        );
+    }
+
+
+    // ----------------------------------------------
+    // Groupes auxquels le user appartient.
+    // ----------------------------------------------
+
+    const {
+        data,
+        error,
+    } = await supabase
         .from("group_members")
         .select(`
             group_id,
@@ -190,42 +206,107 @@ export async function getMyGroups(): Promise<Group[]> {
         `)
         .eq("user_id", user.id)
         .eq("status", "active")
-        .order("joined_at", {
-            ascending: false,
-        });
+        .order(
+            "joined_at",
+            {
+                ascending: false,
+            },
+        );
 
-    if (error) throw error;
+    if (error) {
+        throw error;
+    }
+
+
+    // ----------------------------------------------
+    // Compteurs non lus de tous les groupes.
+    // Une seule requête.
+    // ----------------------------------------------
+
+    const {
+        data: unreadData,
+        error: unreadError,
+    } = await supabase.rpc(
+        "get_my_unread_counts",
+    );
+
+    if (unreadError) {
+        throw unreadError;
+    }
+
+
+    const unreadMap =
+        new Map<string, number>();
+
+
+    for (
+        const row of
+        (unreadData ?? []) as UnreadCountRow[]
+        ) {
+
+        unreadMap.set(
+            row.group_id,
+            Number(row.unread_count),
+        );
+    }
+
+
+    // ----------------------------------------------
+    // Construction finale des cartes Home.
+    // ----------------------------------------------
 
     return (
         (data ?? []) as unknown as MembershipWithGroup[]
     ).flatMap((membership) => {
 
-        if (!membership.groups) return [];
+        if (!membership.groups) {
+            return [];
+        }
 
-        const group = Array.isArray(
-            membership.groups,
-        )
-            ? membership.groups[0]
-            : membership.groups;
+        const group =
+            Array.isArray(
+                membership.groups,
+            )
+                ? membership.groups[0]
+                : membership.groups;
 
-        if (!group) return [];
+
+        if (!group) {
+            return [];
+        }
+
 
         return [{
             id: group.id,
             name: group.name,
             color: group.color,
-            dominus_id: group.dominus_id,
-            invite_code: group.invite_code,
+
+            dominus_id:
+            group.dominus_id,
+
+            invite_code:
+            group.invite_code,
+
             lifetime_minutes:
             group.lifetime_minutes,
-            expires_at: group.expires_at,
-            created_at: group.created_at,
 
+            expires_at:
+            group.expires_at,
+
+            created_at:
+            group.created_at,
+
+
+            // Nombre réel de membres.
             members_count:
-                group.group_members?.[0]?.count ?? 0,
+                group.group_members?.[0]?.count ??
+                0,
 
-            // Réservé pour la prochaine étape : messages non lus.
-            unread_count: 0,
+
+            // Nombre réel de messages non lus.
+            unread_count:
+                unreadMap.get(group.id) ??
+                0,
         }];
     });
 }

@@ -141,17 +141,12 @@ export default function HomePage() {
                                 <div className="mr-4">
 
                                     {group.unread_count > 0 && (
-
                                         <div className="flex h-7 min-w-7 items-center justify-center rounded-full bg-sky-500 px-2">
-
-                        <span className="text-xs font-bold text-white">
-                            {group.unread_count}
-                        </span>
-
+                                        <span className="text-xs font-bold text-white">
+                                            {group.unread_count}
+                                        </span>
                                         </div>
-
                                     )}
-
                                 </div>
 
                                 {/* Flèche */}

@@ -35,6 +35,8 @@ export type ChatMessage = {
     date: string | null;
     replyTo: MessageReply | null;
     attachments: ChatAttachment[];
+    // Nombre d'autres membres ayant lu ce message.
+    readCount: number;
 };
 
 type MessageDatabaseRow = {
@@ -69,11 +71,7 @@ type AttachmentRow = {
     file_size: number | null;
 };
 
-
-// =========================================================
 // RÉCUPÈRE L'UTILISATEUR CONNECTÉ
-// =========================================================
-
 async function getCurrentUserId(): Promise<string> {
     const {
         data: { user },
@@ -89,11 +87,7 @@ async function getCurrentUserId(): Promise<string> {
     return user.id;
 }
 
-
-// =========================================================
 // RÉCUPÈRE LA MEMBERSHIP DU USER DANS LE GROUPE
-// =========================================================
-
 async function getMyMembershipId(
     groupId: string,
 ): Promise<string> {
@@ -112,11 +106,7 @@ async function getMyMembershipId(
     return data.id;
 }
 
-
-// =========================================================
 // ENVOIE UN MESSAGE, UNE RÉPONSE ET ÉVENTUELLEMENT UN FICHIER
-// =========================================================
-
 export async function sendMessage(
     groupId: string,
     content: string,
@@ -196,10 +186,7 @@ export async function sendMessage(
 }
 
 
-// =========================================================
 // CHARGE TOUS LES MESSAGES DU GROUPE
-// =========================================================
-
 export async function getMessages(
     groupId: string,
 ): Promise<ChatMessage[]> {
@@ -225,11 +212,8 @@ export async function getMessages(
 }
 
 
-// =========================================================
 // CHARGE UN MESSAGE PRÉCIS
 // Utilisé par Realtime après un nouvel INSERT.
-// =========================================================
-
 export async function getMessageById(
     messageId: string,
 ): Promise<ChatMessage> {
@@ -261,11 +245,8 @@ export async function getMessageById(
 }
 
 
-// =========================================================
 // TRANSFORME LES DONNÉES SUPABASE POUR LE FRONTEND
 // Pas de jointure récursive messages → messages.
-// =========================================================
-
 async function hydrateMessages(
     rows: MessageDatabaseRow[],
 ): Promise<ChatMessage[]> {
@@ -406,6 +387,35 @@ async function hydrateMessages(
         attachmentMap.set(attachment.messageId, list);
     }
 
+// Nombre de lecteurs par message.
+    const readCountMap = new Map<string, number>();
+
+    if (messageIds.length > 0) {
+
+        const {
+            data: readData,
+            error: readError,
+        } = await supabase
+            .from("message_reads")
+            .select("message_id")
+            .in("message_id", messageIds);
+
+        if (readError) {
+            throw readError;
+        }
+
+        for (const read of readData ?? []) {
+
+            const current =
+                readCountMap.get(read.message_id) ?? 0;
+
+            readCountMap.set(
+                read.message_id,
+                current + 1,
+            );
+        }
+    }
+
     return rows.map((row, index) => {
         const membership = membershipMap.get(
             row.sender_membership_id,
@@ -480,17 +490,16 @@ async function hydrateMessages(
                     }
                     : null,
 
-            attachments:
-                attachmentMap.get(row.id) ?? [],
+            attachments: attachmentMap.get(row.id) ?? [],
+
+            // Nombre de membres ayant lu ce message.
+            readCount: readCountMap.get(row.id) ?? 0,
         };
     });
 }
 
 
-// =========================================================
 // NORMALISE LA RELATION profiles RETOURNÉE PAR SUPABASE
-// =========================================================
-
 function getProfile(
     profile: MembershipRow["profiles"] | undefined,
 ): { display_name: string } | null {
@@ -501,11 +510,8 @@ function getProfile(
         : profile;
 }
 
-// =========================================================
 // Décore les messages pour l'affichage.
 // Les séparateurs de dates sont calculés ici.
-// =========================================================
-
 export function decorateMessages(
     messages: ChatMessage[],
 ) {
@@ -546,10 +552,80 @@ export function decorateMessages(
     });
 }
 
-// =========================================================
-// FORMAT DES SÉPARATEURS DE DATE
-// =========================================================
+// RÉCUPÈRE LES IDs DES MESSAGES NON LUS
+type UnreadMessageRow = {
+    message_id: string;
+};
 
+export async function getUnreadMessageIds(
+    groupId: string,
+): Promise<string[]> {
+
+    const { data, error } = await supabase.rpc(
+        "get_unread_message_ids",
+        {
+            target_group_id: groupId,
+        },
+    );
+
+    if (error) {
+        throw error;
+    }
+
+    return (
+        (data ?? []) as UnreadMessageRow[]
+    ).map((row) => row.message_id);
+}
+
+
+// MARQUE TOUS LES MESSAGES DU GROUPE COMME LUS
+
+export async function markGroupMessagesAsRead(
+    groupId: string,
+): Promise<void> {
+
+    const { error } = await supabase.rpc(
+        "mark_group_messages_read",
+        {
+            target_group_id: groupId,
+        },
+    );
+
+    if (error) {
+        throw error;
+    }
+}
+
+// MARQUE UN NOUVEAU MESSAGE COMME LU
+// lorsqu'il arrive pendant que le chat est déjà ouvert
+export async function markMessageAsRead(
+    groupId: string,
+    messageId: string,
+): Promise<void> {
+
+    const membershipId =
+        await getMyMembershipId(groupId);
+
+    const { error } = await supabase
+        .from("message_reads")
+        .upsert(
+            {
+                message_id: messageId,
+                membership_id: membershipId,
+            },
+            {
+                onConflict:
+                    "message_id,membership_id",
+                ignoreDuplicates: true,
+            },
+        );
+
+    if (error) {
+        throw error;
+    }
+}
+
+// FORMAT DES SÉPARATEURS DE DATE
 export function formatMessageDate(date: Date): string {
     const today = new Date();
     const yesterday = new Date();
