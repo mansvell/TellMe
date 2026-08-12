@@ -1332,7 +1332,7 @@ export default function ChatPage() {
                             }
                             maxLength={40}
                             autoFocus
-                            placeholder="Ex. Projet RAG"
+                            placeholder="friendsTeam"
                             className="mt-2 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-slate-900 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-100"
                         />
 
