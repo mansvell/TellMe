@@ -308,15 +308,14 @@ export default function RegisterPage() {
                                 className="mt-1 h-5 w-5 accent-sky-500"
                             />
 
-                            <span className="text-sm leading-6 text-slate-600">
-                                J’accepte les conditions d’utilisation et la
-                                politique de confidentialité.
-                            </span>
+                            <p className="text-sm leading-6 text-slate-600"> J’accepte les
+                                <span onClick={() => navigate("/terms")}>conditions d’utilisation</span> et la
+                                <span onClick={() => navigate("/privacy")}>politique de confidentialité</span>.
+                            </p>
                         </label>
 
                         {errorMessage && (
-                            <div
-                                role="alert"
+                            <div role="alert"
                                 className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
                             >
                                 {errorMessage}

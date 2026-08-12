@@ -125,11 +125,7 @@ export default function SettingsPage() {
 
     // Thème sombre local.
     const [darkMode, setDarkMode] =
-        useState(() => {
-            return localStorage.getItem(
-                "tellme-theme",
-            ) === "dark";
-        });
+        useState(false);
 
     // Modification du pseudo.
     const [
@@ -164,9 +160,7 @@ export default function SettingsPage() {
         setErrorMessage,
     ] = useState("");
 
-    // Force le compteur du pseudo à se recalculer.
-    const [, setClock] =
-        useState(Date.now());
+    const [clock, setClock] = useState(0);
 
 
     // ========================================================
@@ -277,19 +271,15 @@ export default function SettingsPage() {
                     loadedProfile.notificationsEnabled,
                 );
 
-
                 // Charge l'autorisation d'invitation.
                 const allowInvitations =
                     await getInvitationsEnabled();
 
-
                 if (!active) return;
-
 
                 setInvitationsEnabled(
                     allowInvitations,
                 );
-
 
             } catch (error) {
 
@@ -298,16 +288,13 @@ export default function SettingsPage() {
                     error,
                 );
 
-
                 if (!active) return;
-
 
                 setErrorMessage(
                     "Impossible de charger les paramètres.",
                 );
 
             } finally {
-
                 if (active) {
 
                     setLoading(false);
@@ -315,9 +302,7 @@ export default function SettingsPage() {
             }
         }
 
-
         void loadSettings();
-
 
         return () => {
 
@@ -326,83 +311,43 @@ export default function SettingsPage() {
 
     }, [navigate]);
 
-
-    // ========================================================
     // COMPTEUR DU PSEUDO
-    // ========================================================
-
     useEffect(() => {
 
-        const interval =
-            window.setInterval(
-                () => {
+        const interval = window.setInterval(() => {
 
-                    setClock(
-                        Date.now(),
-                    );
+            setClock(Date.now());
 
-                },
-                60000,
-            );
-
+        }, 60000);
 
         return () => {
 
-            window.clearInterval(
-                interval,
-            );
+            window.clearInterval(interval);
+
         };
 
     }, []);
 
-
-    // ========================================================
     // THÈME
-    // ========================================================
-
     useEffect(() => {
-
         const root =
             document.documentElement;
 
-
         if (darkMode) {
-
-            root.classList.add(
-                "dark",
-            );
-
-            localStorage.setItem(
-                "tellme-theme",
-                "dark",
-            );
-
+            root.classList.add("dark");
         } else {
-
-            root.classList.remove(
-                "dark",
-            );
-
-            localStorage.setItem(
-                "tellme-theme",
-                "light",
-            );
+            root.classList.remove("dark");
         }
 
     }, [darkMode]);
 
-
-    // ========================================================
     // DATE DE CRÉATION
-    // ========================================================
-
     const memberSince =
         useMemo(() => {
 
             if (!profile) {
                 return "";
             }
-
 
             return new Date(
                 profile.createdAt,
@@ -415,20 +360,12 @@ export default function SettingsPage() {
                 },
             );
 
-        }, [profile]);
+        }, [profile, clock]);
 
-
-    // ========================================================
-    // PROCHAINE MODIFICATION DU PSEUDO
-    // ========================================================
-
+                             // PROCHAINE MODIFICATION DU PSEUDO
     const usernameAvailability =
         useMemo(() => {
-
-            if (
-                !profile?.usernameUpdatedAt
-            ) {
-
+            if (!profile?.usernameUpdatedAt) {
                 return {
                     canEdit: true,
                     text:
@@ -436,39 +373,21 @@ export default function SettingsPage() {
                 };
             }
 
+            const lastUpdate = new Date( profile.usernameUpdatedAt ).getTime();
 
-            const lastUpdate =
-                new Date(
-                    profile.usernameUpdatedAt,
-                ).getTime();
+            const delay = USERNAME_CHANGE_DELAY_DAYS * 24 * 60 * 60 * 1000;
 
+            const availableAt = lastUpdate + delay;
 
-            const delay =
-                USERNAME_CHANGE_DELAY_DAYS *
-                24 *
-                60 *
-                60 *
-                1000;
-
-
-            const availableAt =
-                lastUpdate + delay;
-
-
-            const remaining =
-                availableAt -
-                Date.now();
-
+            const remaining = availableAt - clock;
 
             if (remaining <= 0) {
-
                 return {
                     canEdit: true,
                     text:
                         "Modifiable maintenant",
                 };
             }
-
 
             const days =
                 Math.floor(
@@ -480,7 +399,6 @@ export default function SettingsPage() {
                         24
                     ),
                 );
-
 
             const hours =
                 Math.floor(
@@ -500,7 +418,6 @@ export default function SettingsPage() {
                     ),
                 );
 
-
             const minutes =
                 Math.floor(
                     (
@@ -517,9 +434,7 @@ export default function SettingsPage() {
                     ),
                 );
 
-
             if (days > 0) {
-
                 return {
                     canEdit: false,
                     text:
@@ -527,16 +442,13 @@ export default function SettingsPage() {
                 };
             }
 
-
             if (hours > 0) {
-
                 return {
                     canEdit: false,
                     text:
                         `${hours} h ${minutes} min`,
                 };
             }
-
 
             return {
                 canEdit: false,
@@ -546,31 +458,19 @@ export default function SettingsPage() {
 
         }, [
             profile,
+            clock,
         ]);
 
-
-    // ========================================================
     // MODIFIE LES NOTIFICATIONS
-    // ========================================================
-
-    async function handleNotifications(
-        enabled: boolean,
-    ) {
+    async function handleNotifications(enabled: boolean) {
 
         if (!profile) return;
 
+        const previousValue = notificationsEnabled;
 
-        const previousValue =
-            notificationsEnabled;
+        setNotificationsEnabled(enabled);
 
-
-        setNotificationsEnabled(
-            enabled,
-        );
-
-        setSavingNotifications(
-            true,
-        );
+        setSavingNotifications(true);
 
         setErrorMessage("");
 
@@ -637,11 +537,7 @@ export default function SettingsPage() {
         }
     }
 
-
-    // ========================================================
     // MODIFIE LES AUTORISATIONS D'INVITATION
-    // ========================================================
-
     async function handleInvitations(
         enabled: boolean,
     ) {
@@ -693,11 +589,6 @@ export default function SettingsPage() {
         }
     }
 
-
-    // ========================================================
-    // OUVRE LA MODIFICATION DU PSEUDO
-    // ========================================================
-
     function openUsernameModal() {
 
         if (
@@ -707,23 +598,14 @@ export default function SettingsPage() {
             return;
         }
 
-
-        setNewUsername(
-            profile.displayName,
-        );
+        setNewUsername(profile.displayName);
 
         setErrorMessage("");
 
-        setShowUsernameModal(
-            true,
-        );
+        setShowUsernameModal(true);
     }
 
-
-    // ========================================================
     // ENREGISTRE LE NOUVEAU PSEUDO
-    // ========================================================
-
     async function handleUsernameSave(
         event:
             React.FormEvent<HTMLFormElement>,
@@ -784,40 +666,29 @@ export default function SettingsPage() {
 
 
         try {
-
-            const updatedAt =
-                new Date().toISOString();
-
-
-            const { error } =
-                await supabase
-                    .from("profiles")
-                    .update({
-                        display_name:
-                        cleanUsername,
-
-                        username_updated_at:
-                        updatedAt,
-                    })
-                    .eq(
-                        "id",
-                        profile.id,
-                    );
-
+            const {
+                error,
+            } = await supabase.rpc(
+                "update_my_username",
+                {
+                    new_display_name:
+                    cleanUsername,
+                },
+            );
 
             if (error) {
                 throw error;
             }
 
+// Date utilisée immédiatement par l'interface.
+// PostgreSQL possède également sa propre date avec now().
+            const updatedAt =
+                new Date().toISOString();
 
-            setProfile(
-                current => {
-
+            setProfile(current => {
                     if (!current) {
                         return current;
                     }
-
-
                     return {
                         ...current,
 
@@ -829,13 +700,7 @@ export default function SettingsPage() {
                     };
                 },
             );
-
-
-            setShowUsernameModal(
-                false,
-            );
-
-
+            setShowUsernameModal(false);
         } catch (error) {
 
             console.error(
@@ -858,11 +723,7 @@ export default function SettingsPage() {
         }
     }
 
-
-    // ========================================================
     // DÉCONNEXION
-    // ========================================================
-
     async function handleLogout() {
 
         setLoggingOut(
@@ -910,11 +771,7 @@ export default function SettingsPage() {
         }
     }
 
-
-    // ========================================================
     // CHARGEMENT
-    // ========================================================
-
     if (loading) {
 
         return (
@@ -930,11 +787,7 @@ export default function SettingsPage() {
         );
     }
 
-
-    // ========================================================
-    // PROFIL INTROUVABLE
-    // ========================================================
-
+    // PROFIL INTROUVABLe
     if (!profile) {
 
         return (
@@ -962,19 +815,9 @@ export default function SettingsPage() {
         );
     }
 
-
-    // ========================================================
-    // PAGE
-    // ========================================================
-
     return (
 
         <main className="min-h-screen bg-slate-100 pb-28 dark:bg-slate-950">
-
-
-            {/* ==================================================
-                HEADER
-            ================================================== */}
 
             <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
 
@@ -1144,45 +987,20 @@ export default function SettingsPage() {
 
 
                     <SwitchRow
-                        icon={
-                            <Moon
-                                size={21}
-                            />
-                        }
-
+                        icon={<Moon size={21}/>}
                         title="Thème sombre"
-
                         description="Utiliser une apparence sombre dans TellMe."
-
-                        checked={
-                            darkMode
-                        }
-
-                        onChange={
-                            setDarkMode
-                        }
+                        checked={darkMode}
+                        onChange={setDarkMode}
                     />
 
 
                     <SwitchRow
-                        icon={
-                            <ShieldCheck
-                                size={21}
-                            />
-                        }
-
+                        icon={<ShieldCheck size={21}/>}
                         title="Autoriser les invitations"
-
                         description="Les membres de tes groupes peuvent t'inviter dans une conversation privée."
-
-                        checked={
-                            invitationsEnabled
-                        }
-
-                        loading={
-                            savingInvitations
-                        }
-
+                        checked={invitationsEnabled}
+                        loading={savingInvitations}
                         onChange={
                             value =>
                                 void handleInvitations(
@@ -1193,119 +1011,62 @@ export default function SettingsPage() {
 
                 </div>
 
-
-                {/* ==================================================
-                    LANGUE
-                ================================================== */}
+                {/* LANGUE*/}
 
                 <SettingsTitle>
                     Application
                 </SettingsTitle>
 
-
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
-
                     <Row
                         disabled
-
-                        icon={
-                            <Languages
-                                size={21}
-                            />
-                        }
-
+                         icon={<Languages size={21}/>}
                         title="Langue"
-
-                        value="Bientôt"
-
+                        value="Bientôt disponible"
                         description="D'autres langues seront disponibles prochainement."
                     />
 
                 </div>
 
 
-                {/* ==================================================
-                    INFORMATIONS
-                ================================================== */}
-
+                {/*INFORMATIONS */}
                 <SettingsTitle>
                     Informations
                 </SettingsTitle>
 
-
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
-
                     <Row
-                        icon={
-                            <Shield
-                                size={21}
-                            />
-                        }
-
+                        icon={<Shield size={21}/>}
                         title="Politique de confidentialité"
-
                         description="Découvre comment TellMe protège tes informations."
-
-                        onClick={() =>
-                            navigate(
-                                "/privacy",
-                            )
-                        }
+                        onClick={() => navigate("/privacy")}
                     />
 
-
-                    <Row
-                        icon={
-                            <FileText
-                                size={21}
-                            />
-                        }
-
+                    <Row icon={<FileText size={21}/>}
                         title="Conditions d'utilisation"
-
                         description="Règles et conditions d'utilisation de TellMe."
-
-                        onClick={() =>
-                            navigate(
-                                "/terms",
-                            )
-                        }
+                        onClick={() => navigate("/terms")}
                     />
-
 
                     <Row
                         title="Version"
-
                         value="1.0.0"
-
                         disabled
                     />
 
                 </div>
 
-
-                {/* ==================================================
-                    DÉCONNEXION
-                ================================================== */}
-
                 <button
                     type="button"
-
                     onClick={() =>
                         setShowLogoutModal(
                             true,
                         )
                     }
-
                     className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-50 font-bold text-red-600 transition hover:bg-red-100 active:scale-[0.99] dark:bg-red-950/30 dark:text-red-400"
                 >
-
-                    <LogOut
-                        size={20}
-                    />
-
+                    <LogOut size={20}/>
                     Déconnexion
-
                 </button>
 
 
@@ -1314,11 +1075,6 @@ export default function SettingsPage() {
                 </p>
 
             </section>
-
-
-            {/* ==================================================
-                MODAL PSEUDO
-            ================================================== */}
 
             {showUsernameModal && (
 
@@ -1358,7 +1114,7 @@ export default function SettingsPage() {
                                 </h2>
 
                                 <p className="mt-1 text-sm leading-5 text-slate-500">
-                                    Après modification, tu devras attendre {USERNAME_CHANGE_DELAY_DAYS} jours avant de pouvoir le changer à nouveau.
+                                    Après modification, vous devrez attendre {USERNAME_CHANGE_DELAY_DAYS} jours avant de pouvoir le changer à nouveau.
                                 </p>
 
                             </div>

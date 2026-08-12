@@ -41,10 +41,6 @@ export default function App() {
 
           <Route path="/invit" element={<InvitationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route
-              path="*"
-              element={<Navigate to="/" replace />}
-          />
           <Route path="/join" element={<JoinByLinkPage/>} />
           <Route path="/join/preview" element={<JoinPreviewPage/>} />
           <Route
@@ -54,6 +50,7 @@ export default function App() {
           <Route path="/privacy" element={<PrivacyPage/>}/>
            <Route path="/terms" element={<TermsPage/>}/>
 
+          <Route path="*" element={<Navigate to="/" replace />}/>
 
       </Routes>
 
