@@ -35,7 +35,7 @@ import {
     sendMessage,
     type ChatMessage,
 } from "../services/messages";
-
+import { sendChatInvitation } from "../services/invitations";
 
 // ======================================================
 // TYPES
@@ -54,10 +54,6 @@ type ChatGroup = {
     members: number;
 };
 
-
-// ======================================================
-// CHAT PAGE
-// ======================================================
 
 export default function ChatPage() {
 
@@ -119,11 +115,7 @@ export default function ChatPage() {
     const messagesEndRef =
         useRef<HTMLDivElement | null>(null);
 
-
-    // ======================================================
     // CHARGE LES INFORMATIONS DU GROUPE
-    // ======================================================
-
     useEffect(() => {
 
         async function loadGroup() {
@@ -167,12 +159,7 @@ export default function ChatPage() {
 
     }, [groupId]);
 
-
-    // ======================================================
-    // RECALCULE LES SÉPARATEURS DE DATE
-    // "Aujourd'hui" apparaît uniquement au premier message.
-    // ======================================================
-
+    // RECALCULE LES SÉPARATEURS DE DATE  "Aujourd'hui" apparaît uniquement au premier message.
     function updateMessageDates(
         currentMessages: ChatMessage[],
     ): ChatMessage[] {
@@ -210,22 +197,14 @@ export default function ChatPage() {
         );
     }
 
-
-    // ======================================================
     // CHARGEMENT INITIAL + REALTIME
-    // ======================================================
-
     useEffect(() => {
 
         if (!groupId) return;
 
         let active = true;
 
-
-        // --------------------------------------------------
         // Charge les messages + détecte les non lus.
-        // --------------------------------------------------
-
         Promise.all([
             getMessages(groupId),
             getUnreadMessageIds(groupId),
@@ -281,20 +260,13 @@ export default function ChatPage() {
             });
 
 
-        // --------------------------------------------------
         // CHANNEL REALTIME DU CHAT
-        // --------------------------------------------------
-
         const channel = supabase
             .channel(
                 `chat:${groupId}`,
             )
 
-
-            // ----------------------------------------------
             // NOUVEAU MESSAGE
-            // ----------------------------------------------
-
             .on(
                 "postgres_changes",
                 {
@@ -364,12 +336,7 @@ export default function ChatPage() {
                 },
             )
 
-
-            // ----------------------------------------------
-            // UN MEMBRE A LU UN MESSAGE
-            // ----------------------------------------------
-
-            .on(
+            .on(             // UN MEMBRE A LU UN MESSAGE
                 "postgres_changes",
                 {
                     event: "INSERT",
@@ -418,11 +385,7 @@ export default function ChatPage() {
                 },
             )
 
-
-            // ----------------------------------------------
             // ACTIVE LE CHANNEL
-            // ----------------------------------------------
-
             .subscribe(
                 (status, error) => {
 
@@ -437,11 +400,7 @@ export default function ChatPage() {
                 },
             );
 
-
-        // --------------------------------------------------
         // CLEANUP
-        // --------------------------------------------------
-
         return () => {
 
             active = false;
@@ -453,10 +412,7 @@ export default function ChatPage() {
 
     }, [groupId]);
 
-
-    // ======================================================
     // SCROLL AUTOMATIQUE
-    // ======================================================
 
     useEffect(() => {
 
@@ -467,10 +423,7 @@ export default function ChatPage() {
     }, [messages]);
 
 
-    // ======================================================
     // MENU CONTEXTUEL
-    // ======================================================
-
     function openMenu(
         x: number,
         y: number,
@@ -499,11 +452,7 @@ export default function ChatPage() {
         });
     }
 
-
-    // ======================================================
     // APPUI LONG MOBILE
-    // ======================================================
-
     function handleTouchStart(
         event: React.TouchEvent<HTMLDivElement>,
         message: ChatMessage,
@@ -593,8 +542,7 @@ export default function ChatPage() {
     }
 
 
-    // Pour l'instant garde ton frontend d'invitation.
-    function sendInvitation(
+    async function sendInvitation(
         event: React.FormEvent<HTMLFormElement>,
     ) {
 
@@ -607,17 +555,36 @@ export default function ChatPage() {
             return;
         }
 
-        console.log({
-            targetMessage:
-            inviteMessage,
+        try {
 
-            conversationName:
-                conversationName.trim(),
-        });
+            await sendChatInvitation(
 
-        setConversationName("");
+                inviteMessage.sender_membership_id,
 
-        setInviteMessage(null);
+                conversationName,
+
+            );
+
+            setConversationName("");
+
+            setInviteMessage(null);
+
+            alert(
+                "Invitation envoyée.",
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                error instanceof Error
+                    ? error.message
+                    : "Impossible d'envoyer l'invitation.",
+            );
+
+        }
+
     }
 
 

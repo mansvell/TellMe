@@ -15,6 +15,8 @@ import InvitationsPage from "./pages/InvitationsPage.tsx";
 import SettingsPage from "./pages/SettingsPage.tsx";
 import JoinByLinkPage from "./pages/joinByLinkpage.tsx";
 import JoinPreviewPage from "./pages/JoinPreviewPage.tsx";
+import TermsPage from "./pages/TermsPage.tsx";
+import PrivacyPage from "./pages/PrivacyPage.tsx";
 
 
 export default function App() {
@@ -49,6 +51,10 @@ export default function App() {
               path="/join/:inviteCode"
               element={<JoinPreviewPage />}
           />
+          <Route path="/privacy" element={<PrivacyPage/>}/>
+           <Route path="/terms" element={<TermsPage/>}/>
+
+
       </Routes>
 
   );

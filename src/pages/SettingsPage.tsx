@@ -1,42 +1,986 @@
 import {
-    ArrowLeft,
-    ChevronRight,
     Bell,
+    ChevronRight,
+    FileText,
     Languages,
-    UserPen,
-    Palette,
+    LoaderCircle,
+    LogOut,
+    Moon,
     Shield,
+    ShieldCheck,
+    UserPen,
+    X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+
+import {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+
+import {
+    useNavigate,
+} from "react-router-dom";
+
 import BottomNavigation from "../components/BottomNavigation.tsx";
+import { supabase } from "../lib/supabase";
+
+import {
+    getInvitationsEnabled,
+    updateInvitationsEnabled,
+} from "../services/invitations";
+
+
+// ============================================================
+// TYPES
+// ============================================================
+
+type ProfileSettings = {
+    id: string;
+    displayName: string;
+    profileColor: string;
+    createdAt: string;
+    usernameUpdatedAt: string | null;
+    notificationsEnabled: boolean;
+};
+
+
+type ProfileDatabaseRow = {
+    id: string;
+    display_name: string | null;
+    default_color: string | null;
+    created_at: string;
+    username_updated_at: string | null;
+    notifications_enabled: boolean | null;
+};
+
+
+type SwitchProps = {
+    icon: React.ReactNode;
+    title: string;
+    description?: string;
+    checked: boolean;
+    disabled?: boolean;
+    loading?: boolean;
+    onChange: (value: boolean) => void;
+};
+
+
+type RowProps = {
+    icon?: React.ReactNode;
+    title: string;
+    value?: string;
+    description?: string;
+    disabled?: boolean;
+    onClick?: () => void;
+};
+
+
+// ============================================================
+// CONSTANTES
+// ============================================================
+
+// Le pseudo peut être modifié tous les 14 jours.
+const USERNAME_CHANGE_DELAY_DAYS = 14;
+
+
+// ============================================================
+// PAGE
+// ============================================================
 
 export default function SettingsPage() {
 
-    const colors = [
-        "#0EA5E9",
-        "#22C55E",
-        "#F97316",
-        "#EC4899",
-        "#8B5CF6",
-        "#64748B",
-    ];
+    const navigate = useNavigate();
+
+    // Profil du user connecté.
+    const [profile, setProfile] =
+        useState<ProfileSettings | null>(null);
+
+    // Chargement initial.
+    const [loading, setLoading] =
+        useState(true);
+
+    // Notifications.
+    const [
+        notificationsEnabled,
+        setNotificationsEnabled,
+    ] = useState(true);
+
+    // Invitations.
+    const [
+        invitationsEnabled,
+        setInvitationsEnabled,
+    ] = useState(true);
+
+    // Sauvegarde des switches.
+    const [
+        savingNotifications,
+        setSavingNotifications,
+    ] = useState(false);
+
+    const [
+        savingInvitations,
+        setSavingInvitations,
+    ] = useState(false);
+
+    // Thème sombre local.
+    const [darkMode, setDarkMode] =
+        useState(() => {
+            return localStorage.getItem(
+                "tellme-theme",
+            ) === "dark";
+        });
+
+    // Modification du pseudo.
+    const [
+        showUsernameModal,
+        setShowUsernameModal,
+    ] = useState(false);
+
+    const [
+        newUsername,
+        setNewUsername,
+    ] = useState("");
+
+    const [
+        savingUsername,
+        setSavingUsername,
+    ] = useState(false);
+
+    // Déconnexion.
+    const [
+        showLogoutModal,
+        setShowLogoutModal,
+    ] = useState(false);
+
+    const [
+        loggingOut,
+        setLoggingOut,
+    ] = useState(false);
+
+    // Erreur générale.
+    const [
+        errorMessage,
+        setErrorMessage,
+    ] = useState("");
+
+    // Force le compteur du pseudo à se recalculer.
+    const [, setClock] =
+        useState(Date.now());
+
+
+    // ========================================================
+    // CHARGE LE PROFIL
+    // ========================================================
+
+    useEffect(() => {
+
+        let active = true;
+
+        async function loadSettings() {
+
+            try {
+
+                const {
+                    data: { user },
+                    error: userError,
+                } =
+                    await supabase.auth.getUser();
+
+
+                if (userError) {
+                    throw userError;
+                }
+
+
+                if (!user) {
+
+                    navigate(
+                        "/welcome",
+                        {
+                            replace: true,
+                        },
+                    );
+
+                    return;
+                }
+
+
+                const {
+                    data,
+                    error,
+                } =
+                    await supabase
+                        .from("profiles")
+                        .select(`
+                            id,
+                            display_name,
+                            default_color,
+                            created_at,
+                            username_updated_at,
+                            notifications_enabled
+                        `)
+                        .eq(
+                            "id",
+                            user.id,
+                        )
+                        .single();
+
+
+                if (error) {
+                    throw error;
+                }
+
+
+                const row =
+                    data as ProfileDatabaseRow;
+
+
+                if (!active) return;
+
+
+                const loadedProfile:
+                    ProfileSettings = {
+
+                    id:
+                    row.id,
+
+                    displayName:
+                        row.display_name ??
+                        "Utilisateur",
+
+                    profileColor:
+                        row.default_color ??
+                        "#0EA5E9",
+
+                    createdAt:
+                    row.created_at,
+
+                    usernameUpdatedAt:
+                    row.username_updated_at,
+
+                    notificationsEnabled:
+                        row.notifications_enabled ??
+                        true,
+                };
+
+
+                setProfile(
+                    loadedProfile,
+                );
+
+                setNewUsername(
+                    loadedProfile.displayName,
+                );
+
+                setNotificationsEnabled(
+                    loadedProfile.notificationsEnabled,
+                );
+
+
+                // Charge l'autorisation d'invitation.
+                const allowInvitations =
+                    await getInvitationsEnabled();
+
+
+                if (!active) return;
+
+
+                setInvitationsEnabled(
+                    allowInvitations,
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Settings loading error:",
+                    error,
+                );
+
+
+                if (!active) return;
+
+
+                setErrorMessage(
+                    "Impossible de charger les paramètres.",
+                );
+
+            } finally {
+
+                if (active) {
+
+                    setLoading(false);
+                }
+            }
+        }
+
+
+        void loadSettings();
+
+
+        return () => {
+
+            active = false;
+        };
+
+    }, [navigate]);
+
+
+    // ========================================================
+    // COMPTEUR DU PSEUDO
+    // ========================================================
+
+    useEffect(() => {
+
+        const interval =
+            window.setInterval(
+                () => {
+
+                    setClock(
+                        Date.now(),
+                    );
+
+                },
+                60000,
+            );
+
+
+        return () => {
+
+            window.clearInterval(
+                interval,
+            );
+        };
+
+    }, []);
+
+
+    // ========================================================
+    // THÈME
+    // ========================================================
+
+    useEffect(() => {
+
+        const root =
+            document.documentElement;
+
+
+        if (darkMode) {
+
+            root.classList.add(
+                "dark",
+            );
+
+            localStorage.setItem(
+                "tellme-theme",
+                "dark",
+            );
+
+        } else {
+
+            root.classList.remove(
+                "dark",
+            );
+
+            localStorage.setItem(
+                "tellme-theme",
+                "light",
+            );
+        }
+
+    }, [darkMode]);
+
+
+    // ========================================================
+    // DATE DE CRÉATION
+    // ========================================================
+
+    const memberSince =
+        useMemo(() => {
+
+            if (!profile) {
+                return "";
+            }
+
+
+            return new Date(
+                profile.createdAt,
+            ).toLocaleDateString(
+                "fr-FR",
+                {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                },
+            );
+
+        }, [profile]);
+
+
+    // ========================================================
+    // PROCHAINE MODIFICATION DU PSEUDO
+    // ========================================================
+
+    const usernameAvailability =
+        useMemo(() => {
+
+            if (
+                !profile?.usernameUpdatedAt
+            ) {
+
+                return {
+                    canEdit: true,
+                    text:
+                        "Modifiable maintenant",
+                };
+            }
+
+
+            const lastUpdate =
+                new Date(
+                    profile.usernameUpdatedAt,
+                ).getTime();
+
+
+            const delay =
+                USERNAME_CHANGE_DELAY_DAYS *
+                24 *
+                60 *
+                60 *
+                1000;
+
+
+            const availableAt =
+                lastUpdate + delay;
+
+
+            const remaining =
+                availableAt -
+                Date.now();
+
+
+            if (remaining <= 0) {
+
+                return {
+                    canEdit: true,
+                    text:
+                        "Modifiable maintenant",
+                };
+            }
+
+
+            const days =
+                Math.floor(
+                    remaining /
+                    (
+                        1000 *
+                        60 *
+                        60 *
+                        24
+                    ),
+                );
+
+
+            const hours =
+                Math.floor(
+                    (
+                        remaining %
+                        (
+                            1000 *
+                            60 *
+                            60 *
+                            24
+                        )
+                    ) /
+                    (
+                        1000 *
+                        60 *
+                        60
+                    ),
+                );
+
+
+            const minutes =
+                Math.floor(
+                    (
+                        remaining %
+                        (
+                            1000 *
+                            60 *
+                            60
+                        )
+                    ) /
+                    (
+                        1000 *
+                        60
+                    ),
+                );
+
+
+            if (days > 0) {
+
+                return {
+                    canEdit: false,
+                    text:
+                        `${days} j ${hours} h`,
+                };
+            }
+
+
+            if (hours > 0) {
+
+                return {
+                    canEdit: false,
+                    text:
+                        `${hours} h ${minutes} min`,
+                };
+            }
+
+
+            return {
+                canEdit: false,
+                text:
+                    `${minutes} min`,
+            };
+
+        }, [
+            profile,
+        ]);
+
+
+    // ========================================================
+    // MODIFIE LES NOTIFICATIONS
+    // ========================================================
+
+    async function handleNotifications(
+        enabled: boolean,
+    ) {
+
+        if (!profile) return;
+
+
+        const previousValue =
+            notificationsEnabled;
+
+
+        setNotificationsEnabled(
+            enabled,
+        );
+
+        setSavingNotifications(
+            true,
+        );
+
+        setErrorMessage("");
+
+
+        try {
+
+            const { error } =
+                await supabase
+                    .from("profiles")
+                    .update({
+                        notifications_enabled:
+                        enabled,
+                    })
+                    .eq(
+                        "id",
+                        profile.id,
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            setProfile(
+                current => {
+
+                    if (!current) {
+                        return current;
+                    }
+
+
+                    return {
+                        ...current,
+                        notificationsEnabled:
+                        enabled,
+                    };
+                },
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Notification settings error:",
+                error,
+            );
+
+
+            setNotificationsEnabled(
+                previousValue,
+            );
+
+
+            setErrorMessage(
+                "Impossible de modifier les notifications.",
+            );
+
+        } finally {
+
+            setSavingNotifications(
+                false,
+            );
+        }
+    }
+
+
+    // ========================================================
+    // MODIFIE LES AUTORISATIONS D'INVITATION
+    // ========================================================
+
+    async function handleInvitations(
+        enabled: boolean,
+    ) {
+
+        const previousValue =
+            invitationsEnabled;
+
+
+        setInvitationsEnabled(
+            enabled,
+        );
+
+        setSavingInvitations(
+            true,
+        );
+
+        setErrorMessage("");
+
+
+        try {
+
+            await updateInvitationsEnabled(
+                enabled,
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Invitation settings error:",
+                error,
+            );
+
+
+            setInvitationsEnabled(
+                previousValue,
+            );
+
+
+            setErrorMessage(
+                "Impossible de modifier les invitations.",
+            );
+
+        } finally {
+
+            setSavingInvitations(
+                false,
+            );
+        }
+    }
+
+
+    // ========================================================
+    // OUVRE LA MODIFICATION DU PSEUDO
+    // ========================================================
+
+    function openUsernameModal() {
+
+        if (
+            !profile ||
+            !usernameAvailability.canEdit
+        ) {
+            return;
+        }
+
+
+        setNewUsername(
+            profile.displayName,
+        );
+
+        setErrorMessage("");
+
+        setShowUsernameModal(
+            true,
+        );
+    }
+
+
+    // ========================================================
+    // ENREGISTRE LE NOUVEAU PSEUDO
+    // ========================================================
+
+    async function handleUsernameSave(
+        event:
+            React.FormEvent<HTMLFormElement>,
+    ) {
+
+        event.preventDefault();
+
+
+        if (!profile) return;
+
+
+        const cleanUsername =
+            newUsername.trim();
+
+
+        if (
+            cleanUsername.length < 2
+        ) {
+
+            setErrorMessage(
+                "Le pseudo doit contenir au moins 2 caractères.",
+            );
+
+            return;
+        }
+
+
+        if (
+            cleanUsername.length > 24
+        ) {
+
+            setErrorMessage(
+                "Le pseudo ne peut pas dépasser 24 caractères.",
+            );
+
+            return;
+        }
+
+
+        if (
+            cleanUsername ===
+            profile.displayName
+        ) {
+
+            setShowUsernameModal(
+                false,
+            );
+
+            return;
+        }
+
+
+        setSavingUsername(
+            true,
+        );
+
+        setErrorMessage("");
+
+
+        try {
+
+            const updatedAt =
+                new Date().toISOString();
+
+
+            const { error } =
+                await supabase
+                    .from("profiles")
+                    .update({
+                        display_name:
+                        cleanUsername,
+
+                        username_updated_at:
+                        updatedAt,
+                    })
+                    .eq(
+                        "id",
+                        profile.id,
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            setProfile(
+                current => {
+
+                    if (!current) {
+                        return current;
+                    }
+
+
+                    return {
+                        ...current,
+
+                        displayName:
+                        cleanUsername,
+
+                        usernameUpdatedAt:
+                        updatedAt,
+                    };
+                },
+            );
+
+
+            setShowUsernameModal(
+                false,
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Username update error:",
+                error,
+            );
+
+
+            setErrorMessage(
+                error instanceof Error
+                    ? error.message
+                    : "Impossible de modifier le pseudo.",
+            );
+
+        } finally {
+
+            setSavingUsername(
+                false,
+            );
+        }
+    }
+
+
+    // ========================================================
+    // DÉCONNEXION
+    // ========================================================
+
+    async function handleLogout() {
+
+        setLoggingOut(
+            true,
+        );
+
+        setErrorMessage("");
+
+
+        try {
+
+            const { error } =
+                await supabase.auth.signOut();
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            navigate(
+                "/welcome",
+                {
+                    replace: true,
+                },
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Logout error:",
+                error,
+            );
+
+
+            setErrorMessage(
+                "Impossible de se déconnecter.",
+            );
+
+
+            setLoggingOut(
+                false,
+            );
+        }
+    }
+
+
+    // ========================================================
+    // CHARGEMENT
+    // ========================================================
+
+    if (loading) {
+
+        return (
+
+            <main className="flex min-h-screen items-center justify-center bg-slate-100">
+
+                <LoaderCircle
+                    size={34}
+                    className="animate-spin text-sky-500"
+                />
+
+            </main>
+        );
+    }
+
+
+    // ========================================================
+    // PROFIL INTROUVABLE
+    // ========================================================
+
+    if (!profile) {
+
+        return (
+
+            <main className="flex min-h-screen items-center justify-center bg-slate-100 p-5">
+
+                <div className="max-w-md rounded-3xl bg-white p-8 text-center shadow-sm">
+
+                    <Shield
+                        size={34}
+                        className="mx-auto text-slate-400"
+                    />
+
+                    <h1 className="mt-4 text-xl font-bold text-slate-900">
+                        Profil indisponible
+                    </h1>
+
+                    <p className="mt-2 text-sm text-slate-500">
+                        Impossible de récupérer tes paramètres.
+                    </p>
+
+                </div>
+
+            </main>
+        );
+    }
+
+
+    // ========================================================
+    // PAGE
+    // ========================================================
 
     return (
 
-        <main className="min-h-screen bg-slate-100 py-12">
+        <main className="min-h-screen bg-slate-100 pb-28 dark:bg-slate-950">
 
-            <header className="fixed top-0 left-0 right-0 bg-white shadow-sm">
 
-                <div className="mx-auto flex h-16 max-w-4xl items-center gap-4 px-5">
+            {/* ==================================================
+                HEADER
+            ================================================== */}
 
-                    <Link to="/home">
+            <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
 
-                        <ArrowLeft/>
+                <div className="mx-auto flex h-16 max-w-4xl items-center justify-center px-5">
 
-                    </Link>
-
-                    <h1 className="text-xl font-bold">
+                    <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                         Paramètres
                     </h1>
 
@@ -44,152 +988,664 @@ export default function SettingsPage() {
 
             </header>
 
-            <section className="mx-auto max-w-4xl space-y-6 p-5">
 
-                <div className="rounded-3xl bg-white shadow-sm overflow-hidden">
+            {/* ==================================================
+                CONTENU
+            ================================================== */}
 
-                    <Row
-                        icon={<UserPen size={21}/>}
-                        title="Pseudo"
-                        value="Mansvell"
-                    />
+            <section className="mx-auto max-w-4xl space-y-5 p-4 sm:p-5">
 
-                    <div className="px-6 pb-5 text-sm text-slate-500">
 
-                        Tu pourras modifier ton pseudo dans
-                        <span className="font-semibold text-sky-600">
-                            {" "}4 jours
+                {/* ==================================================
+                    CARTE PROFIL
+                ================================================== */}
+
+                <div
+                    className="relative overflow-hidden rounded-[2rem] p-7 shadow-lg sm:p-9"
+                    style={{
+                        backgroundColor:
+                        profile.profileColor,
+                    }}
+                >
+
+                    {/* Décoration */}
+
+                    <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/10"/>
+
+                    <div className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-black/5"/>
+
+
+                    <div className="relative">
+
+                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/70">
+                            TellMe
+                        </p>
+
+
+                        <h2 className="mt-5 break-words text-3xl font-black tracking-tight text-white sm:text-4xl">
+                            {profile.displayName}
+                        </h2>
+
+
+                        <div className="mt-6 inline-flex rounded-full bg-black/10 px-4 py-2 backdrop-blur">
+
+                            <p className="text-xs font-medium text-white/90">
+                                Membre depuis le {memberSince}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {/* ==================================================
+                    ERREUR
+                ================================================== */}
+
+                {errorMessage && (
+
+                    <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+
+                        <X
+                            size={18}
+                            className="mt-0.5 shrink-0"
+                        />
+
+                        <span>
+                            {errorMessage}
                         </span>
 
                     </div>
 
-                </div>
+                )}
 
-                {/* Couleur */}
 
-                <div className="rounded-3xl bg-white p-6 shadow-sm">
+                {/* ==================================================
+                    COMPTE
+                ================================================== */}
 
-                    <div className="flex items-center gap-3">
+                <SettingsTitle>
+                    Compte
+                </SettingsTitle>
 
-                        <Palette
-                            className="text-sky-500"
-                            size={22}
-                        />
 
-                        <h2 className="font-bold">
-                            Couleur par défaut
-                        </h2>
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
 
-                    </div>
-
-                    <div className="grid grid-cols-6 gap-4 mt-6">
-
-                        {colors.map(color => (
-
-                            <button
-                                key={color}
-                                style={{background:color}}
-                                className="aspect-square rounded-full border-4 border-white shadow hover:scale-105 transition"
+                    <Row
+                        icon={
+                            <UserPen
+                                size={21}
                             />
+                        }
 
-                        ))}
+                        title="Pseudo"
 
-                    </div>
+                        value={
+                            profile.displayName
+                        }
 
-                </div>
+                        description={
+                            usernameAvailability.canEdit
+                                ? "Tu peux modifier ton pseudo."
+                                : `Prochaine modification dans ${usernameAvailability.text}.`
+                        }
 
-                {/* Notifications */}
+                        disabled={
+                            !usernameAvailability.canEdit
+                        }
 
-                <div className="rounded-3xl bg-white shadow-sm overflow-hidden">
-
-                    <SwitchRow
-                        icon={<Bell size={21}/>}
-                        title="Notifications"
-                        checked={true}
+                        onClick={
+                            openUsernameModal
+                        }
                     />
 
                 </div>
 
-                <div className="rounded-3xl bg-white shadow-sm overflow-hidden">
+
+                {/* ==================================================
+                    PRÉFÉRENCES
+                ================================================== */}
+
+                <SettingsTitle>
+                    Préférences
+                </SettingsTitle>
+
+
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
+
+                    <SwitchRow
+                        icon={
+                            <Bell
+                                size={21}
+                            />
+                        }
+
+                        title="Notifications"
+
+                        description="Recevoir les notifications des conversations."
+
+                        checked={
+                            notificationsEnabled
+                        }
+
+                        loading={
+                            savingNotifications
+                        }
+
+                        onChange={
+                            value =>
+                                void handleNotifications(
+                                    value,
+                                )
+                        }
+                    />
+
+
+                    <SwitchRow
+                        icon={
+                            <Moon
+                                size={21}
+                            />
+                        }
+
+                        title="Thème sombre"
+
+                        description="Utiliser une apparence sombre dans TellMe."
+
+                        checked={
+                            darkMode
+                        }
+
+                        onChange={
+                            setDarkMode
+                        }
+                    />
+
+
+                    <SwitchRow
+                        icon={
+                            <ShieldCheck
+                                size={21}
+                            />
+                        }
+
+                        title="Autoriser les invitations"
+
+                        description="Les membres de tes groupes peuvent t'inviter dans une conversation privée."
+
+                        checked={
+                            invitationsEnabled
+                        }
+
+                        loading={
+                            savingInvitations
+                        }
+
+                        onChange={
+                            value =>
+                                void handleInvitations(
+                                    value,
+                                )
+                        }
+                    />
+
+                </div>
+
+
+                {/* ==================================================
+                    LANGUE
+                ================================================== */}
+
+                <SettingsTitle>
+                    Application
+                </SettingsTitle>
+
+
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
 
                     <Row
                         disabled
-                        icon={<Languages size={21} />}
+
+                        icon={
+                            <Languages
+                                size={21}
+                            />
+                        }
+
                         title="Langue"
+
                         value="Bientôt"
+
+                        description="D'autres langues seront disponibles prochainement."
                     />
 
                 </div>
 
-                <div className="rounded-3xl bg-white shadow-sm overflow-hidden">
 
-                    <SwitchRow
-                        icon={<Shield size={21}/>}
-                        title="Autoriser les invitations"
-                        checked={true}
+                {/* ==================================================
+                    INFORMATIONS
+                ================================================== */}
+
+                <SettingsTitle>
+                    Informations
+                </SettingsTitle>
+
+
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
+
+                    <Row
+                        icon={
+                            <Shield
+                                size={21}
+                            />
+                        }
+
+                        title="Politique de confidentialité"
+
+                        description="Découvre comment TellMe protège tes informations."
+
+                        onClick={() =>
+                            navigate(
+                                "/privacy",
+                            )
+                        }
                     />
 
-                </div>
 
-                {/* A propos */}
+                    <Row
+                        icon={
+                            <FileText
+                                size={21}
+                            />
+                        }
 
-                <div className="rounded-3xl bg-white shadow-sm overflow-hidden">
+                        title="Conditions d'utilisation"
+
+                        description="Règles et conditions d'utilisation de TellMe."
+
+                        onClick={() =>
+                            navigate(
+                                "/terms",
+                            )
+                        }
+                    />
+
 
                     <Row
                         title="Version"
+
                         value="1.0.0"
-                    />
 
-                    <Row
-                        title="Conditions d'utilisation"
-                    />
-
-                    <Row
-                        title="Politique de confidentialité"
+                        disabled
                     />
 
                 </div>
 
-                <BottomNavigation active="settings"/>
+
+                {/* ==================================================
+                    DÉCONNEXION
+                ================================================== */}
+
+                <button
+                    type="button"
+
+                    onClick={() =>
+                        setShowLogoutModal(
+                            true,
+                        )
+                    }
+
+                    className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-50 font-bold text-red-600 transition hover:bg-red-100 active:scale-[0.99] dark:bg-red-950/30 dark:text-red-400"
+                >
+
+                    <LogOut
+                        size={20}
+                    />
+
+                    Déconnexion
+
+                </button>
+
+
+                <p className="pb-3 text-center text-xs leading-5 text-slate-400">
+                    TellMe protège ton anonymat dans les conversations.
+                </p>
 
             </section>
 
+
+            {/* ==================================================
+                MODAL PSEUDO
+            ================================================== */}
+
+            {showUsernameModal && (
+
+                <div
+                    className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-5"
+
+                    onClick={() =>
+                        !savingUsername &&
+                        setShowUsernameModal(
+                            false,
+                        )
+                    }
+                >
+
+                    <form
+                        onSubmit={
+                            event =>
+                                void handleUsernameSave(
+                                    event,
+                                )
+                        }
+
+                        onClick={
+                            event =>
+                                event.stopPropagation()
+                        }
+
+                        className="w-full max-w-md rounded-t-[2rem] bg-white p-6 shadow-2xl sm:rounded-[2rem] dark:bg-slate-900"
+                    >
+
+                        <div className="flex items-start justify-between gap-4">
+
+                            <div>
+
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    Modifier le pseudo
+                                </h2>
+
+                                <p className="mt-1 text-sm leading-5 text-slate-500">
+                                    Après modification, tu devras attendre {USERNAME_CHANGE_DELAY_DAYS} jours avant de pouvoir le changer à nouveau.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                type="button"
+
+                                disabled={
+                                    savingUsername
+                                }
+
+                                onClick={() =>
+                                    setShowUsernameModal(
+                                        false,
+                                    )
+                                }
+
+                                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
+                            >
+
+                                <X
+                                    size={18}
+                                />
+
+                            </button>
+
+                        </div>
+
+
+                        <label className="mt-6 block">
+
+                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                Nouveau pseudo
+                            </span>
+
+
+                            <input
+                                autoFocus
+
+                                type="text"
+
+                                value={
+                                    newUsername
+                                }
+
+                                maxLength={24}
+
+                                disabled={
+                                    savingUsername
+                                }
+
+                                onChange={
+                                    event =>
+                                        setNewUsername(
+                                            event.target.value,
+                                        )
+                                }
+
+                                placeholder="Ton pseudo"
+
+                                className="mt-2 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-sky-900/30"
+                            />
+
+                        </label>
+
+
+                        <div className="mt-2 flex justify-between text-xs text-slate-400">
+
+                            <span>
+                                2 caractères minimum
+                            </span>
+
+                            <span>
+                                {newUsername.length}/24
+                            </span>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+
+                            disabled={
+                                savingUsername ||
+                                newUsername.trim().length <
+                                2
+                            }
+
+                            className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white transition hover:bg-sky-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300"
+                        >
+
+                            {savingUsername && (
+
+                                <LoaderCircle
+                                    size={19}
+                                    className="animate-spin"
+                                />
+
+                            )}
+
+                            Enregistrer
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            )}
+
+
+            {/* ==================================================
+                MODAL DÉCONNEXION
+            ================================================== */}
+
+            {showLogoutModal && (
+
+                <div
+                    className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-5"
+
+                    onClick={() =>
+                        !loggingOut &&
+                        setShowLogoutModal(
+                            false,
+                        )
+                    }
+                >
+
+                    <div
+                        onClick={
+                            event =>
+                                event.stopPropagation()
+                        }
+
+                        className="w-full max-w-md rounded-t-[2rem] bg-white p-6 shadow-2xl sm:rounded-[2rem] dark:bg-slate-900"
+                    >
+
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400">
+
+                            <LogOut
+                                size={22}
+                            />
+
+                        </div>
+
+
+                        <h2 className="mt-5 text-xl font-bold text-slate-900 dark:text-white">
+                            Se déconnecter ?
+                        </h2>
+
+
+                        <p className="mt-2 text-sm leading-6 text-slate-500">
+                            Tu devras te reconnecter pour retrouver tes groupes et tes conversations.
+                        </p>
+
+
+                        <div className="mt-6 grid grid-cols-2 gap-3">
+
+                            <button
+                                type="button"
+
+                                disabled={
+                                    loggingOut
+                                }
+
+                                onClick={() =>
+                                    setShowLogoutModal(
+                                        false,
+                                    )
+                                }
+
+                                className="h-12 rounded-2xl bg-slate-100 font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"
+                            >
+                                Annuler
+                            </button>
+
+
+                            <button
+                                type="button"
+
+                                disabled={
+                                    loggingOut
+                                }
+
+                                onClick={() =>
+                                    void handleLogout()
+                                }
+
+                                className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-500 font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
+                            >
+
+                                {loggingOut && (
+
+                                    <LoaderCircle
+                                        size={18}
+                                        className="animate-spin"
+                                    />
+
+                                )}
+
+                                Déconnexion
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            )}
+
+
+            <BottomNavigation
+                active="settings"
+            />
+
         </main>
-
     );
-
 }
 
-type RowProps = {
-    icon?: React.ReactNode;
-    title: string;
-    value?: string;
-    disabled?: boolean;
-};
+
+// ============================================================
+// TITRE DE SECTION
+// ============================================================
+
+function SettingsTitle({
+                           children,
+                       }: {
+    children: React.ReactNode;
+}) {
+
+    return (
+
+        <h2 className="px-2 pt-1 text-xs font-bold uppercase tracking-[0.16em] text-slate-400">
+            {children}
+        </h2>
+
+    );
+}
+
+
+// ============================================================
+// ROW
+// ============================================================
 
 function Row({
                  icon,
                  title,
                  value,
+                 description,
                  disabled = false,
+                 onClick,
              }: RowProps) {
 
     return (
 
         <button
-            disabled={disabled}
-            className={`w-full flex items-center justify-between px-6 py-5 border-b last:border-0 transition ${
+            type="button"
+
+            disabled={
                 disabled
-                    ? "cursor-not-allowed bg-slate-50 text-slate-400"
-                    : "hover:bg-slate-50"
+            }
+
+            onClick={
+                onClick
+            }
+
+            className={`flex w-full items-center justify-between gap-4 border-b border-slate-100 px-5 py-5 text-left transition last:border-0 dark:border-slate-800 ${
+                disabled
+                    ? "cursor-default"
+                    : "hover:bg-slate-50 active:bg-slate-100 dark:hover:bg-slate-800/60"
             }`}
         >
 
-            <div className="flex items-center gap-4">
+            <div className="flex min-w-0 items-center gap-4">
 
                 {icon && (
 
-                    <div className={disabled ? "text-slate-300" : "text-sky-500"}>
+                    <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                            disabled
+                                ? "bg-slate-100 text-slate-300 dark:bg-slate-800"
+                                : "bg-sky-50 text-sky-500 dark:bg-sky-950/40"
+                        }`}
+                    >
 
                         {icon}
 
@@ -197,31 +1653,55 @@ function Row({
 
                 )}
 
-                <span className="font-medium">
 
-                    {title}
+                <div className="min-w-0">
 
-                </span>
+                    <p
+                        className={`font-semibold ${
+                            disabled
+                                ? "text-slate-400"
+                                : "text-slate-800 dark:text-slate-100"
+                        }`}
+                    >
+                        {title}
+                    </p>
+
+
+                    {description && (
+
+                        <p className="mt-1 text-xs leading-5 text-slate-400">
+                            {description}
+                        </p>
+
+                    )}
+
+                </div>
 
             </div>
 
-            <div className="flex items-center gap-3">
+
+            <div className="flex shrink-0 items-center gap-2">
 
                 {value && (
 
-                    <span>
-
+                    <span
+                        className={`max-w-32 truncate text-sm ${
+                            disabled
+                                ? "text-slate-400"
+                                : "text-slate-500 dark:text-slate-300"
+                        }`}
+                    >
                         {value}
-
                     </span>
 
                 )}
+
 
                 {!disabled && (
 
                     <ChevronRight
                         size={18}
-                        className="text-slate-400"
+                        className="text-slate-300"
                     />
 
                 )}
@@ -231,61 +1711,110 @@ function Row({
         </button>
 
     );
-
 }
 
-type SwitchProps={
-    icon:React.ReactNode;
-    title:string;
-    checked:boolean;
-}
 
-function SwitchRow({ icon, title, checked }: SwitchProps) {
+// ============================================================
+// SWITCH ROW
+// ============================================================
 
-    const [enabled, setEnabled] = useState(checked);
+function SwitchRow({
+                       icon,
+                       title,
+                       description,
+                       checked,
+                       disabled = false,
+                       loading = false,
+                       onChange,
+                   }: SwitchProps) {
 
     return (
 
-        <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-5 last:border-0 dark:border-slate-800">
 
-            <div className="flex items-center gap-4">
+            <div className="flex min-w-0 items-center gap-4">
 
-                <div className="text-sky-500">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-500 dark:bg-sky-950/40">
 
                     {icon}
 
                 </div>
 
-                <span className="font-medium">
 
-                    {title}
+                <div>
 
-                </span>
+                    <p className="font-semibold text-slate-800 dark:text-slate-100">
+                        {title}
+                    </p>
+
+
+                    {description && (
+
+                        <p className="mt-1 max-w-lg text-xs leading-5 text-slate-400">
+                            {description}
+                        </p>
+
+                    )}
+
+                </div>
 
             </div>
 
+
             <button
                 type="button"
-                onClick={() => setEnabled(!enabled)}
-                className={`relative h-8 w-14 rounded-full transition-all duration-300 ${
-                    enabled
+
+                role="switch"
+
+                aria-checked={
+                    checked
+                }
+
+                disabled={
+                    disabled ||
+                    loading
+                }
+
+                onClick={() =>
+                    onChange(
+                        !checked,
+                    )
+                }
+
+                className={`relative h-8 w-14 shrink-0 rounded-full transition-all duration-300 ${
+                    checked
                         ? "bg-sky-500"
-                        : "bg-slate-300"
+                        : "bg-slate-300 dark:bg-slate-700"
+                } ${
+                    disabled ||
+                    loading
+                        ? "cursor-not-allowed opacity-60"
+                        : ""
                 }`}
             >
 
-                <span
-                    className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-all duration-300 ${
-                        enabled
-                            ? "left-7"
-                            : "left-1"
-                    }`}
-                />
+                {loading ? (
+
+                    <LoaderCircle
+                        size={16}
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 animate-spin text-white"
+                    />
+
+                ) : (
+
+                    <span
+                        className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow-md transition-all duration-300 ${
+                            checked
+                                ? "left-7"
+                                : "left-1"
+                        }`}
+                    />
+
+                )}
 
             </button>
 
         </div>
 
     );
-
 }

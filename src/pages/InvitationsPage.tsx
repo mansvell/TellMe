@@ -1,28 +1,8 @@
-import {
-    ArrowLeft,
-    Check,
-    CheckCircle2,
-    Clock3,
-    LoaderCircle,
-    MessageCircle,
-    ShieldOff,
-    X,
-    XCircle,
-} from "lucide-react";
+import { Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, X, XCircle} from "lucide-react";
 
-import {
-    Link,
-    useNavigate,
-} from "react-router-dom";
-
-import {
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
-
+import {useNavigate} from "react-router-dom";
+import {useEffect, useMemo, useState} from "react";
 import BottomNavigation from "../components/BottomNavigation";
-
 import { supabase } from "../lib/supabase";
 
 import {
@@ -33,32 +13,21 @@ import {
     rejectChatInvitation,
     type ChatInvitation,
 } from "../services/invitations";
-
-
-// ======================================================
-// TYPES
-// ======================================================
+import icon from "../assets/icon.png";
 
 type InvitationTab =
     | "pending"
     | "accepted"
     | "rejected";
 
-
-// ======================================================
-// PAGE
-// ======================================================
-
 export default function InvitationsPage() {
+    const navigate = useNavigate();
 
-    const navigate =
-        useNavigate();
-
-    // Toutes les invitations reçues + envoyées.
+    //Toutes les invitations reçues + envoyées.
     const [invitations, setInvitations] =
         useState<ChatInvitation[]>([]);
 
-    // Onglet actuellement sélectionné.
+    //Onglet actuellement sélectionné.
     const [activeTab, setActiveTab] =
         useState<InvitationTab>("pending");
 
@@ -74,32 +43,22 @@ export default function InvitationsPage() {
     const [errorMessage, setErrorMessage] =
         useState("");
 
-
-    // ======================================================
     // CHARGE LES INVITATIONS + REALTIME
-    // ======================================================
-
     useEffect(() => {
-
         let active = true;
-
 
         // Charge toutes les invitations.
         async function loadInvitations() {
 
             try {
-
                 const data =
                     await getMyChatInvitations();
 
                 if (!active) return;
-
                 setInvitations(data);
-
                 setLoading(false);
 
             } catch (error) {
-
                 console.error(
                     "Invitations loading error:",
                     error,
@@ -115,19 +74,9 @@ export default function InvitationsPage() {
             }
         }
 
-
         void loadInvitations();
 
-
-        // ==================================================
-        // REALTIME
-        //
-        // Recharge la liste dès qu'une invitation :
-        // - est créée
-        // - acceptée
-        // - refusée
-        // ==================================================
-
+        // Recharge la liste dès qu'une invitation : - est créée - acceptée - refusée
         const channel =
             supabase
                 .channel(
@@ -144,9 +93,7 @@ export default function InvitationsPage() {
                     },
 
                     async () => {
-
                         try {
-
                             const data =
                                 await getMyChatInvitations();
 
@@ -157,20 +104,14 @@ export default function InvitationsPage() {
                             );
 
                         } catch (error) {
-
-                            console.error(
-                                "Invitations realtime error:",
-                                error,
-                            );
+                            console.error("Invitations realtime error:", error);
                         }
                     },
                 )
-
                 .subscribe(
                     (status, error) => {
 
                         if (error) {
-
                             console.error(
                                 "Invitation realtime subscription error:",
                                 status,
@@ -180,11 +121,9 @@ export default function InvitationsPage() {
                     },
                 );
 
-
         return () => {
 
             active = false;
-
             void supabase.removeChannel(
                 channel,
             );
@@ -192,11 +131,7 @@ export default function InvitationsPage() {
 
     }, []);
 
-
-    // ======================================================
     // COMPTEURS
-    // ======================================================
-
     const pendingCount =
         useMemo(
             () =>
@@ -234,11 +169,7 @@ export default function InvitationsPage() {
             [invitations],
         );
 
-
-    // ======================================================
     // INVITATIONS AFFICHÉES DANS L'ONGLET ACTUEL
-    // ======================================================
-
     const visibleInvitations =
         useMemo(() => {
 
@@ -253,18 +184,13 @@ export default function InvitationsPage() {
                 );
             }
 
-
-            if (
-                activeTab === "accepted"
-            ) {
-
+            if ( activeTab === "accepted") {
                 return invitations.filter(
                     (invitation) =>
                         invitation.status ===
                         "accepted",
                 );
             }
-
 
             return invitations.filter(
                 (invitation) =>
@@ -279,11 +205,7 @@ export default function InvitationsPage() {
             activeTab,
         ]);
 
-
-    // ======================================================
     // ACCEPTER UNE INVITATION
-    // ======================================================
-
     async function handleAccept(
         invitation: ChatInvitation,
     ) {
@@ -293,14 +215,11 @@ export default function InvitationsPage() {
         );
 
         setErrorMessage("");
-
         try {
-
             const groupId =
                 await acceptChatInvitation(
                     invitation.id,
                 );
-
 
             // Recharge les invitations immédiatement.
             const refreshed =
@@ -310,19 +229,16 @@ export default function InvitationsPage() {
                 refreshed,
             );
 
-
             // Ouvre directement le nouveau groupe.
             navigate(
                 `/chat/${groupId}`,
             );
 
         } catch (error) {
-
             console.error(
                 "Accept invitation error:",
                 error,
             );
-
             setErrorMessage(
                 error instanceof Error
                     ? error.message
@@ -330,16 +246,10 @@ export default function InvitationsPage() {
             );
 
         } finally {
-
             setProcessingId(null);
         }
     }
-
-
-    // ======================================================
-    // REFUSER UNE INVITATION
-    // ======================================================
-
+                                         // REFUSER UNE INVITATION
     async function handleReject(
         invitation: ChatInvitation,
     ) {
@@ -383,85 +293,38 @@ export default function InvitationsPage() {
         }
     }
 
-
-    // ======================================================
     // OUVRIR UNE CONVERSATION ACCEPTÉE
-    // ======================================================
-
-    function openConversation(
-        invitation: ChatInvitation,
-    ) {
-
-        if (
-            !invitation.createdGroupId
-        ) {
+    function openConversation(invitation: ChatInvitation) {
+        if ( !invitation.createdGroupId ) {
             return;
         }
-
-        navigate(
-            `/chat/${invitation.createdGroupId}`,
-        );
+        navigate(`/chat/${invitation.createdGroupId}`);
     }
 
-
-    // ======================================================
-    // JSX
-    // ======================================================
-
     return (
-
         <main className="min-h-screen bg-slate-100 pb-28">
-
-
-            {/* ==================================================
-                HEADER
-            ================================================== */}
 
             <header className="sticky top-0 z-20 border-b border-slate-200 bg-white">
 
-                <div className="mx-auto flex h-16 max-w-5xl items-center gap-4 px-5">
+                    <div className="flex items-center justify-center gap-3 p-2">
 
-                    <Link
-                        to="/home"
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
-                    >
-                        <ArrowLeft
-                            size={22}
+                        <img
+                            src={icon}
+                            alt=""
+                            className="w-15 h-12 rounded-2xl"
                         />
-                    </Link>
-
-
-                    <div>
-
                         <h1 className="text-xl font-bold text-slate-900">
                             Invitations
                         </h1>
-
-                        <p className="text-xs text-slate-400">
-                            Gère tes demandes de conversation
-                        </p>
-
                     </div>
-
-                </div>
 
             </header>
 
-
-            {/* ==================================================
-                CONTENU
-            ================================================== */}
-
             <section className="mx-auto max-w-5xl p-4 sm:p-5">
+                <div
+                    className="rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-lg shadow-sky-100 sm:p-7">
 
-
-                {/* ==================================================
-                    INTRO
-                ================================================== */}
-
-                <div className="rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-lg shadow-sky-100 sm:p-7">
-
-                    <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4">
 
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
 

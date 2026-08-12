@@ -45,10 +45,7 @@ export default function HomePage() {
     return (
 
         <main className="min-h-screen bg-slate-50 flex flex-col">
-
-
             <header className="bg-white px-5 pt-5 pb-4 shadow-sm">
-
                 <div className="flex items-center justify-between">
 
                     <div className="flex items-center gap-3">
@@ -59,18 +56,9 @@ export default function HomePage() {
                             className="w-15 h-12 rounded-2xl"
                         />
 
-                        <div>
-
-                            <p className="text-slate-500 text-sm">
-                                TellMe
-                            </p>
-
-                            <h1 className="font-bold text-2xl">
-                                UserName
-                            </h1>
-
-                        </div>
-
+                        <h1 className="font-bold text-2xl">
+                            TellMe
+                        </h1>
                     </div>
 
                     <button className="relative w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center">

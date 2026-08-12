@@ -447,8 +447,7 @@ async function hydrateMessages(
         return {
             id: row.id,
             group_id: row.group_id,
-            sender_membership_id:
-            row.sender_membership_id,
+            sender_membership_id: row.sender_membership_id,
             content: row.content,
             reply_to_id: row.reply_to_id,
             created_at: row.created_at,
