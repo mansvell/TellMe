@@ -3,8 +3,7 @@ import {
     ChevronRight,
     FileText,
     Languages,
-    LoaderCircle,
-    LogOut,
+    LoaderCircle, Mail,
     Moon,
     Shield,
     ShieldCheck,
@@ -12,16 +11,8 @@ import {
     X,
 } from "lucide-react";
 
-import {
-    useEffect,
-    useMemo,
-    useState,
-} from "react";
-
-import {
-    useNavigate,
-} from "react-router-dom";
-
+import {useEffect, useMemo, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import BottomNavigation from "../components/BottomNavigation.tsx";
 import { supabase } from "../lib/supabase";
 
@@ -30,10 +21,11 @@ import {
     updateInvitationsEnabled,
 } from "../services/invitations";
 
-
-// ============================================================
-// TYPES
-// ============================================================
+import {
+    disablePushNotifications,
+    enablePushNotifications,
+    getPushStatus,
+} from "../services/pushNotifications";
 
 type ProfileSettings = {
     id: string;
@@ -75,18 +67,8 @@ type RowProps = {
     onClick?: () => void;
 };
 
-
-// ============================================================
-// CONSTANTES
-// ============================================================
-
 // Le pseudo peut être modifié tous les 14 jours.
 const USERNAME_CHANGE_DELAY_DAYS = 14;
-
-
-// ============================================================
-// PAGE
-// ============================================================
 
 export default function SettingsPage() {
 
@@ -143,17 +125,6 @@ export default function SettingsPage() {
         setSavingUsername,
     ] = useState(false);
 
-    // Déconnexion.
-    const [
-        showLogoutModal,
-        setShowLogoutModal,
-    ] = useState(false);
-
-    const [
-        loggingOut,
-        setLoggingOut,
-    ] = useState(false);
-
     // Erreur générale.
     const [
         errorMessage,
@@ -162,11 +133,7 @@ export default function SettingsPage() {
 
     const [clock, setClock] = useState(0);
 
-
-    // ========================================================
     // CHARGE LE PROFIL
-    // ========================================================
-
     useEffect(() => {
 
         let active = true;
@@ -267,8 +234,11 @@ export default function SettingsPage() {
                     loadedProfile.displayName,
                 );
 
+                const pushStatus =
+                    await getPushStatus();
+
                 setNotificationsEnabled(
-                    loadedProfile.notificationsEnabled,
+                    pushStatus === "enabled",
                 );
 
                 // Charge l'autorisation d'invitation.
@@ -365,6 +335,13 @@ export default function SettingsPage() {
                              // PROCHAINE MODIFICATION DU PSEUDO
     const usernameAvailability =
         useMemo(() => {
+            if (clock === 0) {
+                return {
+                    canEdit: false,
+                    text: "....(Calcul en cours)...",
+                };
+            }
+
             if (!profile?.usernameUpdatedAt) {
                 return {
                     canEdit: true,
@@ -462,60 +439,48 @@ export default function SettingsPage() {
         ]);
 
     // MODIFIE LES NOTIFICATIONS
-    async function handleNotifications(enabled: boolean) {
+    async function handleNotifications(
+        enabled: boolean,
+    ) {
 
-        if (!profile) return;
+        const previousValue =
+            notificationsEnabled;
 
-        const previousValue = notificationsEnabled;
 
-        setNotificationsEnabled(enabled);
-
-        setSavingNotifications(true);
+        setSavingNotifications(
+            true,
+        );
 
         setErrorMessage("");
 
 
         try {
 
-            const { error } =
-                await supabase
-                    .from("profiles")
-                    .update({
-                        notifications_enabled:
-                        enabled,
-                    })
-                    .eq(
-                        "id",
-                        profile.id,
-                    );
+            if (enabled) {
 
+                // Demande la permission système +
+                // crée l'abonnement Web Push.
+                await enablePushNotifications();
 
-            if (error) {
-                throw error;
+                setNotificationsEnabled(
+                    true,
+                );
+
+            } else {
+
+                // Supprime l'abonnement de cet appareil.
+                await disablePushNotifications();
+
+                setNotificationsEnabled(
+                    false,
+                );
             }
-
-
-            setProfile(
-                current => {
-
-                    if (!current) {
-                        return current;
-                    }
-
-
-                    return {
-                        ...current,
-                        notificationsEnabled:
-                        enabled,
-                    };
-                },
-            );
 
 
         } catch (error) {
 
             console.error(
-                "Notification settings error:",
+                "Push notification error:",
                 error,
             );
 
@@ -526,8 +491,11 @@ export default function SettingsPage() {
 
 
             setErrorMessage(
-                "Impossible de modifier les notifications.",
+                error instanceof Error
+                    ? error.message
+                    : "Impossible de modifier les notifications.",
             );
+
 
         } finally {
 
@@ -723,53 +691,6 @@ export default function SettingsPage() {
         }
     }
 
-    // DÉCONNEXION
-    async function handleLogout() {
-
-        setLoggingOut(
-            true,
-        );
-
-        setErrorMessage("");
-
-
-        try {
-
-            const { error } =
-                await supabase.auth.signOut();
-
-
-            if (error) {
-                throw error;
-            }
-
-
-            navigate(
-                "/welcome",
-                {
-                    replace: true,
-                },
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Logout error:",
-                error,
-            );
-
-
-            setErrorMessage(
-                "Impossible de se déconnecter.",
-            );
-
-
-            setLoggingOut(
-                false,
-            );
-        }
-    }
 
     // CHARGEMENT
     if (loading) {
@@ -882,11 +803,7 @@ export default function SettingsPage() {
 
                 </div>
 
-
-                {/* ==================================================
-                    ERREUR
-                ================================================== */}
-
+                {/* ERREUR*/}
                 {errorMessage && (
 
                     <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
@@ -957,28 +874,13 @@ export default function SettingsPage() {
 
 
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
-
                     <SwitchRow
-                        icon={
-                            <Bell
-                                size={21}
-                            />
-                        }
-
+                        icon={<Bell size={21}/>}
                         title="Notifications"
-
                         description="Recevoir les notifications des conversations."
-
-                        checked={
-                            notificationsEnabled
-                        }
-
-                        loading={
-                            savingNotifications
-                        }
-
-                        onChange={
-                            value =>
+                        checked={notificationsEnabled}
+                        loading={savingNotifications}
+                        onChange={value =>
                                 void handleNotifications(
                                     value,
                                 )
@@ -1008,15 +910,11 @@ export default function SettingsPage() {
                                 )
                         }
                     />
-
                 </div>
-
-                {/* LANGUE*/}
 
                 <SettingsTitle>
                     Application
                 </SettingsTitle>
-
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
                     <Row
                         disabled
@@ -1047,6 +945,10 @@ export default function SettingsPage() {
                         description="Règles et conditions d'utilisation de TellMe."
                         onClick={() => navigate("/terms")}
                     />
+                    <Row icon={<Mail size={21}/>}
+                         title="Aide, Support, Bugs"
+                         description="Contactez au mansvellnk@gmail.com"
+                    />
 
                     <Row
                         title="Version"
@@ -1055,20 +957,6 @@ export default function SettingsPage() {
                     />
 
                 </div>
-
-                <button
-                    type="button"
-                    onClick={() =>
-                        setShowLogoutModal(
-                            true,
-                        )
-                    }
-                    className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-50 font-bold text-red-600 transition hover:bg-red-100 active:scale-[0.99] dark:bg-red-950/30 dark:text-red-400"
-                >
-                    <LogOut size={20}/>
-                    Déconnexion
-                </button>
-
 
                 <p className="pb-3 text-center text-xs leading-5 text-slate-400">
                     TellMe protège ton anonymat dans les conversations.
@@ -1108,225 +996,78 @@ export default function SettingsPage() {
                         <div className="flex items-start justify-between gap-4">
 
                             <div>
-
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                                     Modifier le pseudo
                                 </h2>
-
                                 <p className="mt-1 text-sm leading-5 text-slate-500">
                                     Après modification, vous devrez attendre {USERNAME_CHANGE_DELAY_DAYS} jours avant de pouvoir le changer à nouveau.
                                 </p>
-
                             </div>
-
 
                             <button
                                 type="button"
-
-                                disabled={
-                                    savingUsername
-                                }
-
+                                disabled={savingUsername}
                                 onClick={() =>
                                     setShowUsernameModal(
                                         false,
                                     )
                                 }
-
                                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
                             >
-
-                                <X
-                                    size={18}
-                                />
-
+                                <X size={18}/>
                             </button>
-
                         </div>
 
-
                         <label className="mt-6 block">
-
                             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                                 Nouveau pseudo
                             </span>
 
-
                             <input
                                 autoFocus
-
                                 type="text"
-
-                                value={
-                                    newUsername
-                                }
-
+                                value={newUsername}
                                 maxLength={24}
-
-                                disabled={
-                                    savingUsername
-                                }
-
+                                disabled={savingUsername}
                                 onChange={
                                     event =>
                                         setNewUsername(
                                             event.target.value,
                                         )
                                 }
-
                                 placeholder="Ton pseudo"
-
                                 className="mt-2 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-sky-900/30"
                             />
-
                         </label>
 
-
                         <div className="mt-2 flex justify-between text-xs text-slate-400">
-
                             <span>
                                 2 caractères minimum
                             </span>
-
                             <span>
                                 {newUsername.length}/24
                             </span>
-
                         </div>
-
 
                         <button
                             type="submit"
-
                             disabled={
                                 savingUsername ||
                                 newUsername.trim().length <
                                 2
                             }
-
                             className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white transition hover:bg-sky-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300"
                         >
 
                             {savingUsername && (
-
-                                <LoaderCircle
-                                    size={19}
-                                    className="animate-spin"
-                                />
-
+                                <LoaderCircle size={19} className="animate-spin"/>
                             )}
-
                             Enregistrer
-
                         </button>
-
                     </form>
-
                 </div>
-
             )}
 
-
-            {/* ==================================================
-                MODAL DÉCONNEXION
-            ================================================== */}
-
-            {showLogoutModal && (
-
-                <div
-                    className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-5"
-
-                    onClick={() =>
-                        !loggingOut &&
-                        setShowLogoutModal(
-                            false,
-                        )
-                    }
-                >
-
-                    <div
-                        onClick={
-                            event =>
-                                event.stopPropagation()
-                        }
-
-                        className="w-full max-w-md rounded-t-[2rem] bg-white p-6 shadow-2xl sm:rounded-[2rem] dark:bg-slate-900"
-                    >
-
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400">
-
-                            <LogOut
-                                size={22}
-                            />
-
-                        </div>
-
-
-                        <h2 className="mt-5 text-xl font-bold text-slate-900 dark:text-white">
-                            Se déconnecter ?
-                        </h2>
-
-
-                        <p className="mt-2 text-sm leading-6 text-slate-500">
-                            Tu devras te reconnecter pour retrouver tes groupes et tes conversations.
-                        </p>
-
-
-                        <div className="mt-6 grid grid-cols-2 gap-3">
-
-                            <button
-                                type="button"
-
-                                disabled={
-                                    loggingOut
-                                }
-
-                                onClick={() =>
-                                    setShowLogoutModal(
-                                        false,
-                                    )
-                                }
-
-                                className="h-12 rounded-2xl bg-slate-100 font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200"
-                            >
-                                Annuler
-                            </button>
-
-
-                            <button
-                                type="button"
-
-                                disabled={
-                                    loggingOut
-                                }
-
-                                onClick={() =>
-                                    void handleLogout()
-                                }
-
-                                className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-red-500 font-semibold text-white transition hover:bg-red-600 disabled:opacity-60"
-                            >
-
-                                {loggingOut && (
-
-                                    <LoaderCircle
-                                        size={18}
-                                        className="animate-spin"
-                                    />
-
-                                )}
-
-                                Déconnexion
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            )}
 
 
             <BottomNavigation

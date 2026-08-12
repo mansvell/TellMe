@@ -309,8 +309,8 @@ export default function RegisterPage() {
                             />
 
                             <p className="text-sm leading-6 text-slate-600"> J’accepte les
-                                <span onClick={() => navigate("/terms")}>conditions d’utilisation</span> et la
-                                <span onClick={() => navigate("/privacy")}>politique de confidentialité</span>.
+                                <span className="text-blue-500" onClick={() => navigate("/terms")}> conditions d’utilisation</span> et la
+                                <span className="text-blue-500" onClick={() => navigate("/privacy")}> politique de confidentialité</span>.
                             </p>
                         </label>
 

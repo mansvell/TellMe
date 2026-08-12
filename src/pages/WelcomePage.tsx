@@ -37,12 +37,7 @@ export default function WelcomePage() {
 
                             <button onClick={() => navigate('/register')}
                                     className="flex-1 h-14 rounded-2xl bg-sky-500 hover:bg-sky-600 transition text-white font-bold">
-                                Commencer
-                            </button>
-
-                            <button onClick={() => navigate('/join')} className="flex-1 h-14 rounded-2xl border border-sky-200 hover:bg-sky-50 transition flex items-center
-                                justify-center font-semibold text-sky-600">
-                                J'ai un lien d'invitation
+                                S'enregistrer
                             </button>
 
                         </div>

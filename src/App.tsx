@@ -13,7 +13,6 @@ import MediaPage from "./pages/MediaPage.tsx";
 import CustomizationPage from "./pages/CustomizationPage.tsx";
 import InvitationsPage from "./pages/InvitationsPage.tsx";
 import SettingsPage from "./pages/SettingsPage.tsx";
-import JoinByLinkPage from "./pages/joinByLinkpage.tsx";
 import JoinPreviewPage from "./pages/JoinPreviewPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
@@ -27,9 +26,10 @@ export default function App() {
 
           <Route path="/" element={<SplashPage />} />
 
-            <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/welcome" element={<WelcomePage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/notif" element={<NotificationPage />} />
+
           <Route path="/choosegp" element={<ChooseGroupPage />} />
           <Route path="/home" element={<HomePage />} />
           <Route path="/chat/:groupId" element={<ChatPage />} />
@@ -41,12 +41,10 @@ export default function App() {
 
           <Route path="/invit" element={<InvitationsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/join" element={<JoinByLinkPage/>} />
+
           <Route path="/join/preview" element={<JoinPreviewPage/>} />
-          <Route
-              path="/join/:inviteCode"
-              element={<JoinPreviewPage />}
-          />
+          <Route path="/join/:inviteCode" element={<JoinPreviewPage />}/>
+
           <Route path="/privacy" element={<PrivacyPage/>}/>
            <Route path="/terms" element={<TermsPage/>}/>
 

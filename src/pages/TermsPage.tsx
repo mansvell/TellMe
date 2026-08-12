@@ -6,31 +6,27 @@ import {
     ShieldCheck,
     Users,
 } from "lucide-react";
-
-import { Link } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 
 export default function TermsPage() {
 
+    const navigate = useNavigate();
     return (
 
         <main className="min-h-screen bg-slate-100 pb-10 dark:bg-slate-950">
-
-            {/* Header */}
-
             <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
 
                 <div className="mx-auto flex h-16 max-w-3xl items-center px-5">
 
-                    <Link
-                        to="/settings"
+                    <button onClick={() => navigate(-1)}
                         className="flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-slate-100 dark:hover:bg-slate-800"
                     >
                         <ArrowLeft
                             size={21}
                             className="text-slate-700 dark:text-slate-200"
                         />
-                    </Link>
+                    </button>
 
 
                     <h1 className="ml-3 text-lg font-bold text-slate-900 dark:text-white">
@@ -118,9 +114,7 @@ export default function TermsPage() {
 
 
                 <p className="px-2 text-center text-xs leading-5 text-slate-400">
-                    Version préliminaire des conditions d'utilisation.
-                    Les conditions juridiques définitives devront être
-                    complétées avant la mise en production publique.
+                    © 2026 TellMe - Tous droits reservés
                 </p>
 
             </section>
