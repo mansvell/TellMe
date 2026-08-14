@@ -338,7 +338,7 @@ export default function SettingsPage() {
             if (clock === 0) {
                 return {
                     canEdit: false,
-                    text: "....(Calcul en cours)...",
+                    text: "...( Calcul en cours )..",
                 };
             }
 
@@ -848,7 +848,7 @@ export default function SettingsPage() {
 
                         description={
                             usernameAvailability.canEdit
-                                ? "Tu peux modifier ton pseudo."
+                                ? "Tu peux modifier ton pseudo une fois tous les 14 jours."
                                 : `Prochaine modification dans ${usernameAvailability.text}.`
                         }
 

@@ -1,19 +1,19 @@
-// ============================================================
-// TELLME SERVICE WORKER
-// Reçoit les notifications même lorsque TellMe n'est pas ouvert.
-// ============================================================
 
+// Reçoit une notification push.
 self.addEventListener("push", (event) => {
 
     if (!event.data) {
         return;
     }
 
+
     let payload;
+
 
     try {
 
-        payload = event.data.json();
+        payload =
+            event.data.json();
 
     } catch {
 
@@ -25,37 +25,60 @@ self.addEventListener("push", (event) => {
     }
 
 
+    const groupId =
+        payload.groupId ?? null;
+
+
     const title =
         payload.title ?? "TellMe";
 
 
     const options = {
 
+        // Texte principal.
         body:
             payload.body ??
             "Tu as reçu un nouveau message.",
 
+
+        // Logo principal TellMe.
         icon:
-            "/icon.png",
+            "/tellme-icon.png",
 
+
+        // Petite icône système.
         badge:
-            "/icon.png",
+            "/tellme-icon.png",
 
+
+        // Regroupe les notifications du même groupe.
         tag:
-            payload.groupId
-                ? `tellme-group-${payload.groupId}`
+            groupId
+                ? `tellme-chat-${groupId}`
                 : "tellme-message",
 
+
+        // Une nouvelle notification du groupe
+        // remplace/actualise la précédente.
         renotify: true,
 
+
+        // Vibration mobile.
+        vibrate: [
+            150,
+            80,
+            150,
+        ],
+
+
+        // Informations utilisées au clic.
         data: {
 
-            groupId:
-                payload.groupId ?? null,
+            groupId,
 
             url:
-                payload.groupId
-                    ? `/chat/${payload.groupId}`
+                groupId
+                    ? `/chat/${groupId}`
                     : "/home",
         },
     };
@@ -89,6 +112,14 @@ self.addEventListener(
             "/home";
 
 
+        // Transforme /chat/... en URL complète.
+        const destination =
+            new URL(
+                targetUrl,
+                self.location.origin,
+            ).href;
+
+
         event.waitUntil(
 
             clients
@@ -96,30 +127,33 @@ self.addEventListener(
                     type: "window",
                     includeUncontrolled: true,
                 })
-                .then((windowClients) => {
+                .then(
+                    async (windowClients) => {
 
-                    // Si TellMe est déjà ouvert.
-                    for (const client of windowClients) {
+                        // TellMe est déjà ouvert.
+                        for (
+                            const client
+                            of windowClients
+                            ) {
 
-                        if ("focus" in client) {
+                            if (
+                                "navigate" in client
+                            ) {
 
-                            client.navigate(targetUrl);
+                                await client.navigate(
+                                    destination,
+                                );
 
-                            return client.focus();
+
+                                return client.focus();
+                            }
                         }
-                    }
-
-
-                    // Sinon on ouvre TellMe.
-                    if (clients.openWindow) {
-
+                        // TellMe n'est pas ouvert.
                         return clients.openWindow(
-                            targetUrl,
+                            destination,
                         );
-                    }
-
-                    return undefined;
-                }),
+                    },
+                ),
 
         );
 
