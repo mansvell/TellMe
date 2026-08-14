@@ -1,22 +1,15 @@
-
 // Reçoit une notification push.
 self.addEventListener("push", (event) => {
 
     if (!event.data) {
         return;
     }
-
-
     let payload;
-
-
     try {
-
         payload =
             event.data.json();
 
     } catch {
-
         payload = {
             title: "TellMe",
             body: "Tu as reçu un nouveau message.",
@@ -24,32 +17,25 @@ self.addEventListener("push", (event) => {
         };
     }
 
-
     const groupId =
         payload.groupId ?? null;
-
 
     const title =
         payload.title ?? "TellMe";
 
-
     const options = {
-
         // Texte principal.
         body:
             payload.body ??
             "Tu as reçu un nouveau message.",
 
-
         // Logo principal TellMe.
         icon:
             "/tellme-icon.png",
 
-
         // Petite icône système.
         badge:
             "/tellme-icon.png",
-
 
         // Regroupe les notifications du même groupe.
         tag:
@@ -57,11 +43,9 @@ self.addEventListener("push", (event) => {
                 ? `tellme-chat-${groupId}`
                 : "tellme-message",
 
-
         // Une nouvelle notification du groupe
         // remplace/actualise la précédente.
         renotify: true,
-
 
         // Vibration mobile.
         vibrate: [
@@ -70,12 +54,9 @@ self.addEventListener("push", (event) => {
             150,
         ],
 
-
         // Informations utilisées au clic.
         data: {
-
             groupId,
-
             url:
                 groupId
                     ? `/chat/${groupId}`
@@ -83,34 +64,22 @@ self.addEventListener("push", (event) => {
         },
     };
 
-
     event.waitUntil(
-
         self.registration.showNotification(
             title,
             options,
         ),
-
     );
-
 });
 
-
-// ============================================================
 // CLIC SUR LA NOTIFICATION
-// ============================================================
-
 self.addEventListener(
     "notificationclick",
     (event) => {
-
         event.notification.close();
-
-
         const targetUrl =
             event.notification.data?.url ??
             "/home";
-
 
         // Transforme /chat/... en URL complète.
         const destination =
@@ -119,9 +88,7 @@ self.addEventListener(
                 self.location.origin,
             ).href;
 
-
         event.waitUntil(
-
             clients
                 .matchAll({
                     type: "window",
@@ -129,7 +96,6 @@ self.addEventListener(
                 })
                 .then(
                     async (windowClients) => {
-
                         // TellMe est déjà ouvert.
                         for (
                             const client
@@ -143,8 +109,6 @@ self.addEventListener(
                                 await client.navigate(
                                     destination,
                                 );
-
-
                                 return client.focus();
                             }
                         }
@@ -154,8 +118,6 @@ self.addEventListener(
                         );
                     },
                 ),
-
         );
-
     },
 );
