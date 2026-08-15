@@ -280,6 +280,11 @@ export async function enablePushNotifications():
 
 
     if (subscriptionError) {
+        console.error(
+            "Push subscription save error:",
+            subscriptionError,
+        );
+
         throw subscriptionError;
     }
 
