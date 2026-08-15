@@ -10,7 +10,7 @@ import {
 export default function WelcomePage() {
     const navigate = useNavigate();
     return (
-        <main className="min-h-screen flex flex-col bg-gradient-to-br from-sky-50 via-white to-white">
+        <main className="min-h-screen flex flex-col bg-gradient-to-br from-sky-500 via-white to-white">
 
             <section className="flex-1 flex items-center justify-center px-6 py-10">
 

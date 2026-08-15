@@ -145,7 +145,7 @@ export default function SettingsPage() {
         setErrorMessage,
     ] = useState("");
 
-    const [clock, setClock] = useState(0);
+    const [clock, setClock] = useState<number | null>(null);
 
     useEffect(() => {
 
@@ -291,18 +291,22 @@ export default function SettingsPage() {
     }, [navigate]);
 
     // COMPTEUR DU PSEUDO
+    // Actualise le compteur toutes les minutes.
     useEffect(() => {
 
-        const interval = window.setInterval(() => {
+        const updateClock = () => {
+            setClock(new Date().getTime());
+        };
 
-            setClock(Date.now());
+        updateClock();
 
-        }, 60000);
+        const interval = window.setInterval(
+            updateClock,
+            60_000,
+        );
 
         return () => {
-
             window.clearInterval(interval);
-
         };
 
     }, []);
@@ -329,110 +333,117 @@ export default function SettingsPage() {
         }, [profile, clock]);
 
                              // PROCHAINE MODIFICATION DU PSEUDO
-    const usernameAvailability =
-        useMemo(() => {
-            if (clock === 0) {
-                return {
-                    canEdit: false,
-                    text: "...( Calcul en cours )..",
-                };
-            }
+    const usernameAvailability = useMemo(() => {
 
-            if (!profile?.usernameUpdatedAt) {
-                return {
-                    canEdit: true,
-                    text:
-                        "Modifiable maintenant",
-                };
-            }
-
-            const lastUpdate = new Date( profile.usernameUpdatedAt ).getTime();
-
-            const delay = USERNAME_CHANGE_DELAY_DAYS * 24 * 60 * 60 * 1000;
-
-            const availableAt = lastUpdate + delay;
-
-            const remaining = availableAt - clock;
-
-            if (remaining <= 0) {
-                return {
-                    canEdit: true,
-                    text:
-                        "Modifiable maintenant",
-                };
-            }
-
-            const days =
-                Math.floor(
-                    remaining /
-                    (
-                        1000 *
-                        60 *
-                        60 *
-                        24
-                    ),
-                );
-
-            const hours =
-                Math.floor(
-                    (
-                        remaining %
-                        (
-                            1000 *
-                            60 *
-                            60 *
-                            24
-                        )
-                    ) /
-                    (
-                        1000 *
-                        60 *
-                        60
-                    ),
-                );
-
-            const minutes =
-                Math.floor(
-                    (
-                        remaining %
-                        (
-                            1000 *
-                            60 *
-                            60
-                        )
-                    ) /
-                    (
-                        1000 *
-                        60
-                    ),
-                );
-
-            if (days > 0) {
-                return {
-                    canEdit: false,
-                    text:
-                        `${days} j ${hours} h`,
-                };
-            }
-
-            if (hours > 0) {
-                return {
-                    canEdit: false,
-                    text:
-                        `${hours} h ${minutes} min`,
-                };
-            }
-
+        // Le profil n'est pas encore chargé.
+        if (!profile) {
             return {
                 canEdit: false,
-                text:
-                    `${minutes} min`,
+                loading: true,
+                text: "",
             };
+        }
 
-        }, [
-            profile,
-            clock,
-        ]);
+        // L'horloge n'est pas encore initialisée.
+        if (clock === null) {
+            return {
+                canEdit: false,
+                loading: true,
+                text: "",
+            };
+        }
+
+        // Aucun changement précédent : modification autorisée.
+        if (!profile.usernameUpdatedAt) {
+            return {
+                canEdit: true,
+                loading: false,
+                text: "Modifiable maintenant",
+            };
+        }
+
+        const lastUpdate =
+            new Date(
+                profile.usernameUpdatedAt,
+            ).getTime();
+
+        const delay =
+            USERNAME_CHANGE_DELAY_DAYS *
+            24 *
+            60 *
+            60 *
+            1000;
+
+        const availableAt =
+            lastUpdate + delay;
+
+        const remaining =
+            availableAt - clock;
+
+
+        // Le délai de 14 jours est terminé.
+        if (remaining <= 0) {
+            return {
+                canEdit: true,
+                loading: false,
+                text: "Modifiable maintenant",
+            };
+        }
+
+
+        const days =
+            Math.floor(
+                remaining /
+                (1000 * 60 * 60 * 24),
+            );
+
+        const hours =
+            Math.floor(
+                (
+                    remaining %
+                    (1000 * 60 * 60 * 24)
+                ) /
+                (1000 * 60 * 60),
+            );
+
+        const minutes =
+            Math.floor(
+                (
+                    remaining %
+                    (1000 * 60 * 60)
+                ) /
+                (1000 * 60),
+            );
+
+
+        if (days > 0) {
+            return {
+                canEdit: false,
+                loading: false,
+                text: `${days} j ${hours} h`,
+            };
+        }
+
+
+        if (hours > 0) {
+            return {
+                canEdit: false,
+                loading: false,
+                text: `${hours} h ${minutes} min`,
+            };
+        }
+
+
+        return {
+            canEdit: false,
+            loading: false,
+            text: `${Math.max(1, minutes)} min`,
+        };
+
+    }, [
+        profile,
+        clock,
+    ]);
 
     // MODIFIE LES NOTIFICATIONS
     async function handleNotifications(
@@ -644,8 +655,8 @@ export default function SettingsPage() {
                 throw error;
             }
 
-// Date utilisée immédiatement par l'interface.
-// PostgreSQL possède également sa propre date avec now().
+                                // Date utilisée immédiatement par l'interface.
+                                // PostgreSQL possède également sa propre date avec now().
             const updatedAt =
                 new Date().toISOString();
 
@@ -817,12 +828,14 @@ export default function SettingsPage() {
                         title="Pseudo"
                         value={profile.displayName}
                         description={
-                            usernameAvailability.canEdit
-                                ? "Tu peux modifier ton pseudo une fois tous les 14 jours."
-                                : `Prochaine modification dans ${usernameAvailability.text}.`
+                            usernameAvailability.loading
+                                ? undefined
+                                : usernameAvailability.canEdit
+                                    ? "Tu peux modifier ton pseudo une fois tous les 14 jours."
+                                    : `Prochaine modification dans ${usernameAvailability.text}.`
                         }
                         disabled={
-                            !usernameAvailability.canEdit
+                            !usernameAvailability.canEdit || usernameAvailability.loading
                         }
                         onClick={
                             openUsernameModal
