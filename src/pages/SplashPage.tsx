@@ -14,10 +14,11 @@ export default function SplashPage() {
 
         let active = true;
 
+
         async function initializeApp() {
 
-            //Affiche le Splash quelques instants.
-            const minimumSplashTime =
+            //Garde le Splash visible un minimum de temps
+            const splashDelay =
                 new Promise((resolve) =>
                     window.setTimeout(
                         resolve,
@@ -25,15 +26,17 @@ export default function SplashPage() {
                     ),
                 );
 
-            //Vérifie la session Supabase.
+
+            //Vérifie la session enregistrée
             const sessionRequest =
                 supabase.auth.getSession();
+
 
             const [
                 ,
                 sessionResult,
             ] = await Promise.all([
-                minimumSplashTime,
+                splashDelay,
                 sessionRequest,
             ]);
 
@@ -41,11 +44,7 @@ export default function SplashPage() {
                 return;
             }
 
-            const session =
-                sessionResult.data.session;
-
-            // Session existante → Home
-            if (session) {
+            if (sessionResult.data.session) {
 
                 navigate(
                     "/home",
@@ -53,10 +52,9 @@ export default function SplashPage() {
                         replace: true,
                     },
                 );
-
                 return;
             }
-            // Aucun utilisateur connecté → Welcome
+
             navigate(
                 "/welcome",
                 {

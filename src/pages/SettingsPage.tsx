@@ -803,7 +803,8 @@ export default function SettingsPage() {
                 {/* ERREUR*/}
                 {errorMessage && (
 
-                    <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+                    <div
+                        className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
 
                         <X
                             size={18}
@@ -857,9 +858,9 @@ export default function SettingsPage() {
                         checked={notificationsEnabled}
                         loading={savingNotifications}
                         onChange={value =>
-                                void handleNotifications(
-                                    value,
-                                )
+                            void handleNotifications(
+                                value,
+                            )
                         }
                     />
 
@@ -894,7 +895,7 @@ export default function SettingsPage() {
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
                     <Row
                         disabled
-                         icon={<Languages size={21}/>}
+                        icon={<Languages size={21}/>}
                         title="Langue"
                         value="Bientôt disponible"
                         description="D'autres langues seront disponibles prochainement."
@@ -917,13 +918,13 @@ export default function SettingsPage() {
                     />
 
                     <Row icon={<FileText size={21}/>}
-                        title="Conditions d'utilisation"
-                        description="Règles et conditions d'utilisation de TellMe."
-                        onClick={() => navigate("/terms")}
+                         title="Conditions d'utilisation"
+                         description="Règles et conditions d'utilisation de TellMe."
+                         onClick={() => navigate("/terms")}
                     />
                     <Row icon={<Mail size={21}/>}
                          title="Aide, Support, Bugs"
-                         description="Contactez au mansvellnk@gmail.com"
+                         description="Contact: mansvellnk@gmail.com"
                     />
 
                     <Row
@@ -934,8 +935,11 @@ export default function SettingsPage() {
 
                 </div>
 
-                <p className="pb-3 text-center text-xs leading-5 text-slate-400">
-                    TellMe protège ton anonymat dans les conversations.
+                <p className="pb-3 text-center text-xm leading-5 text-slate-400">
+                    TellMe, l'App qui te permet d'être libre en secret.
+                </p>
+                <p className=" text-center text-xm leading-5 text-slate-400">
+                    -2026-
                 </p>
 
             </section>
@@ -1054,11 +1058,6 @@ export default function SettingsPage() {
     );
 }
 
-
-// ============================================================
-// TITRE DE SECTION
-// ============================================================
-
 function SettingsTitle({
                            children,
                        }: {
@@ -1073,11 +1072,6 @@ function SettingsTitle({
 
     );
 }
-
-
-// ============================================================
-// ROW
-// ============================================================
 
 function Row({
                  icon,
