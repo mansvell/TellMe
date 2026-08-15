@@ -95,26 +95,26 @@ export default function MembersPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100">
+        <main className="min-h-screen bg-slate-100 dark:bg-slate-800">
 
-            <header className="bg-white shadow-sm">
+            <header className="bg-white dark:bg-slate-700 shadow-sm">
 
-                <div className="mx-auto flex h-16 max-w-3xl items-center gap-4 px-5">
+                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5">
 
                     <Link
                         to={`/gdetailp/${groupId}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100"
+                        className="flex h-10 w-10 items-center dark:text-white justify-center rounded-xl hover:bg-slate-100"
                     >
-                        <ArrowLeft />
+                        <ArrowLeft/>
                     </Link>
 
                     <div>
 
-                        <h1 className="text-xl font-bold">
-                            Membres
+                        <h1 className="text-xl dark:text-white font-bold">
+                            Membres du groupe
                         </h1>
 
-                        <p className="text-xs text-slate-400">
+                        <p className="text-xs dark:text-white text-slate-400">
                             {members.length}{" "}
                             {members.length > 1
                                 ? "personnes"
@@ -123,12 +123,13 @@ export default function MembersPage() {
 
                     </div>
 
+                    <div className="w-10"/>
                 </div>
 
             </header>
 
 
-            <section className="mx-auto max-w-3xl p-5">
+            <section className="mx-auto max-w-4xl p-5">
 
                 <div className="flex h-14 items-center gap-3 rounded-2xl bg-white px-4 shadow-sm">
 
@@ -164,7 +165,7 @@ export default function MembersPage() {
 
                 ) : (
 
-                    <div className="mt-5 overflow-hidden rounded-3xl bg-white shadow-sm">
+                    <div className="mt-5 overflow-hidden rounded-3xl bg-white dark:bg-slate-600 shadow-sm">
 
                         {filteredMembers.map(
                             (member) => (

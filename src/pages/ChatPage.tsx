@@ -1037,10 +1037,7 @@ export default function ChatPage() {
                 </div>
             )}
 
-            {/* FOOTER / INPUT */}
             <footer className="z-20 shrink-0 border-t border-slate-200 bg-white dark:bg-slate-700 p-3 sm:p-4">
-
-
                 {/* FICHIER SÉLECTIONNÉ */}
                 {selectedFile && (
 

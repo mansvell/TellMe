@@ -353,20 +353,20 @@ export default function GroupDetailsPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100">
+        <main className="min-h-screen bg-slate-100 dark:bg-slate-800">
 
-            <header className="bg-white shadow-sm">
+            <header className="bg-white dark:bg-slate-700 shadow-sm">
 
-                <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-5">
+                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
 
                     <Link
                         to={`/chat/${group.id}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl transition hover:bg-slate-100"
+                        className="flex h-10 w-10 items-center dark:text-white justify-center rounded-xl transition hover:bg-slate-300"
                     >
                         <ArrowLeft />
                     </Link>
 
-                    <h1 className="text-lg font-bold">
+                    <h1 className="text-lg dark:text-white font-bold">
                         Informations
                     </h1>
 
@@ -381,7 +381,7 @@ export default function GroupDetailsPage() {
 
                 {/* Identité du groupe */}
 
-                <div className="rounded-3xl bg-white p-8 shadow-sm">
+                <div className="rounded-3xl bg-white dark:bg-slate-600 p-8 shadow-sm">
 
                     <div className="flex flex-col items-center text-center">
 
@@ -400,7 +400,7 @@ export default function GroupDetailsPage() {
                             />
                         </div>
 
-                        <h2 className="mt-5 text-3xl font-bold text-slate-900">
+                        <h2 className="mt-5 text-3xl font-bold text-slate-900 dark:text-white">
                             {group.name}
                         </h2>
 
@@ -416,7 +416,7 @@ export default function GroupDetailsPage() {
                                 : "message"}
                         </p>
 
-                        <p className="mt-1 text-sm text-slate-400">
+                        <p className="mt-1 text-sm text-slate-400 dark:text-white">
                             {group.createdAtLabel}
                         </p>
 
@@ -424,10 +424,7 @@ export default function GroupDetailsPage() {
 
                 </div>
 
-
-                {/* Navigation */}
-
-                <div className="mt-6 overflow-hidden rounded-3xl bg-white shadow-sm">
+                <div className="mt-6 overflow-hidden rounded-3xl bg-white dark:bg-slate-600 shadow-sm">
 
                     <Item
                         to={`/members/${group.id}`}
@@ -458,16 +455,13 @@ export default function GroupDetailsPage() {
 
                 </div>
 
+                <div className="mt-6 rounded-3xl bg-white dark:bg-slate-600 p-6 shadow-sm">
 
-                {/* Invitation */}
-
-                <div className="mt-6 rounded-3xl bg-white p-6 shadow-sm">
-
-                    <h3 className="text-lg font-bold">
+                    <h3 className="text-lg dark:text-white font-bold">
                         Invite tes ami(e)s
                     </h3>
 
-                    <p className="mt-1 text-sm text-slate-500">
+                    <p className="mt-1 text-sm text-red-300">
                         Seules les personnes possédant ce lien pourront rejoindre le groupe.
                     </p>
 
@@ -506,17 +500,13 @@ export default function GroupDetailsPage() {
 
                             Partager
                         </button>
-
                     </div>
-
                 </div>
 
-
                 {/* Durée : uniquement visible par le Dominus */}
-
                 {group.isDominus && (
 
-                    <div className="mt-6 rounded-3xl bg-white p-5 shadow-sm sm:p-6">
+                    <div className="mt-6 rounded-3xl bg-white dark:bg-slate-600 p-5 shadow-sm sm:p-6">
 
                         <div className="flex items-start gap-3">
 
@@ -528,15 +518,15 @@ export default function GroupDetailsPage() {
 
                             <div>
 
-                                <h3 className="font-bold text-slate-900">
+                                <h3 className="font-bold text-slate-900 dark:text-white">
                                     Durée de vie du groupe
                                 </h3>
 
-                                <p className="mt-1 text-sm text-slate-500">
+                                <p className="mt-1 text-sm text-red-300 ">
                                     Cette option n’est visible que par le créateur.
                                 </p>
 
-                                <p className="mt-1 text-xs leading-5 text-slate-400">
+                                <p className="mt-1 text-xs leading-5 text-slate-400 dark:text-white">
                                     À expiration, le groupe, les messages, les membres et les médias seront supprimés. Le lien deviendra invalide.
                                 </p>
 
@@ -691,7 +681,7 @@ function Item({
 
         <Link
             to={to}
-            className="flex w-full items-center justify-between border-b px-6 py-5 transition last:border-0 hover:bg-slate-50"
+            className="flex w-full items-center justify-between border-b px-6 py-5 transition last:border-0"
         >
 
             <div className="flex min-w-0 items-center gap-4">
@@ -702,11 +692,11 @@ function Item({
 
                 <div className="min-w-0">
 
-                    <p className="font-medium text-slate-900">
+                    <p className="font-medium text-slate-900 dark:text-white">
                         {title}
                     </p>
 
-                    <p className="mt-0.5 truncate text-sm text-slate-400">
+                    <p className="mt-0.5 truncate text-sm text-slate-400 dark:text-white/70">
                         {subtitle}
                     </p>
 

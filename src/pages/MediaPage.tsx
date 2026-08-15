@@ -108,20 +108,20 @@ export default function MediaPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100">
+        <main className="min-h-screen bg-slate-100 dark:bg-slate-800">
 
-            <header className="sticky top-0 z-20 border-b border-slate-200 bg-white">
+            <header className="sticky top-0 z-20 border-b border-slate-200 bg-white dark:bg-slate-600">
 
                 <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-5">
 
                     <Link
                         to={`/gdetailp/${groupId}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100"
+                        className="flex h-10 w-10 items-center dark:text-white justify-center rounded-xl hover:bg-slate-100"
                     >
                         <ArrowLeft />
                     </Link>
 
-                    <h1 className="text-xl font-bold">
+                    <h1 className="text-xl dark:text-white font-bold">
                         Médias
                     </h1>
 
@@ -315,25 +315,15 @@ export default function MediaPage() {
                                                     />
 
                                                 </div>
-
                                             </div>
                                         </>
-
                                     )}
-
                                 </button>
-
                             ),
                         )}
-
                     </div>
-
                 )}
-
             </section>
-
-
-            {/* Preview plein écran */}
 
             {preview && (
 

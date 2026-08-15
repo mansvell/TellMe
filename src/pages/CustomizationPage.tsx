@@ -124,20 +124,20 @@ export default function CustomizationPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100">
+        <main className="min-h-screen bg-slate-100 dark:bg-slate-800" >
 
-            <header className="bg-white shadow-sm">
+            <header className="bg-white dark:bg-slate-600 shadow-sm">
 
                 <div className="mx-auto flex h-16 max-w-5xl items-center gap-4 px-5">
 
                     <Link
                         to={`/gdetailp/${groupId}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100"
+                        className="flex h-10 w-10 dark:text-white items-center justify-center rounded-xl hover:bg-slate-100"
                     >
                         <ArrowLeft />
                     </Link>
 
-                    <h1 className="text-xl font-bold">
+                    <h1 className="text-xl  dark:text-white font-bold">
                         Personnalisation
                     </h1>
 
@@ -150,7 +150,7 @@ export default function CustomizationPage() {
 
                 {/* Aperçu */}
 
-                <div className="rounded-3xl bg-white p-6 shadow-sm">
+                <div className="rounded-3xl bg-white dark:bg-slate-700 p-6 shadow-sm">
 
                     <div className="flex items-center gap-3">
 
@@ -162,11 +162,11 @@ export default function CustomizationPage() {
 
                         <div>
 
-                            <h2 className="font-bold text-slate-900">
+                            <h2 className="font-bold text-slate-900 dark:text-white">
                                 Aperçu
                             </h2>
 
-                            <p className="text-sm text-slate-400">
+                            <p className="text-sm text-slate-400 dark:text-white/70">
                                 Cette couleur s’applique uniquement dans ce groupe.
                             </p>
 
@@ -175,7 +175,7 @@ export default function CustomizationPage() {
                     </div>
 
 
-                    <div className="mt-6 space-y-4 rounded-3xl bg-slate-100 p-5">
+                    <div className="mt-6 space-y-4 rounded-3xl bg-slate-100 dark:bg.slate-700 p-5">
 
                         <div className="flex justify-start">
 
