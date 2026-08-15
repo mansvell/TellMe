@@ -1,29 +1,93 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/Logo.png";
+
+import { supabase } from "../lib/supabase";
+import splashlogo from "../assets/Logo.png";
+
 
 export default function SplashPage() {
 
     const navigate = useNavigate();
 
+    //Vérifie la session pendant l'affichage du Splash.
     useEffect(() => {
 
-        const timer = setTimeout(() => {
+        let active = true;
 
-            navigate("/welcome");
+        async function initializeApp() {
 
-        },5000);
+            //Affiche le Splash quelques instants.
+            const minimumSplashTime =
+                new Promise((resolve) =>
+                    window.setTimeout(
+                        resolve,
+                        1800,
+                    ),
+                );
 
-        return ()=>clearTimeout(timer);
+            //Vérifie la session Supabase.
+            const sessionRequest =
+                supabase.auth.getSession();
 
-    },[]);
+            const [
+                ,
+                sessionResult,
+            ] = await Promise.all([
+                minimumSplashTime,
+                sessionRequest,
+            ]);
+
+            if (!active) {
+                return;
+            }
+
+            const session =
+                sessionResult.data.session;
+
+            // Session existante → Home
+            if (session) {
+
+                navigate(
+                    "/home",
+                    {
+                        replace: true,
+                    },
+                );
+
+                return;
+            }
+            // Aucun utilisateur connecté → Welcome
+            navigate(
+                "/welcome",
+                {
+                    replace: true,
+                },
+            );
+        }
+
+
+        void initializeApp();
+
+
+        return () => {
+            active = false;
+        };
+
+    }, [navigate]);
+
 
     return (
-        <div className="fixed inset-0 z-40 flex flex-col bg-cover bg-center bg-no-repeat overflow-hidden"
-                 style={{backgroundImage: `url(${logo})`}}>
 
-        </div>
+        <main className="fixed inset-0 overflow-hidden bg-white dark:bg-slate-950">
 
-);
+            <img
+                src={splashlogo}
+                alt="TellMe"
+                draggable={false}
+                className="h-full w-full object-cover"
+            />
 
+        </main>
+
+    );
 }
