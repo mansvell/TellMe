@@ -302,9 +302,9 @@ export default function InvitationsPage() {
     }
 
     return (
-        <main className="min-h-screen bg-slate-100 pb-28">
+        <main className="min-h-screen bg-slate-100 dark:bg-slate-900 pb-28">
 
-            <header className="sticky top-0 z-20 border-b border-slate-200 bg-white">
+            <header className="sticky top-0 z-20 border-b border-slate-200 bg-white dark:bg-slate-700 ">
 
                     <div className="flex items-center justify-center gap-3 p-2">
 
@@ -313,7 +313,7 @@ export default function InvitationsPage() {
                             alt=""
                             className="w-15 h-12 rounded-2xl"
                         />
-                        <h1 className="text-xl font-bold text-slate-900">
+                        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
                             Invitations
                         </h1>
                     </div>
@@ -327,16 +327,10 @@ export default function InvitationsPage() {
                 <div className="flex items-start gap-4">
 
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-
-                            <MessageCircle
-                                size={24}
-                            />
-
+                            <MessageCircle size={24} />
                         </div>
 
-
                         <div>
-
                             <h2 className="text-xl font-bold sm:text-2xl">
                                 Conversations privées
                             </h2>
@@ -350,11 +344,6 @@ export default function InvitationsPage() {
                     </div>
 
                 </div>
-
-
-                {/* ==================================================
-                    TABS
-                ================================================== */}
 
                 <div className="mt-6 grid grid-cols-3 gap-2 rounded-2xl bg-white p-1.5 shadow-sm">
 
@@ -410,11 +399,6 @@ export default function InvitationsPage() {
 
                 </div>
 
-
-                {/* ==================================================
-                    ERREUR
-                ================================================== */}
-
                 {errorMessage && (
 
                     <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
@@ -425,13 +409,7 @@ export default function InvitationsPage() {
 
                 )}
 
-
-                {/* ==================================================
-                    CHARGEMENT
-                ================================================== */}
-
                 {loading ? (
-
                     <div className="flex min-h-[420px] items-center justify-center">
 
                         <LoaderCircle
@@ -499,11 +477,6 @@ export default function InvitationsPage() {
 
             </section>
 
-
-            {/* ==================================================
-                BOTTOM NAVIGATION
-            ================================================== */}
-
             <BottomNavigation
                 active="invitations"
             />
@@ -513,31 +486,19 @@ export default function InvitationsPage() {
 }
 
 
-// ======================================================
 // TAB BUTTON
-// ======================================================
-
 type TabButtonProps = {
-
     active: boolean;
-
     label: string;
-
     count: number;
-
     onClick: () => void;
 };
 
-
-function TabButton({
-                       active,
-                       label,
-                       count,
+function TabButton({active, label, count,
                        onClick,
                    }: TabButtonProps) {
 
     return (
-
         <button
             type="button"
 
@@ -574,24 +535,13 @@ function TabButton({
     );
 }
 
-
-// ======================================================
-// INVITATION CARD
-// ======================================================
-
 type InvitationCardProps = {
-
     invitation: ChatInvitation;
-
     processing: boolean;
-
     onAccept: () => void;
-
     onReject: () => void;
-
     onOpen: () => void;
 };
-
 
 function InvitationCard({
                             invitation,
@@ -628,43 +578,23 @@ function InvitationCard({
 
     return (
 
-        <article className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm transition hover:shadow-md">
-
-
-            {/* ==================================================
-                HEADER CARD
-            ================================================== */}
+        <article className="overflow-hidden rounded-3xl border border-slate-100 bg-white dark:bg-slate-700 shadow-sm transition hover:shadow-md">
 
             <div className="p-5 sm:p-6">
 
                 <div className="flex items-start gap-4">
 
-
-                    {/* Icône */}
-
-                    <StatusIcon
-                        status={
-                            invitation.status
-                        }
-                    />
-
-
-                    {/* Infos */}
+                    <StatusIcon status={invitation.status}/>
 
                     <div className="min-w-0 flex-1">
 
                         <div className="flex flex-wrap items-start justify-between gap-3">
-
                             <div className="min-w-0">
-
                                 <h3 className="truncate text-lg font-bold text-slate-900 sm:text-xl">
-
                                     {
                                         invitation.conversationName
                                     }
-
                                 </h3>
-
 
                                 <p className="mt-1 text-sm text-slate-500">
 
@@ -694,8 +624,6 @@ function InvitationCard({
                         </div>
 
 
-                        {/* Date */}
-
                         <p className="mt-3 text-xs text-slate-400">
 
                             {formatInvitationDate(
@@ -714,23 +642,14 @@ function InvitationCard({
 
                 </div>
 
-
-                {/* ==================================================
-                    STATUS DETAILS
-                ================================================== */}
-
                 {isSent &&
                     isPending && (
-
                         <div className="mt-5 flex items-start gap-3 rounded-2xl bg-amber-50 p-4">
-
                             <Clock3
                                 size={19}
                                 className="mt-0.5 shrink-0 text-amber-500"
                             />
-
                             <div>
-
                                 <p className="text-sm font-semibold text-amber-700">
                                     En attente d’une réponse
                                 </p>
@@ -738,18 +657,13 @@ function InvitationCard({
                                 <p className="mt-1 text-xs leading-5 text-amber-600">
                                     Tu seras informé automatiquement lorsque cette personne acceptera ou refusera.
                                 </p>
-
                             </div>
-
                         </div>
-
                     )}
-
 
                 {isBlocked && (
 
                     <div className="mt-5 flex items-start gap-3 rounded-2xl bg-slate-100 p-4">
-
                         <ShieldOff
                             size={19}
                             className="mt-0.5 shrink-0 text-slate-500"
@@ -1116,61 +1030,32 @@ function EmptyState({
         <MessageCircle size={28} />;
 
 
-    if (
-        tab === "pending"
-    ) {
-
-        title =
-            "Aucune invitation en cours";
-
-        description =
-            "Les invitations envoyées ou reçues en attente apparaîtront ici.";
-
-        icon =
-            <Clock3 size={28} />;
+    if (tab === "pending") {
+        title = "Aucune invitation en cours";
+        description = "Les invitations envoyées ou reçues en attente apparaîtront ici.";
+        icon = <Clock3 size={28} />;
     }
 
 
-    if (
-        tab === "accepted"
-    ) {
-
-        title =
-            "Aucune invitation acceptée";
-
-        description =
-            "Tes conversations créées à partir d’invitations apparaîtront ici.";
-
-        icon =
-            <CheckCircle2 size={28} />;
+    if (tab === "accepted") {
+        title = "Aucune invitation acceptée";
+        description = "Tes conversations créées à partir d’invitations apparaîtront ici.";
+        icon = <CheckCircle2 size={28} />;
     }
 
 
-    if (
-        tab === "rejected"
-    ) {
-
-        title =
-            "Aucune invitation refusée";
-
-        description =
-            "Les invitations refusées ou indisponibles apparaîtront ici.";
-
-        icon =
-            <XCircle size={28} />;
+    if (tab === "rejected") {
+        title = "Aucune invitation refusée";
+        description = "Les invitations refusées ou indisponibles apparaîtront ici.";
+        icon = <XCircle size={28} />;
     }
-
 
     return (
-
-        <div className="mt-6 flex min-h-[420px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white px-6 text-center">
+        <div className="mt-6 flex min-h-[420px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white dark:bg-slate-700 px-6 text-center">
 
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sky-100 text-sky-500">
-
                 {icon}
-
             </div>
-
 
             <h2 className="mt-5 text-xl font-bold text-slate-800">
 

@@ -27,6 +27,11 @@ import {
     getPushStatus,
 } from "../services/pushNotifications";
 
+import {
+    applyTheme,
+    getSavedTheme,
+} from "../services/theme";
+
 type ProfileSettings = {
     id: string;
     displayName: string;
@@ -74,7 +79,21 @@ export default function SettingsPage() {
 
     const navigate = useNavigate();
 
-    // Profil du user connecté.
+    const [darkMode, setDarkMode] =
+        useState(
+            () => getSavedTheme() === "dark",
+        );
+    // Active ou désactive le thème sombre global.
+    function handleDarkMode(enabled: boolean) {
+
+        setDarkMode(enabled);
+
+        applyTheme(
+            enabled
+                ? "dark"
+                : "light",
+        );
+    }
     const [profile, setProfile] =
         useState<ProfileSettings | null>(null);
 
@@ -105,11 +124,6 @@ export default function SettingsPage() {
         setSavingInvitations,
     ] = useState(false);
 
-    // Thème sombre local.
-    const [darkMode, setDarkMode] =
-        useState(false);
-
-    // Modification du pseudo.
     const [
         showUsernameModal,
         setShowUsernameModal,
@@ -133,7 +147,6 @@ export default function SettingsPage() {
 
     const [clock, setClock] = useState(0);
 
-    // CHARGE LE PROFIL
     useEffect(() => {
 
         let active = true;
@@ -166,7 +179,6 @@ export default function SettingsPage() {
                     return;
                 }
 
-
                 const {
                     data,
                     error,
@@ -192,13 +204,10 @@ export default function SettingsPage() {
                     throw error;
                 }
 
-
                 const row =
                     data as ProfileDatabaseRow;
 
-
                 if (!active) return;
-
 
                 const loadedProfile:
                     ProfileSettings = {
@@ -297,19 +306,6 @@ export default function SettingsPage() {
         };
 
     }, []);
-
-    // THÈME
-    useEffect(() => {
-        const root =
-            document.documentElement;
-
-        if (darkMode) {
-            root.classList.add("dark");
-        } else {
-            root.classList.remove("dark");
-        }
-
-    }, [darkMode]);
 
     // DATE DE CRÉATION
     const memberSince =
@@ -738,7 +734,7 @@ export default function SettingsPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100 pb-28 dark:bg-slate-950">
+        <main className="min-h-screen bg-slate-100 pb-28 dark:bg-slate-800">
 
             <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
 
@@ -752,17 +748,7 @@ export default function SettingsPage() {
 
             </header>
 
-
-            {/* ==================================================
-                CONTENU
-            ================================================== */}
-
             <section className="mx-auto max-w-4xl space-y-5 p-4 sm:p-5">
-
-
-                {/* ==================================================
-                    CARTE PROFIL
-                ================================================== */}
 
                 <div
                     className="relative overflow-hidden rounded-[2rem] p-7 shadow-lg sm:p-9"
@@ -893,7 +879,7 @@ export default function SettingsPage() {
                         title="Thème sombre"
                         description="Utiliser une apparence sombre dans TellMe."
                         checked={darkMode}
-                        onChange={setDarkMode}
+                        onChange={handleDarkMode}
                     />
 
 
@@ -1210,11 +1196,6 @@ function Row({
     );
 }
 
-
-// ============================================================
-// SWITCH ROW
-// ============================================================
-
 function SwitchRow({
                        icon,
                        title,
@@ -1232,9 +1213,7 @@ function SwitchRow({
             <div className="flex min-w-0 items-center gap-4">
 
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-500 dark:bg-sky-950/40">
-
                     {icon}
-
                 </div>
 
 

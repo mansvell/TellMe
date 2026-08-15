@@ -88,17 +88,15 @@ export default function NewGroup({
         setErrorMessage("");
 
         try {
-            // AJOUT : on récupère l'id du groupe créé.
             const groupId = await createGroup(name, color, lifetime);
 
-            // AJOUT : recharge immédiatement Home.
             await onCreated();
 
-                // AJOUT : ferme le dialogue.
+                //ferme le dialogue.
             resetForm();
             onClose();
 
-                // AJOUT : pour le debug (à enlever plus tard)
+                //pour le debug (à enlever plus tard)
             console.log("Groupe créé :", groupId);
         } catch (error) {
             console.error("Create group error:", error);
@@ -128,11 +126,11 @@ export default function NewGroup({
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-bold text-slate-900">
-                            Nouveau groupe
+                            Creer un nouveau groupe
                         </h2>
 
                         <p className="mt-1 text-sm text-slate-500">
-                            Crée ton espace privé.
+                            Invitez vos ami(e)s via le lien et discutez librement et en secret
                         </p>
                     </div>
 
@@ -145,14 +143,7 @@ export default function NewGroup({
                     </button>
                 </div>
 
-                {/* Nom du groupe */}
                 <div className="mt-7">
-                    <label
-                        htmlFor="group-name"
-                        className="text-sm font-bold text-slate-700"
-                    >
-                        Nom du groupe
-                    </label>
 
                     <div className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 transition focus-within:border-sky-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-100">
                         <img
@@ -170,7 +161,7 @@ export default function NewGroup({
                             }
                             maxLength={40}
                             autoFocus
-                            placeholder="Ex. Développeurs React"
+                            placeholder="Nom du Groupe"
                             className="min-w-0 flex-1 bg-transparent text-slate-900 outline-none placeholder:text-slate-400"
                         />
 
