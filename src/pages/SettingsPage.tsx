@@ -736,7 +736,7 @@ export default function SettingsPage() {
 
         <main className="min-h-screen bg-slate-100 pb-28 dark:bg-slate-800">
 
-            <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+            <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-700">
 
                 <div className="mx-auto flex h-16 max-w-4xl items-center justify-center px-5">
 
@@ -807,41 +807,23 @@ export default function SettingsPage() {
 
                 )}
 
-
-                {/* ==================================================
-                    COMPTE
-                ================================================== */}
-
                 <SettingsTitle>
                     Compte
                 </SettingsTitle>
-
-
-                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
 
                     <Row
-                        icon={
-                            <UserPen
-                                size={21}
-                            />
-                        }
-
+                        icon={<UserPen size={21}/>}
                         title="Pseudo"
-
-                        value={
-                            profile.displayName
-                        }
-
+                        value={profile.displayName}
                         description={
                             usernameAvailability.canEdit
                                 ? "Tu peux modifier ton pseudo une fois tous les 14 jours."
                                 : `Prochaine modification dans ${usernameAvailability.text}.`
                         }
-
                         disabled={
                             !usernameAvailability.canEdit
                         }
-
                         onClick={
                             openUsernameModal
                         }
@@ -849,17 +831,12 @@ export default function SettingsPage() {
 
                 </div>
 
-
-                {/* ==================================================
-                    PRÉFÉRENCES
-                ================================================== */}
-
                 <SettingsTitle>
                     Préférences
                 </SettingsTitle>
 
 
-                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
                     <SwitchRow
                         icon={<Bell size={21}/>}
                         title="Notifications"
@@ -901,7 +878,7 @@ export default function SettingsPage() {
                 <SettingsTitle>
                     Application
                 </SettingsTitle>
-                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
                     <Row
                         disabled
                          icon={<Languages size={21}/>}
@@ -918,7 +895,7 @@ export default function SettingsPage() {
                     Informations
                 </SettingsTitle>
 
-                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-900">
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
                     <Row
                         icon={<Shield size={21}/>}
                         title="Politique de confidentialité"
@@ -1208,7 +1185,7 @@ function SwitchRow({
 
     return (
 
-        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-5 last:border-0 dark:border-slate-800">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-5 last:border-0 dark:border-slate-700">
 
             <div className="flex min-w-0 items-center gap-4">
 
@@ -1216,9 +1193,7 @@ function SwitchRow({
                     {icon}
                 </div>
 
-
                 <div>
-
                     <p className="font-semibold text-slate-800 dark:text-slate-100">
                         {title}
                     </p>

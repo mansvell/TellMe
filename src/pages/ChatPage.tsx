@@ -372,9 +372,6 @@ export default function ChatPage() {
                                     return {
                                         ...message,
 
-                                        // Realtime :
-                                        // une personne supplémentaire
-                                        // a lu ce message.
                                         readCount:
                                             message.readCount +
                                             1,
@@ -492,11 +489,6 @@ export default function ChatPage() {
                 null;
         }
     }
-
-
-    // ======================================================
-    // RÉPONDRE À UN MESSAGE
-    // ======================================================
 
     function answerMessage() {
 

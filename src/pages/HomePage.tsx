@@ -101,34 +101,24 @@ export default function HomePage() {
                     <div className="flex items-center gap-3">
 
                         <div className=" shadow-lg shadow-sky-900/10 backdrop-blur-xl ">
-
                             <img
                                 src={icon}
                                 alt="TellMe"
                                 className="h-18 w-18 object-contain drop-shadow-md"
                             />
-
                         </div>
 
-
                         <div>
-
                             <h1 className="text-3xl font-black tracking-tight text-white">
                                 TellMe
                             </h1>
-
                         </div>
-
                     </div>
-
                 </div>
 
                 <div className="mt-7 flex h-15 items-center gap-3 rounded-2xl border border-white/30 bg-white/95 px-4 shadow-xl shadow-sky-900/10 backdrop-blur-xl transition-all duration-300 focus-within:-translate-y-0.5 focus-within:ring-4 focus-within:ring-white/20 dark:border-slate-700 dark:bg-slate-900/95 dark:shadow-black/20 dark:focus-within:ring-sky-500/10">
 
-                    <Search
-                        size={21}
-                        className="shrink-0 text-slate-400 dark:text-slate-500"
-                    />
+                    <Search size={21} className="shrink-0 text-slate-400 dark:text-slate-500"/>
 
                     <input
                         value={search}
@@ -139,11 +129,8 @@ export default function HomePage() {
                         className="min-w-0 flex-1 bg-transparent text-slate-800 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
                     />
 
-
                     {/* Efface la recherche */}
-
                     {search && (
-
                         <button
                             type="button"
                             onClick={() => setSearch("")}
@@ -293,11 +280,10 @@ export default function HomePage() {
                                 type="button"
                                 key={group.id}
                                 onClick={() => navigate(`/chat/${group.id}`)}
-                                className="group relative w-full overflow-hidden rounded-3xl border border-white bg-white/95 p-4 text-left shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-100 hover:shadow-xl hover:shadow-slate-200/60 active:scale-[0.99] dark:border-slate-800 dark:bg-slate-900/95 dark:hover:border-slate-700 dark:hover:shadow-black/20"
+                                className="group relative w-full overflow-hidden rounded-3xl border border-white bg-white/95 p-4 text-left shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-100 hover:shadow-xl hover:shadow-slate-200/60 active:scale-[0.99] dark:border-slate-800 dark:bg-slate-700 dark:hover:border-slate-700 dark:hover:shadow-black/20"
                             >
 
                                 <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-gradient-to-br from-sky-100 to-cyan-100 opacity-0 blur-2xl transition duration-300 group-hover:opacity-100 dark:from-sky-900/30 dark:to-cyan-900/20" />
-
 
                                 <div className="relative flex items-center">
 
