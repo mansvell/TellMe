@@ -590,7 +590,7 @@ function InvitationCard({
 
                         <div className="flex flex-wrap items-start justify-between gap-3">
                             <div className="min-w-0">
-                                <h3 className="truncate text-lg font-bold text-slate-900 sm:text-xl">
+                                <h3 className="truncate text-lg font-bold text-slate-900 dark:text-white sm:text-xl">
                                     {
                                         invitation.conversationName
                                     }
@@ -602,7 +602,7 @@ function InvitationCard({
                                         ? "Invitation reçue de "
                                         : "Invitation envoyée à "}
 
-                                    <span className="font-semibold text-slate-700">
+                                    <span className="font-semibold text-slate-700 dark:text-white">
 
                                         {
                                             invitation.counterpartName

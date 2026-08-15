@@ -151,11 +151,11 @@ export async function enablePushNotifications():
         );
     }
 
-
+    console.log("PUSH 1 - start");
     // Demande l'autorisation système.
     const permission =
         await Notification.requestPermission();
-
+    console.log("PUSH 2 - permission:", permission);
 
     if (
         permission !==
@@ -183,13 +183,13 @@ export async function enablePushNotifications():
 
     const registration =
         await getServiceWorkerRegistration();
-
+    console.log("PUSH 3 - service worker ready");
 
     // Vérifie d'abord s'il existe déjà.
     let subscription =
         await registration.pushManager
             .getSubscription();
-
+    console.log("PUSH 4 - existing subscription:", subscription);
 
     if (!subscription) {
         subscription =
@@ -203,6 +203,7 @@ export async function enablePushNotifications():
                         ),
                 });
     }
+    console.log("PUSH 5 - subscription ready");
 
 
     const subscriptionJson =
@@ -250,7 +251,7 @@ export async function enablePushNotifications():
         );
     }
 
-
+    console.log("PUSH 6 - saving in Supabase");
     // Sauvegarde cet appareil.
     const {
         error: subscriptionError,
@@ -278,6 +279,10 @@ export async function enablePushNotifications():
                 },
             );
 
+    console.log(
+        "PUSH 7 - Supabase result:",
+        subscriptionError,
+    );
 
     if (subscriptionError) {
         console.error(
