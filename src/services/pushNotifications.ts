@@ -179,7 +179,12 @@ export async function enablePushNotifications():
             "VITE_VAPID_PUBLIC_KEY est manquante.",
         );
     }
-
+    console.log(
+        "VAPID:",
+        `${publicKey.substring(0, 10)}...`,
+        "length:",
+        publicKey.length,
+    );
 
     const registration =
         await getServiceWorkerRegistration();
