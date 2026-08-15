@@ -14,8 +14,8 @@ export default function TermsPage() {
     const navigate = useNavigate();
     return (
 
-        <main className="min-h-screen bg-slate-100 pb-10 dark:bg-slate-950">
-            <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+        <main className="min-h-screen bg-slate-100 pb-10 dark:bg-slate-900">
+            <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-700">
 
                 <div className="mx-auto flex h-16 max-w-3xl items-center px-5">
 
@@ -39,8 +39,6 @@ export default function TermsPage() {
 
 
             <section className="mx-auto max-w-3xl space-y-5 p-5">
-
-                {/* Introduction */}
 
                 <div className="rounded-[2rem] bg-slate-900 p-7 text-white shadow-sm dark:bg-sky-500">
 
@@ -139,7 +137,7 @@ function TermsCard({
 
     return (
 
-        <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-slate-900">
+        <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-slate-700">
 
             <div className="flex items-start gap-4">
 

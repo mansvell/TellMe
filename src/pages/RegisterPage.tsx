@@ -160,7 +160,7 @@ export default function RegisterPage() {
     return (
         <main className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-blue-50 px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-6xl items-center justify-center">
-                <section className="grid w-full overflow-hidden rounded-[2rem] border border-sky-100 bg-white lg:grid-cols-[0.9fr_1.1fr]">
+                <section className="grid w-full overflow-hidden rounded-[2rem] border border-sky-100 bg-white dark:bg-slate-700 lg:grid-cols-[0.9fr_1.1fr]">
 
                     <div className="hidden min-h-[650px] flex-col justify-between bg-gradient-to-br from-sky-500 to-blue-600 p-10 text-white lg:flex">
                         <img
@@ -202,17 +202,17 @@ export default function RegisterPage() {
 
                         <div className="mt-8 lg:mt-0">
                             <span
-                                className="inline-flex text-center rounded-full bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-700">
-                                Choisissez un nom au hasard pour garder l'anonymat
+                                className="inline-flex text-center rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white">
+                                Choisissez un nom au hasard pour garder l'anonymat !!
                             </span>
                         </div>
 
-                        <div className="mt-8">
+                        <div className="mt-3">
                             <label
                                 htmlFor="pseudo"
-                                className="text-sm font-bold text-slate-700"
+                                className="text-sm dark:text-white font-bold text-slate-700"
                             >
-                                Pseudo principal
+                                Entrez votre pseudo:
                             </label>
 
                             <div
@@ -229,7 +229,7 @@ export default function RegisterPage() {
                                         setPseudo(event.target.value)
                                     }
                                     maxLength={24}
-                                    placeholder="Ex. BlueCloud"
+                                    placeholder="Python"
                                     className="min-w-0 flex-1 bg-transparent text-slate-900 outline-none placeholder:text-slate-400"
                                 />
 
@@ -240,8 +240,8 @@ export default function RegisterPage() {
                         </div>
 
                         <div className="mt-6">
-                            <p className="text-sm font-bold text-slate-700">
-                                Couleur de ton identité
+                            <p className="text-sm font-bold dark:text-white text-slate-700">
+                                Couleur de ton identité :
                             </p>
 
                             <div className="mt-3 flex flex-wrap gap-3">
@@ -271,9 +271,9 @@ export default function RegisterPage() {
                         <div className="mt-6">
                             <label
                                 htmlFor="language"
-                                className="text-sm font-bold text-slate-700"
+                                className="text-sm dark:text-white font-bold text-slate-700"
                             >
-                                Langue
+                                Langue :
                             </label>
 
                             <div

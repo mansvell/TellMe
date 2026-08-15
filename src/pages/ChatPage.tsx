@@ -501,11 +501,6 @@ export default function ChatPage() {
         setMenu(null);
     }
 
-
-    // ======================================================
-    // COPIER UN MESSAGE
-    // ======================================================
-
     async function copyMessage() {
 
         if (!menu) return;
@@ -517,11 +512,7 @@ export default function ChatPage() {
         setMenu(null);
     }
 
-
-    // ======================================================
     // INVITATION PRIVÉE
-    // ======================================================
-
     function openInvitation() {
 
         if (!menu) return;
@@ -578,11 +569,6 @@ export default function ChatPage() {
         }
 
     }
-
-
-    // ======================================================
-    // ENVOIE UN MESSAGE
-    // ======================================================
 
     async function handleSendMessage() {
 
@@ -650,21 +636,11 @@ export default function ChatPage() {
         }
     }
 
-
-    // ======================================================
-    // JSX
-    // ======================================================
-
     return (
 
-        <main className="flex h-screen min-h-0 flex-col overflow-hidden bg-slate-100">
+        <main className="flex h-screen min-h-0 flex-col overflow-hidden bg-slate-100 dark:bg-slate-800">
 
-
-            {/* ==================================================
-                HEADER
-            ================================================== */}
-
-            <header className="z-20 shrink-0 border-b border-slate-200 bg-white">
+            <header className="z-20 shrink-0 border-b border-slate-200 bg-white dark:bg-slate-700">
 
                 <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-3 sm:px-5">
 
@@ -672,20 +648,15 @@ export default function ChatPage() {
 
                         <Link
                             to="/home"
-                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 dark:text-white transition hover:bg-slate-100"
                         >
-                            <ArrowLeft
-                                size={22}
-                            />
+                            <ArrowLeft size={22}/>
                         </Link>
 
 
-                        <Link
-                            to={`/gdetailp/${groupId}`}
+                        <Link to={`/gdetailp/${groupId}`}
                             className="flex min-w-0 items-center gap-3"
                         >
-
-                            {/* Couleur du groupe */}
 
                             <div
                                 className="flex h-14 w-14 items-center justify-center rounded-2xl sm:h-12 sm:w-12"
@@ -705,16 +676,10 @@ export default function ChatPage() {
 
                             </div>
 
-
-                            {/* Nom + membres */}
-
                             <div className="min-w-0">
-
-                                <h1 className="truncate font-bold text-slate-900">
-
+                                <h1 className="truncate font-bold text-slate-900 dark:text-white">
                                     {group?.name ??
                                         "Chargement..."}
-
                                 </h1>
 
                                 <p className="truncate text-sm text-emerald-500">
@@ -735,11 +700,9 @@ export default function ChatPage() {
 
 
                     <Link to={`/gdetailp/${groupId}`}
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-600 dark:text-white transition hover:bg-slate-100"
                     >
-                        <Settings
-                            size={21}
-                        />
+                        <Settings size={28}/>
                     </Link>
                 </div>
 
@@ -961,10 +924,7 @@ export default function ChatPage() {
                                         )}
 
 
-                                        {/* ==================
-                                            HEURE + LECTURE
-                                        ================== */}
-
+                                        {/* HEURE + LECTURE*/}
                                         <div className="mt-2 flex items-center justify-end gap-1.5 text-[11px] text-white/80">
 
                                             <span>
@@ -1078,7 +1038,7 @@ export default function ChatPage() {
             )}
 
             {/* FOOTER / INPUT */}
-            <footer className="z-20 shrink-0 border-t border-slate-200 bg-white p-3 sm:p-4">
+            <footer className="z-20 shrink-0 border-t border-slate-200 bg-white dark:bg-slate-700 p-3 sm:p-4">
 
 
                 {/* FICHIER SÉLECTIONNÉ */}

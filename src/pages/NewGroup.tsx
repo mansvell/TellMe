@@ -121,15 +121,15 @@ export default function NewGroup({
             <form
                 onSubmit={handleSubmit}
                 onClick={(event) => event.stopPropagation()}
-                className="max-h-[92vh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-6 shadow-2xl sm:max-w-lg sm:rounded-[2rem]"
+                className="max-h-[92vh] w-full overflow-y-auto rounded-t-[2rem] bg-white dark:bg-slate-700 p-6 shadow-2xl sm:max-w-lg sm:rounded-[2rem]"
             >
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900">
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
                             Creer un nouveau groupe
                         </h2>
 
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm text-slate-500 dark:text-white">
                             Invitez vos ami(e)s via le lien et discutez librement et en secret
                         </p>
                     </div>
@@ -173,7 +173,7 @@ export default function NewGroup({
 
                 {/* Couleur du groupe */}
                 <div className="mt-7">
-                    <p className="text-sm font-bold text-slate-700">
+                    <p className="text-sm font-bold text-slate-700 dark:text-white">
                         Couleur du groupe
                     </p>
 
@@ -217,7 +217,7 @@ export default function NewGroup({
                             className="text-sky-500"
                         />
 
-                        <p className="text-sm font-bold text-slate-700">
+                        <p className="text-sm font-bold text-slate-700 dark:text-white">
                             Durée de vie
                         </p>
                     </div>
