@@ -204,7 +204,7 @@ export default function VoteBuzz() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible d'enregistrer ton vote.",
+                    : "Vous avez deja voté !",
             );
 
         } finally {

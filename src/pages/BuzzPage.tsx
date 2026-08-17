@@ -1,35 +1,15 @@
-import {
-    BarChart3,
-    Check,
-    ChevronRight,
-    CirclePlus,
-    Copy,
-    Flame,
-    Link2,
-    Lock,
-    MessageCircle,
-    MoreHorizontal,
-    Plus,
-    Send,
-    Share2,
-    Trash2,
-    Users,
-    Vote,
-    X,
-} from "lucide-react";
+import {BarChart3, Check, ChevronRight, CirclePlus, Copy, Flame, Link2, Lock, MessageCircle, MoreHorizontal, Plus,
+    Share2, Trash2, Users, Vote, X,Globe } from "lucide-react";
 
 import {
     useEffect,
     useMemo,
     useState, useRef
 } from "react";
-import {
-    publishBuzzToGroup,
-} from "../services/buzz";
+import {publishBuzzToGroup } from "../services/buzz";
 import icon from "../assets/icon.png";
 
-import BottomNavigation
-    from "../components/BottomNavigation";
+import BottomNavigation from "../components/BottomNavigation";
 
 import {
     getMyGroups,
@@ -53,11 +33,6 @@ type Tab =
     | "create"
     | "mine"
     | "results";
-
-
-// ============================================================
-// PAGE
-// ============================================================
 
 export default function BuzzPage() {
 
@@ -140,10 +115,7 @@ export default function BuzzPage() {
         };
     }, []);
 
-
-    // ========================================================
     // STATS
-    // ========================================================
     async function handlePublishToGroup(
         buzz: Buzz,
     ) {
@@ -203,10 +175,7 @@ export default function BuzzPage() {
         );
 
 
-    // ========================================================
     // OPTIONS
-    // ========================================================
-
     function updateOption(
         index: number,
         value: string,
@@ -435,11 +404,6 @@ export default function BuzzPage() {
             );
     }
 
-
-    // ========================================================
-    // CLOSE / DELETE
-    // ========================================================
-
     async function toggleBuzz(
         buzz: Buzz,
     ) {
@@ -505,19 +469,9 @@ export default function BuzzPage() {
         }
     }
 
-
-    // ========================================================
-    // UI
-    // ========================================================
-
     return (
 
         <main className="relative min-h-screen overflow-x-hidden bg-slate-50 pb-28 text-slate-900 duration-500 dark:bg-slate-950 dark:text-white">
-
-
-            {/* ================================================= */}
-            {/* MÊME BACKGROUND QUE TON ANCIEN BUZZ */}
-            {/* ================================================= */}
 
             <div className="pointer-events-none absolute inset-x-0 top-0 h-[430px] bg-gradient-to-br from-sky-600 via-sky-500 to-cyan-400 dark:from-sky-950 dark:via-sky-900 dark:to-slate-900" />
 
@@ -526,11 +480,6 @@ export default function BuzzPage() {
             <div className="pointer-events-none absolute -right-28 top-10 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
 
             <div className="pointer-events-none absolute -left-32 top-40 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
-
-
-            {/* ================================================= */}
-            {/* HEADER */}
-            {/* ================================================= */}
 
             <header className="relative z-10 mx-auto max-w-7xl px-5 pt-6">
 
@@ -559,7 +508,7 @@ export default function BuzzPage() {
                             </div>
 
                             <p className="mt-0.5 text-sm font-medium text-sky-100">
-                                Lance la discussion.
+                                Lance la discussion
                             </p>
 
                         </div>
@@ -628,39 +577,18 @@ export default function BuzzPage() {
 
                     <div className="mx-auto mt-8 max-w-3xl">
 
-
-                        {/* INTRO */}
-
-                        <div>
-
-                            <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-500">
-                                Nouveau Buzz
-                            </p>
-
-                            <h3 className="mt-1 text-2xl font-black">
-                                Pose ta question
-                            </h3>
-
-                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                Une bonne question suffit parfois pour réveiller tout un groupe.
-                            </p>
-
-                        </div>
-
-
                         {/* QUESTION */}
-
-                        <div className="mt-6 rounded-[1.8rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                        <div className="mt-6 rounded-[1.8rem] border border-slate-200/80 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
                             <div className="flex items-center gap-3">
 
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-50 text-xl dark:bg-orange-950/30">
-                                    🔥
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500 text-xl dark:bg-orange-950/30">
+                                    <Flame size={25} />
                                 </div>
 
                                 <div>
 
-                                    <h4 className="font-black">
+                                    <h4 className="font-bold text-sky-500">
                                         Ta question
                                     </h4>
 
@@ -681,9 +609,9 @@ export default function BuzzPage() {
                                     )
                                 }
                                 maxLength={220}
-                                rows={4}
+                                rows={3}
                                 placeholder="Ex : Est-ce que tu pourrais pardonner une tromperie ?"
-                                className="mt-5 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-base font-semibold outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-sky-950"
+                                className="mt-3 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-base font-semibold outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-sky-950"
                             />
 
                             <div className="mt-1 text-right text-xs text-slate-400">
@@ -694,14 +622,13 @@ export default function BuzzPage() {
 
 
                         {/* OPTIONS */}
-
                         <div className="mt-4 rounded-[1.8rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
                             <div className="flex items-center justify-between">
 
                                 <div>
 
-                                    <h4 className="font-black">
+                                    <h4 className="font-bold text-sky-500">
                                         Réponses
                                     </h4>
 
@@ -725,9 +652,7 @@ export default function BuzzPage() {
                                         option,
                                         index,
                                     ) => (
-
-                                        <div
-                                            key={index}
+                                        <div key={index}
                                             className="flex items-center gap-3"
                                         >
 
@@ -736,7 +661,6 @@ export default function BuzzPage() {
                                                     65 + index,
                                                 )}
                                             </div>
-
 
                                             <input
                                                 value={option}
@@ -794,18 +718,12 @@ export default function BuzzPage() {
 
                         </div>
 
-
                         {/* TYPE DE VOTE */}
-
                         <div className="mt-4 rounded-[1.8rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
-                            <h4 className="font-black">
+                            <h4 className="font-bold text-sky-500">
                                 Type de vote
                             </h4>
-
-                            <p className="mt-1 text-xs text-slate-400">
-                                Décide comment les participants peuvent répondre.
-                            </p>
 
 
                             <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -815,7 +733,6 @@ export default function BuzzPage() {
                                         voteType ===
                                         "single"
                                     }
-                                    emoji="☝️"
                                     title="Un seul choix"
                                     description="Une seule réponse par participant."
                                     onClick={() =>
@@ -830,7 +747,6 @@ export default function BuzzPage() {
                                         voteType ===
                                         "multiple"
                                     }
-                                    emoji="✌️"
                                     title="Plusieurs choix"
                                     description="Plusieurs réponses peuvent être sélectionnées."
                                     onClick={() =>
@@ -847,18 +763,20 @@ export default function BuzzPage() {
 
                         {/* GROUPE */}
 
-                        <div className="mt-4 rounded-[1.8rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                        <div
+                            className="mt-4 rounded-[1.8rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
                             <div className="flex items-center gap-3">
 
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-500 dark:bg-violet-950/30">
-                                    <Users size={20} />
+                                <div
+                                    className="flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-500 dark:bg-violet-950/30">
+                                    <Users size={20}/>
                                 </div>
 
                                 <div>
 
-                                    <h4 className="font-black">
-                                        Lier à un groupe
+                                    <h4 className="font-bold text-sky-500">
+                                        Lier le Buzz à un groupe
                                     </h4>
 
                                     <p className="text-xs text-slate-400">
@@ -871,6 +789,9 @@ export default function BuzzPage() {
 
 
                             <p className="mt-4 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                                Ton Buzz sera visible dans ce groupe
+                            </p>
+                            <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
                                 Les personnes qui découvrent ton Buzz pourront être invitées à rejoindre ce groupe.
                             </p>
 
@@ -911,8 +832,8 @@ export default function BuzzPage() {
 
 
                         {/* SETTINGS */}
-
-                        <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                        <div
+                            className="mt-4 overflow-hidden rounded-[1.8rem] border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
                             <ToggleRow
                                 icon={
@@ -982,11 +903,7 @@ export default function BuzzPage() {
 
                     <div className="mt-8">
 
-                        <SectionHeader
-                            eyebrow="Ton activité"
-                            title="Mes Buzz"
-                            description="Gère tes sondages, partage-les et suis leur activité."
-                        />
+                        <h2 className="text-2xl text-white font-bold"> Activité </h2>
 
 
                         {loading ? (
@@ -1027,8 +944,8 @@ export default function BuzzPage() {
 
                                                     <div className="flex min-w-0 items-start gap-3">
 
-                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-orange-50 text-xl dark:bg-orange-950/30">
-                                                            🔥
+                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-400 text-xl dark:bg-orange-950/30">
+                                                            <Flame size={20} />
                                                         </div>
 
                                                         <div className="min-w-0">
@@ -1190,20 +1107,8 @@ export default function BuzzPage() {
 
                                                         <button
                                                             type="button"
-                                                            onClick={() =>
-                                                                void copyBuzz(
-                                                                    buzz,
-                                                                )
-                                                            }
-                                                            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-500 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
-                                                        >
-                                                            <Copy size={17}/>
-                                                        </button>
-
-                                                        <button
-                                                            type="button"
                                                             onClick={() => setSelectedBuzzToShare(buzz)}
-                                                            className="flex items-center gap-2 rounded-2xl bg-sky-50 px-4 py-3 font-bold text-sky-600 transition hover:bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300"
+                                                            className="flex items-center gap-2 rounded-2xl bg-sky-200 px-4 py-3 font-bold text-sky-600 transition hover:bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300"
                                                         >
                                                             <Share2 size={18}/>
                                                             Partager
@@ -1232,20 +1137,15 @@ export default function BuzzPage() {
                 {tab === "results" && (
 
                     <div className="mt-8">
-
-                        <SectionHeader
-                            eyebrow="Statistiques"
-                            title="Résultats"
-                            description="Découvre comment les gens réagissent à tes questions."
-                        />
-
+                        <h2 className="text-2xl font-bold text-white">
+                            Statistiques des Votes
+                        </h2>
 
                         {/* GLOBAL STATS */}
-
                         <div className="mt-6 grid grid-cols-3 gap-3">
 
                             <StatCard
-                                emoji="<Flame>"
+                                icon=<Flame/>
                                 value={
                                     buzzes.length
                                 }
@@ -1253,7 +1153,7 @@ export default function BuzzPage() {
                             />
 
                             <StatCard
-                                emoji="🗳️"
+                                icon=<Vote/>
                                 value={
                                     totalVotes
                                 }
@@ -1261,7 +1161,7 @@ export default function BuzzPage() {
                             />
 
                             <StatCard
-                                emoji="🌍"
+                                icon=<Globe/>
                                 value={
                                     externalVotes
                                 }
@@ -1339,7 +1239,7 @@ export default function BuzzPage() {
 
             </section>
 
-            {/* SUCCESS MODAL */}
+            {/* card du Buzz crée */}
             {createdBuzz && (
 
                 <div
@@ -1356,19 +1256,19 @@ export default function BuzzPage() {
                         }
                     >
 
-                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-500 dark:bg-emerald-950/30">
-                            <Check size={30} />
+                        <div
+                            className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-500 dark:bg-emerald-950/30">
+                            <Check size={30}/>
                         </div>
 
 
                         <h3 className="mt-4 text-center text-2xl font-black">
-                            Ton Buzz est prêt 🔥
+                            Ton Buzz est prêt !
                         </h3>
 
-                        <p className="mt-2 text-center text-sm leading-6 text-slate-500 dark:text-slate-400">
-                            Maintenant, fais voter les autres.
+                        <p className="mt-2 text-center text-xl leading-6 text-slate-500 dark:text-slate-400">
+                            Retrouve le sous l'onglet "Mes Buzz" et partage ton lien
                         </p>
-
 
                         {/* GROUPE */}
                         {createdBuzz.group_id && (
@@ -1381,7 +1281,7 @@ export default function BuzzPage() {
                                         createdBuzz,
                                     )
                                 }
-                                className="mt-6 flex h-14 w-full items-center justify-between rounded-2xl bg-violet-50 px-4 text-violet-600 transition hover:bg-violet-100 disabled:opacity-50 dark:bg-violet-950/30 dark:text-violet-300"
+                                className="mt-6 mb-5 flex h-14 w-full items-center justify-between rounded-2xl bg-violet-50 px-4 text-violet-600 transition hover:bg-violet-100 disabled:opacity-50 dark:bg-violet-950/30 dark:text-violet-300"
                             >
 
                                 <span className="flex items-center gap-3 font-bold">
@@ -1401,62 +1301,23 @@ export default function BuzzPage() {
                         )}
 
 
-                        {/* STATUS */}
-                        {createdBuzz.allow_external_votes && (
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    void shareBuzz(
-                                        createdBuzz,
-                                    )
-                                }
-                                className="mt-3 flex h-14 w-full items-center justify-between rounded-2xl bg-sky-500 px-4 text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600"
-                            >
-
-                                <span className="flex items-center gap-3 font-bold">
-                                    <Send size={19} />
-                                    Partager
-                                </span>
-                                <Share2 size={18} />
-                            </button>
-                        )}
-
-                        <button
-                            type="button"
-                            onClick={() =>
-                                void copyBuzz(
-                                    createdBuzz,
-                                )
-                            }
-                            className="mt-3 flex h-14 w-full items-center justify-between rounded-2xl bg-slate-100 px-4 text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300"
-                        >
-                            <span className="flex items-center gap-3 font-bold">
-                                <Copy size={19} />
-                                Copier le lien
-                            </span>
-                            <Link2 size={18} />
-                        </button>
-
                         <button
                             type="button"
                             onClick={() =>
                                 setCreatedBuzz(null)
                             }
-                            className="mt-5 h-12 w-full font-bold text-slate-400 transition hover:text-slate-600 dark:hover:text-white"
+                            className="mx-auto flex items-center justify-center p-4 rounded-xl item-center font-bold text-white bg-sky-400 transition hover:text-slate-600 dark:hover:text-white"
                         >
-                            Terminer
+                            Okay
                         </button>
-
                     </div>
-
                 </div>
-
             )}
 
 
             {selectedBuzzToShare && (
-                <div className="fixed inset-0 z-[300] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-5">
+                <div
+                    className="fixed inset-0 z-[300] flex items-end justify-center bg-black/60 p-0 backdrop-blur-sm sm:items-center sm:p-5">
                     <div className="max-h-[95vh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-5 dark:bg-slate-900 sm:max-w-lg sm:rounded-[2rem]">
                         <div className="flex items-center justify-between">
                             <div>
@@ -1547,20 +1408,8 @@ function TabButton({active, icon, label, onClick}: {
     );
 }
 
-
-// ============================================================
-// CHOICE
-// ============================================================
-
-function ChoiceCard({
-                        selected,
-                        emoji,
-                        title,
-                        description,
-                        onClick,
-                    }: {
+function ChoiceCard({selected, title, description, onClick}: {
     selected: boolean;
-    emoji: string;
     title: string;
     description: string;
     onClick: () => void;
@@ -1581,13 +1430,7 @@ function ChoiceCard({
                 </div>
 
             )}
-
-
-            <span className="text-2xl">
-                {emoji}
-            </span>
-
-            <h5 className="mt-3 font-black">
+            <h5 className="mt-3 text-sky-600 font-bold">
                 {title}
             </h5>
 
@@ -1625,7 +1468,7 @@ function ToggleRow({
 
             <div className="min-w-0 flex-1">
 
-                <h4 className="font-bold">
+                <h4 className="font-bold text-sky-500">
                     {title}
                 </h4>
 
@@ -1653,53 +1496,19 @@ function ToggleRow({
     );
 }
 
-function SectionHeader({
-                           eyebrow,
-                           title,
-                           description,
-                       }: {
-    eyebrow: string;
-    title: string;
-    description: string;
-}) {
 
-    return (
-
-        <div>
-
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-500">
-                {eyebrow}
-            </p>
-
-            <h3 className="mt-1 text-2xl font-black">
-                {title}
-            </h3>
-
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                {description}
-            </p>
-
-        </div>
-
-    );
-}
-
-function StatCard({
-                      emoji,
-                      value,
-                      label,
-                  }: {
-    emoji: string;
+function StatCard({icon, value, label}: {
+    icon: React.ReactNode;
     value: number;
     label: string;
 }) {
 
     return (
 
-        <div className="rounded-[1.5rem] border border-slate-200/80 bg-white p-4 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="rounded-[1.5rem] flex items-center justify-between border border-slate-200/80 bg-white p-4 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
-            <div className="text-2xl">
-                {emoji}
+            <div className="text-sky-500">
+                {icon}
             </div>
 
             <p className="mt-2 text-xl font-black">
