@@ -245,22 +245,27 @@ export default function VoteBuzz() {
     if (!buzz) {
 
         return (
-            <main className="flex min-h-screen items-center justify-center bg-slate-50 px-5 text-center dark:bg-slate-950">
+            <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-sky-500 via-white to-white px-5 text-center dark:bg-slate-950">
 
                 <div>
-
-                    <div className="text-5xl">
-                        👀
-                    </div>
+                    <img
+                        src={icon}
+                        alt="TellMe"
+                        className="h-30 w-30 object-contain ml-25"
+                    />
 
                     <h1 className="mt-5 text-2xl font-black dark:text-white">
-                        Ce Buzz n'existe plus
+                        Oups! Ce Buzz n'existe plus...
                     </h1>
 
                     <p className="mt-2 text-sm text-slate-500">
-                        Il a peut-être été fermé par son créateur.
+                        Il a été fermé par son créateur
                     </p>
 
+                    <button className="mt-5  p-2 bg-sky-500 text-xm text-white rounded-2xl" onClick={() =>
+                        navigate(`/welcome`)}>
+                        Rejoins TellMe et partage des moments fun
+                    </button>
                 </div>
 
             </main>
@@ -270,7 +275,8 @@ export default function VoteBuzz() {
 
     return (
 
-        <main className="relative min-h-screen overflow-hidden bg-slate-50 px-5 pb-12 text-slate-900 dark:bg-slate-950 dark:text-white">
+        <main
+            className="relative min-h-screen overflow-hidden bg-slate-50 px-5 pb-12 text-slate-900 dark:bg-slate-950 dark:text-white">
 
             <div className="pointer-events-none absolute inset-x-0 top-0 h-[430px] bg-gradient-to-br from-sky-600 via-sky-500 to-cyan-400 dark:from-sky-950 dark:via-sky-900 dark:to-slate-900" />
 
@@ -356,31 +362,23 @@ export default function VoteBuzz() {
                                                             strokeWidth={3}
                                                         />
                                                     )}
-
                                                 </span>
-
                                                 <span className="font-bold">
                                                     {option.label}
                                                 </span>
-
                                             </button>
 
                                         );
-
                                     },
                                 )}
-
                             </div>
 
-
                             {errorMessage && (
-
                                 <p className="mt-4 text-center text-sm font-semibold text-red-500">
                                     {errorMessage}
                                 </p>
 
                             )}
-
 
                             <button
                                 type="button"
@@ -406,14 +404,11 @@ export default function VoteBuzz() {
                                 {voting
                                     ? "Vote..."
                                     : "Voter"}
-
                             </button>
 
 
                             <div className="mt-5 flex items-center justify-center gap-2 text-xs font-semibold text-slate-400">
-
                                 <LockKeyhole size={14} />
-
                                 Aucun compte TellMe nécessaire
 
                             </div>
@@ -438,7 +433,7 @@ export default function VoteBuzz() {
                             Merci pour ta participation
                         </p>
 
-
+                                                    {/*les results montrés aux externes */}
                         {buzz.show_results_after_vote &&
                             results.length > 0 && (
 
@@ -511,26 +506,24 @@ export default function VoteBuzz() {
 
                                     <div className="flex items-center gap-3">
 
-                                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-100 text-sky-500 dark:bg-sky-950/50">
-                                            <MessageCircle size={20} />
+                                        <div
+                                            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-100 text-sky-500 dark:bg-sky-950/50">
+                                            <MessageCircle size={20}/>
                                         </div>
 
                                         <div>
-
-                                            <p className="text-xs font-bold text-slate-400">
-                                                LA DISCUSSION CONTINUE
+                                            <p className="text-xl font-bold text-slate-400">
+                                                La discussion continue dans:
+                                                <span
+                                                    className="text-xl font-bold text-slate-800"> {buzz.group_name}</span>
                                             </p>
-
-                                            <h3 className="font-black">
-                                                {buzz.group_name}
-                                            </h3>
-
                                         </div>
 
                                     </div>
 
                                     <p className="mt-4 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                        Ce Buzz vient d'un groupe TellMe. Rejoins la discussion pour voir ce que les autres en pensent.
+                                        Ce Buzz vient d'un groupe TellMe. Rejoins la discussion pour voir ce que les
+                                        autres en pensent.
                                     </p>
 
                                     <button
@@ -542,13 +535,14 @@ export default function VoteBuzz() {
                                         }
                                         className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white transition hover:bg-sky-600"
                                     >
-
                                         Rejoindre le groupe
-
-                                        <ArrowRight size={18} />
+                                        <ArrowRight size={18}/>
 
                                     </button>
-
+                                    <button className="mt-5 pb-2 pt-1 flex  w-full text-center justify-center gap-2 rounded-2xl bg-gray-500 font-bold text-green-500" onClick={() =>
+                                        navigate(`/welcome`)}>
+                                        Rejoins TellMe et partage des moments fun
+                                    </button>
                                 </div>
 
                             )}

@@ -575,17 +575,7 @@ export default function BuzzPage() {
 
             </header>
 
-
-            {/* ================================================= */}
-            {/* CONTENT */}
-            {/* ================================================= */}
-
             <section className="relative z-10 mx-auto mt-9 max-w-7xl px-5">
-
-
-                {/* ================================================= */}
-                {/* TABS */}
-                {/* ================================================= */}
 
                 <div className="rounded-[1.5rem] border border-white/50 bg-white/90 p-1.5 shadow-xl shadow-sky-900/10 backdrop-blur-xl dark:border-slate-700/70 dark:bg-slate-900/90">
 
@@ -633,11 +623,6 @@ export default function BuzzPage() {
                     </div>
 
                 </div>
-
-
-                {/* ================================================= */}
-                {/* CREATE */}
-                {/* ================================================= */}
 
                 {tab === "create" && (
 
@@ -992,11 +977,7 @@ export default function BuzzPage() {
 
                 )}
 
-
-                {/* ================================================= */}
-                {/* MES BUZZ */}
-                {/* ================================================= */}
-
+                                           {/* MES BUZZ */}
                 {tab === "mine" && (
 
                     <div className="mt-8">
@@ -1198,25 +1179,12 @@ export default function BuzzPage() {
 
                                                 <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
+                                                    <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
 
-                                                            setTab(
-                                                                "results",
-                                                            );
-                                                        }}
-                                                        className="flex items-center gap-2 text-sm font-bold text-slate-500 transition hover:text-sky-500 dark:text-slate-400"
-                                                    >
-
-                                                        <Vote size={17} />
-
-                                                        {buzz.votes_count ?? 0} votes
-
-                                                        <ChevronRight size={15} />
-
-                                                    </button>
-
+                                                        <span>{buzz.votes_count ?? 0} Votes :</span>
+                                                        <span> {buzz.tellme_votes_count ?? 0} Internes</span>
+                                                        <span>{buzz.external_votes_count ?? 0} Externes</span>
+                                                    </div>
 
                                                     <div className="flex items-center gap-2">
 
@@ -1277,7 +1245,7 @@ export default function BuzzPage() {
                         <div className="mt-6 grid grid-cols-3 gap-3">
 
                             <StatCard
-                                emoji="🔥"
+                                emoji="<Flame>"
                                 value={
                                     buzzes.length
                                 }
@@ -1303,56 +1271,68 @@ export default function BuzzPage() {
                         </div>
 
                         {/* RESULTS LIST */}
-                        <div className="mt-7 space-y-4">
+                        <div className="mt-7 space-y-5">
+                            {buzzes.map((buzz) => {
+                                const results = buzz.results ?? [];
 
-                            {buzzes.map(
-                                (buzz) => (
+                                const totalSelections = results.reduce(
+                                    (total, option) =>
+                                        total + option.votes,
+                                    0,
+                                );
 
-                                    <button
-                                        type="button"
-                                        key={buzz.id}
-                                        className="group w-full rounded-[1.7rem] border border-slate-200/80 bg-white p-5 text-left shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+                                return (
+                                    <div key={buzz.id}
+                                        className="w-full rounded-[1.7rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
                                     >
+                                        <div className="mt-6 space-y-4">
+                                            {results.map((option) => {
+                                                const percentage =
+                                                    totalSelections > 0
+                                                        ? Math.round(
+                                                            (option.votes / totalSelections) * 100,
+                                                        )
+                                                        : 0;
 
-                                        <div className="flex items-center gap-4">
+                                                return (
+                                                    <div key={option.option_id}>
+                                                        <div className="mb-2 flex items-center justify-between gap-3">
+                                                            <span className="min-w-0 truncate font-bold text-slate-700 dark:text-slate-200">
+                                                                {option.label}
+                                                            </span>
 
-                                            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-2xl dark:bg-sky-950/30">
-                                                📊
-                                            </div>
+                                                            <span className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
+                                                                {option.votes} personne{option.votes !== 1 ? "s" : ""} · {percentage}%
+                                                            </span>
+                                                        </div>
 
+                                                        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                                            <div
+                                                                className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-700"
+                                                                style={{
+                                                                    width: `${percentage}%`,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
 
-                                            <div className="min-w-0 flex-1">
+                                            {results.length === 0 && (
+                                                <div className="rounded-2xl bg-slate-50 py-5 text-center dark:bg-slate-800/60">
+                                                    <p className="text-2xl">
+                                                        🗳️
+                                                    </p>
 
-                                                <h4 className="line-clamp-2 font-black">
-                                                    {buzz.question}
-                                                </h4>
-
-
-                                                <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
-
-                                                    <span>
-                                                        🗳️ {buzz.votes_count ?? 0}
-                                                    </span>
-
-                                                    <span>
-                                                        💬 {buzz.tellme_votes_count ?? 0} TellMe
-                                                    </span>
-
-                                                    <span>
-                                                        🌍 {buzz.external_votes_count ?? 0} externes
-                                                    </span>
+                                                    <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+                                                        Aucun résultat pour le moment
+                                                    </p>
                                                 </div>
-                                            </div>
-
-                                            <ChevronRight
-                                                size={20}
-                                                className="text-slate-300 transition group-hover:translate-x-1 group-hover:text-sky-500"
-                                            />
+                                            )}
                                         </div>
-                                    </button>
-
-                                ),
-                            )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

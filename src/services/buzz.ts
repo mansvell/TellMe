@@ -37,6 +37,11 @@ export type Buzz = {
     votes_count?: number;
     tellme_votes_count?: number;
     external_votes_count?: number;
+    results?: {
+        option_id: string;
+        label: string;
+        votes: number;
+    }[];
 };
 
 
@@ -309,24 +314,19 @@ export async function createBuzz(
 // MES BUZZ
 // ============================================================
 
-export async function getMyBuzzes():
-    Promise<Buzz[]> {
-
+export async function getMyBuzzes(): Promise<Buzz[]> {
     const {
         data: { user },
         error: userError,
     } = await supabase.auth.getUser();
 
-
     if (userError) {
         throw userError;
     }
 
-
     if (!user) {
         return [];
     }
-
 
     const {
         data: buzzes,
@@ -342,37 +342,22 @@ export async function getMyBuzzes():
                 position
             )
         `)
-        .eq(
-            "creator_user_id",
-            user.id,
-        )
-        .order(
-            "created_at",
-            {
-                ascending: false,
-            },
-        );
-
+        .eq("creator_user_id", user.id)
+        .order("created_at", {
+            ascending: false,
+        });
 
     if (buzzError) {
         throw buzzError;
     }
 
-
     if (!buzzes?.length) {
         return [];
     }
 
-
-    const buzzIds =
-        buzzes.map(
-            (buzz) => buzz.id,
-        );
-
-
-    // --------------------------------------------------------
-    // CHARGE LES VOTES
-    // --------------------------------------------------------
+    const buzzIds = buzzes.map(
+        (buzz) => buzz.id,
+    );
 
     const {
         data: votes,
@@ -384,37 +369,93 @@ export async function getMyBuzzes():
             buzz_id,
             source
         `)
-        .in(
-            "buzz_id",
-            buzzIds,
-        );
-
+        .in("buzz_id", buzzIds);
 
     if (votesError) {
         throw votesError;
     }
 
+    const voteIds = (votes ?? []).map(
+        (vote) => vote.id,
+    );
+
+    let choices: {
+        vote_id: string;
+        option_id: string;
+    }[] = [];
+
+    if (voteIds.length > 0) {
+        const {
+            data: choicesData,
+            error: choicesError,
+        } = await supabase
+            .from("buzz_vote_choices")
+            .select(`
+                vote_id,
+                option_id
+            `)
+            .in("vote_id", voteIds);
+
+        if (choicesError) {
+            throw choicesError;
+        }
+
+        choices = choicesData ?? [];
+    }
 
     return buzzes.map((buzz) => {
-
         const buzzVotes =
             (votes ?? []).filter(
                 (vote) =>
-                    vote.buzz_id ===
-                    buzz.id,
+                    vote.buzz_id === buzz.id,
             );
 
+        const buzzVoteIds =
+            new Set(
+                buzzVotes.map(
+                    (vote) => vote.id,
+                ),
+            );
+
+        const buzzChoices =
+            choices.filter(
+                (choice) =>
+                    buzzVoteIds.has(
+                        choice.vote_id,
+                    ),
+            );
+
+        const sortedOptions =
+            [...(buzz.buzz_options ?? [])]
+                .sort(
+                    (a, b) =>
+                        a.position -
+                        b.position,
+                );
+
+        const results =
+            sortedOptions.map(
+                (option) => ({
+                    option_id:
+                    option.id,
+
+                    label:
+                    option.label,
+
+                    votes:
+                    buzzChoices.filter(
+                        (choice) =>
+                            choice.option_id ===
+                            option.id,
+                    ).length,
+                }),
+            );
 
         return {
             ...buzz,
 
             buzz_options:
-                [...(buzz.buzz_options ?? [])]
-                    .sort(
-                        (a, b) =>
-                            a.position -
-                            b.position,
-                    ),
+            sortedOptions,
 
             votes_count:
             buzzVotes.length,
@@ -432,8 +473,9 @@ export async function getMyBuzzes():
                     vote.source ===
                     "external",
             ).length,
-        };
 
+            results,
+        };
     }) as Buzz[];
 }
 
