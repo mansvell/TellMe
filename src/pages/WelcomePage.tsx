@@ -4,7 +4,7 @@ import {
     Users,
     Share2,
     ShieldCheck,
-    ArrowRight,
+    Flame,
 } from "lucide-react";
 
 export default function WelcomePage() {
@@ -28,9 +28,8 @@ export default function WelcomePage() {
 
                         <p className="mt-5 text-lg text-slate-500 leading-8">
                             Exprime-toi librement.
-                            Crée des groupes privés,
-                            partage un simple lien
-                            et échange avec les personnes qui comptent.
+                            Crée des groupes privés et tes Buzz,
+                            partage ton lien en gardant ton anonymat
                         </p>
 
                         <div className="flex pb-5 sm:flex-row gap-4 mt-10">
@@ -62,9 +61,9 @@ export default function WelcomePage() {
                             />
 
                             <Feature
-                                icon={<ArrowRight size={24}/>}
-                                title="Un enregistrement"
-                                subtitle="Ensuite plus aucun login"
+                                icon={<Flame size={24}/>}
+                                title="Buzz"
+                                subtitle="crée des sondages explosifs"
                             />
 
                         </div>
@@ -79,7 +78,7 @@ export default function WelcomePage() {
             <footer className="bg-sky-500 text-white py-5 text-center">
 
                 <p className="font-medium">
-                    © 2026 Nkwanga Mansvell · TellMe
+                    © 2026 TellMe par Mansvell Nkwanga
                 </p>
 
             </footer>
@@ -98,7 +97,7 @@ function Feature({icon, title, subtitle}: FeatureProps) {
     return (
         <div className="rounded-3xl bg-white border border-slate-200 shadow-sm p-5 hover:shadow-md transition">
 
-            <div className="flex justify-center gap-3">
+            <div className="flex  gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
                     {icon}
                 </div>

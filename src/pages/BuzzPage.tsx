@@ -356,7 +356,7 @@ export default function BuzzPage() {
             ) {
                 await navigator.share({
                     title: "TellMe Buzz",
-                    text: `🔥 J'ai quelque chose de hot pour toi.\nClique et découvre 👀\n\n${link}`,
+                    text: `${link}`,
                     files: [file],
                 });
 
@@ -391,18 +391,6 @@ export default function BuzzPage() {
         }
     }
 
-
-    async function copyBuzz(
-        buzz: Buzz,
-    ) {
-
-        await navigator.clipboard
-            .writeText(
-                getBuzzShareLink(
-                    buzz.share_code,
-                ),
-            );
-    }
 
     async function toggleBuzz(
         buzz: Buzz,
@@ -1373,7 +1361,7 @@ export default function BuzzPage() {
                             className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98]"
                         >
                             <Share2 size={19} />
-                            Partager en statut
+                            Partager en status
                         </button>
                     </div>
                 </div>

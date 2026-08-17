@@ -16,12 +16,10 @@ const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
         return (
             <div
                 ref={ref}
-                className="relative aspect-[9/16] w-[360px] overflow-hidden rounded-[2rem] bg-gradient-to-b from-sky-400 via-sky-500 to-sky-600 text-white shadow-2xl"
+                className="relative aspect-[9/16] w-[360px] overflow-hidden rounded-[2rem] bg-gradient-to-b from-sky-300 via-sky-400 to-sky-700 text-white shadow-2xl"
             >
-            <div className="absolute -left-24 top-20 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
-            <div className="absolute -right-24 bottom-24 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
 
-            <div className="relative flex h-full flex-col items-center px-8 py-10 text-center">
+            <div className="relative flex h-full flex-col items-center px-8 py-15 text-center">
                 <div className="flex flex-col items-center">
                     <img
                         src={icon}
@@ -44,7 +42,7 @@ const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
                         <span className="ml-2">🔥</span>
                     </h2>
 
-                    <p className="mt-5 text-xl font-bold text-sky-50">
+                    <p className="mt-8 text-xl font-bold text-sky-50">
                         Clique et découvre
                     </p>
                 </div>
