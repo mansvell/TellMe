@@ -1,12 +1,8 @@
-import {
-    House,
-    MailPlus,
-    Settings,
-} from "lucide-react";
+import {House, MailPlus, Settings, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 
 type Props = {
-    active: "home" | "invitations" | "settings";
+    active: "home" | "invitations" | "buzz" | "settings" ;
 };
 
 export default function BottomNavigation({ active }: Props) {
@@ -29,6 +25,13 @@ export default function BottomNavigation({ active }: Props) {
                     active={active === "invitations"}
                     icon={<MailPlus size={22}/>}
                     title="Invitations"
+                />
+
+                <Item
+                    to="/buzz"
+                    active={active === "buzz"}
+                    icon={<Flame size={22}/>}
+                    title="Buzz"
                 />
 
                 <Item

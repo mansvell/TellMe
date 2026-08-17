@@ -17,6 +17,8 @@ import TermsPage from "./pages/TermsPage.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicOnlyRoute from "./components/PublicOnlyRoute";
+import BuzzPage from "./pages/BuzzPage";
+import VoteBuzz from "./pages/VoteBuzz";
 
 
 export default function App() {
@@ -48,6 +50,9 @@ export default function App() {
 
           <Route path="/privacy" element={<PrivacyPage/>}/>
            <Route path="/terms" element={<TermsPage/>}/>
+
+          <Route path="/buzz" element={<ProtectedRoute><BuzzPage /></ProtectedRoute>}/>
+          <Route path="/b/:shareCode" element={<VoteBuzz />}/>
 
           <Route path="*" element={<Navigate to="/" replace />}/>
 

@@ -19,6 +19,19 @@ export type MessageReply = {
     text: string;
     color: string;
 };
+export type ChatBuzzOption = {
+    id: string;
+    label: string;
+    position: number;
+};
+
+export type ChatBuzz = {
+    id: string;
+    question: string;
+    vote_type: "single" | "multiple";
+    is_active: boolean;
+    options: ChatBuzzOption[];
+};
 
 export type ChatMessage = {
     id: string;
@@ -37,6 +50,8 @@ export type ChatMessage = {
     attachments: ChatAttachment[];
     // Nombre d'autres membres ayant lu ce message.
     readCount: number;
+    buzz_id: string | null;
+    buzz: ChatBuzz | null;
 };
 
 type MessageDatabaseRow = {
@@ -46,6 +61,7 @@ type MessageDatabaseRow = {
     content: string;
     reply_to_id: string | null;
     created_at: string;
+    buzz_id: string | null;
 };
 
 type MembershipRow = {
@@ -142,6 +158,7 @@ export async function sendMessage(
                 sender_membership_id,
                 content,
                 reply_to_id,
+                buzz_id,
                 created_at
             `)
             .single();
@@ -198,6 +215,7 @@ export async function getMessages(
             sender_membership_id,
             content,
             reply_to_id,
+            buzz_id,
             created_at
         `)
         .eq("group_id", groupId)
@@ -225,6 +243,7 @@ export async function getMessageById(
             sender_membership_id,
             content,
             reply_to_id,
+            buzz_id,
             created_at
         `)
         .eq("id", messageId)
@@ -253,6 +272,46 @@ async function hydrateMessages(
     if (rows.length === 0) return [];
 
     const currentUserId = await getCurrentUserId();
+    const buzzIds = Array.from(
+        new Set(
+            rows
+                .map((row) => row.buzz_id)
+                .filter((id): id is string => Boolean(id)),
+        ),
+    );
+
+    const buzzMap = new Map<string, ChatBuzz>();
+
+    if (buzzIds.length > 0) {
+        const { data: buzzData, error: buzzError } = await supabase
+            .from("buzzes")
+            .select(`
+            id,
+            question,
+            vote_type,
+            is_active,
+            buzz_options (
+                id,
+                label,
+                position
+            )
+        `)
+            .in("id", buzzIds);
+
+        if (buzzError) throw buzzError;
+
+        for (const buzz of buzzData ?? []) {
+            buzzMap.set(buzz.id, {
+                id: buzz.id,
+                question: buzz.question,
+                vote_type: buzz.vote_type,
+                is_active: buzz.is_active,
+                options: [...(buzz.buzz_options ?? [])].sort(
+                    (a, b) => a.position - b.position,
+                ),
+            });
+        }
+    }
 
     const replyIds = rows
         .map((row) => row.reply_to_id)
@@ -270,6 +329,7 @@ async function hydrateMessages(
                 sender_membership_id,
                 content,
                 reply_to_id,
+                buzz_id,
                 created_at
             `)
             .in("id", replyIds);
@@ -451,7 +511,8 @@ async function hydrateMessages(
             content: row.content,
             reply_to_id: row.reply_to_id,
             created_at: row.created_at,
-
+            buzz_id: row.buzz_id,
+            buzz: row.buzz_id ? buzzMap.get(row.buzz_id) ?? null : null,
             me: membership?.user_id === currentUserId,
 
             name:

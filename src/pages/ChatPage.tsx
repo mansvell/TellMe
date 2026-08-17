@@ -3,7 +3,7 @@ import {
     useRef,
     useState,
 } from "react";
-
+import BuzzMessageCard from "../components/BuzzMessageCard";
 import {
     ArrowLeft,
     Copy,
@@ -745,120 +745,152 @@ export default function ChatPage() {
                                         </div>
                                     )}
 
+                                {message.buzz ? (
+                                    <BuzzMessageCard buzz={message.buzz} />
+                                ) : (
 
-                                                 {/* POSITION GAUCHE / DROITE*/}
-                                <div
-                                    className={`flex ${
-                                        message.me
-                                            ? "justify-end"
-                                            : "justify-start"
-                                    }`}
-                                >
-
-                                    {/* BULLE */}
-                                    <div
-                                        onContextMenu={(
-                                            event,
-                                        ) => {
-
-                                            event.preventDefault();
-
-                                            openMenu(
-                                                event.clientX,
-                                                event.clientY,
-                                                message,
-                                            );
-                                        }}
-
-                                        onTouchStart={(
-                                            event,
-                                        ) =>
-                                            handleTouchStart(
-                                                event,
-                                                message,
-                                            )
-                                        }
-                                        onTouchEnd={cancelLongPress }
-                                        onTouchMove={cancelLongPress}
-                                        onTouchCancel={cancelLongPress }
-                                        className={`max-w-[86%] cursor-pointer rounded-3xl px-4 py-3 text-white shadow-sm select-none sm:max-w-[70%] sm:px-5 ${
-                                            message.me
-                                                ? "rounded-br-lg"
-                                                : "rounded-bl-lg"
+                                    <div className={`flex ${ message.me
+                                                ? "justify-end"
+                                                : "justify-start"
                                         }`}
-                                        // Couleur personnelle du membre.
-                                        style={{
-                                            backgroundColor:
-                                                message.color ??
-                                                "#0EA5E9",
-                                        }}
                                     >
 
-                                        {/* NOM DE L'AUTEUR */}
-                                        {!message.me &&
-                                            message.name && (
-                                                <p className="mb-1 text-sm font-bold text-white">
-                                                    {
-                                                        message.name
-                                                    }
-                                                </p>
-                                            )}
-
-                                        {/* MESSAGE CITÉ */}
-                                        {message.replyTo && (
-
-                                            <div className="mb-2 rounded-xl border-l-4 border-white/80 px-3 py-2"
-                                                // La réponse reprend la couleur de l'auteur cité
-                                                style={{
-                                                    backgroundColor:
-                                                    message
-                                                        .replyTo
-                                                        .color,
-                                                }}
-                                            >
-                                                <p className="text-xs font-bold text-white">
-                                                    {
-                                                        message
-                                                            .replyTo
-                                                            .name
-                                                    }
-                                                </p>
-                                                <p className="mt-0.5 line-clamp-2 text-xs text-white/90">
-                                                    {
-                                                        message
-                                                            .replyTo
-                                                            .text
-                                                    }
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        {/*TEXTE*/}
-                                        <p className="whitespace-pre-wrap break-words text-sm leading-6 sm:text-base">
-
-                                            {
-                                                message.content
-                                            }
-
-                                        </p>
-
-                                        {/* ATTACHMENTS*/}
-
-                                        {message.attachments.map(
-                                            (
-                                                attachment,
+                                        {/* BULLE */}
+                                        <div
+                                            onContextMenu={(
+                                                event,
                                             ) => {
 
-                                                const isImage =
-                                                    attachment.fileType.startsWith(
-                                                        "image/",
-                                                    );
+                                                event.preventDefault();
+
+                                                openMenu(
+                                                    event.clientX,
+                                                    event.clientY,
+                                                    message,
+                                                );
+                                            }}
+
+                                            onTouchStart={(
+                                                event,
+                                            ) =>
+                                                handleTouchStart(
+                                                    event,
+                                                    message,
+                                                )
+                                            }
+                                            onTouchEnd={cancelLongPress }
+                                            onTouchMove={cancelLongPress}
+                                            onTouchCancel={cancelLongPress }
+                                            className={`max-w-[86%] cursor-pointer rounded-3xl px-4 py-3 text-white shadow-sm select-none sm:max-w-[70%] sm:px-5 ${
+                                                message.me
+                                                    ? "rounded-br-lg"
+                                                    : "rounded-bl-lg"
+                                            }`}
+                                            // Couleur personnelle du membre.
+                                            style={{
+                                                backgroundColor:
+                                                    message.color ??
+                                                    "#0EA5E9",
+                                            }}
+                                        >
+
+                                            {/* NOM DE L'AUTEUR */}
+                                            {!message.me &&
+                                                message.name && (
+                                                    <p className="mb-1 text-sm font-bold text-white">
+                                                        {
+                                                            message.name
+                                                        }
+                                                    </p>
+                                                )}
+
+                                            {/* MESSAGE CITÉ */}
+                                            {message.replyTo && (
+
+                                                <div className="mb-2 rounded-xl border-l-4 border-white/80 px-3 py-2"
+                                                    // La réponse reprend la couleur de l'auteur cité
+                                                    style={{
+                                                        backgroundColor:
+                                                        message
+                                                            .replyTo
+                                                            .color,
+                                                    }}
+                                                >
+                                                    <p className="text-xs font-bold text-white">
+                                                        {
+                                                            message
+                                                                .replyTo
+                                                                .name
+                                                        }
+                                                    </p>
+                                                    <p className="mt-0.5 line-clamp-2 text-xs text-white/90">
+                                                        {
+                                                            message
+                                                                .replyTo
+                                                                .text
+                                                        }
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/*TEXTE*/}
+                                            <p className="whitespace-pre-wrap break-words text-sm leading-6 sm:text-base">
+
+                                                {
+                                                    message.content
+                                                }
+
+                                            </p>
+
+                                            {/* ATTACHMENTS*/}
+
+                                            {message.attachments.map(
+                                                (
+                                                    attachment,
+                                                ) => {
+
+                                                    const isImage =
+                                                        attachment.fileType.startsWith(
+                                                            "image/",
+                                                        );
 
 
-                                                // IMAGE
-                                                if (isImage) {
+                                                    // IMAGE
+                                                    if (isImage) {
+
+                                                        return (
+                                                            <a
+                                                                key={
+                                                                    attachment.id
+                                                                }
+                                                                href={
+                                                                    attachment.signedUrl
+                                                                }
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="mt-3 block overflow-hidden rounded-2xl"
+                                                            >
+
+                                                                <img
+                                                                    src={
+                                                                        attachment.signedUrl
+                                                                    }
+                                                                    alt={
+                                                                        attachment.fileName
+                                                                    }
+                                                                    className="max-h-80 w-full object-cover"
+                                                                />
+
+                                                            </a>
+
+                                                        );
+                                                    }
+
+
+                                                    // FICHIER
 
                                                     return (
+
                                                         <a
                                                             key={
                                                                 attachment.id
@@ -868,120 +900,89 @@ export default function ChatPage() {
                                                             }
                                                             target="_blank"
                                                             rel="noreferrer"
-                                                            className="mt-3 block overflow-hidden rounded-2xl"
+                                                            className="mt-3 flex items-center gap-3 rounded-xl bg-white/15 p-3"
                                                         >
 
-                                                            <img
-                                                                src={
-                                                                    attachment.signedUrl
+                                                            <FileText
+                                                                size={
+                                                                    21
                                                                 }
-                                                                alt={
+                                                            />
+
+                                                            <span className="min-w-0 flex-1 truncate text-sm font-medium">
+
+                                                                {
                                                                     attachment.fileName
                                                                 }
-                                                                className="max-h-80 w-full object-cover"
-                                                            />
+
+                                                            </span>
 
                                                         </a>
 
                                                     );
-                                                }
+                                                },
+                                            )}
 
 
-                                                // FICHIER
+                                            {/* HEURE + LECTURE*/}
+                                            <div className="mt-2 flex items-center justify-end gap-1.5 text-[11px] text-white/80">
 
-                                                return (
+                                                <span>
 
-                                                    <a
-                                                        key={
-                                                            attachment.id
-                                                        }
-                                                        href={
-                                                            attachment.signedUrl
-                                                        }
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="mt-3 flex items-center gap-3 rounded-xl bg-white/15 p-3"
-                                                    >
+                                                    {
+                                                        message.time
+                                                    }
 
-                                                        <FileText
-                                                            size={
-                                                                21
-                                                            }
-                                                        />
+                                                </span>
 
-                                                        <span className="min-w-0 flex-1 truncate text-sm font-medium">
 
-                                                            {
-                                                                attachment.fileName
-                                                            }
+                                                {/* Seulement sur mes messages */}
+
+                                                {message.me && (
+
+                                                    <>
+
+                                                        {/*
+                                                            ✓  = personne n'a encore lu
+                                                            ✓✓ = au moins une personne a lu
+                                                        */}
+
+                                                        <span
+                                                            className={`font-bold ${
+                                                                message.readCount >
+                                                                0
+                                                                    ? "tracking-[-3px]"
+                                                                    : ""
+                                                            }`}
+                                                        >
+
+                                                            {message.readCount >
+                                                            0
+                                                                ? "✓✓"
+                                                                : "✓"}
 
                                                         </span>
 
-                                                    </a>
-
-                                                );
-                                            },
-                                        )}
-
-
-                                        {/* HEURE + LECTURE*/}
-                                        <div className="mt-2 flex items-center justify-end gap-1.5 text-[11px] text-white/80">
-
-                                            <span>
-
-                                                {
-                                                    message.time
-                                                }
-
-                                            </span>
-
-
-                                            {/* Seulement sur mes messages */}
-
-                                            {message.me && (
-
-                                                <>
-
-                                                    {/*
-                                                        ✓  = personne n'a encore lu
-                                                        ✓✓ = au moins une personne a lu
-                                                    */}
-
-                                                    <span
-                                                        className={`font-bold ${
-                                                            message.readCount >
-                                                            0
-                                                                ? "tracking-[-3px]"
-                                                                : ""
-                                                        }`}
-                                                    >
+                                                        {/* Nombre de lecteurs */}
 
                                                         {message.readCount >
-                                                        0
-                                                            ? "✓✓"
-                                                            : "✓"}
+                                                            0 && (
 
-                                                    </span>
+                                                                <span className="ml-1 flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
 
-                                                    {/* Nombre de lecteurs */}
+                                                                {
+                                                                    message.readCount
+                                                                }
 
-                                                    {message.readCount >
-                                                        0 && (
+                                                            </span>
 
-                                                            <span className="ml-1 flex min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-
-                                                            {
-                                                                message.readCount
-                                                            }
-
-                                                        </span>
-
-                                                        )}
-                                                </>
-                                            )}
+                                                            )}
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                         ),

@@ -197,11 +197,16 @@ export default function SettingsPage() {
                             "id",
                             user.id,
                         )
-                        .single();
+                        .maybeSingle();
 
 
                 if (error) {
                     throw error;
+                }
+
+                if (!data) {
+                    console.error("Aucun profil trouvé pour cet utilisateur.");
+                    return;
                 }
 
                 const row =
