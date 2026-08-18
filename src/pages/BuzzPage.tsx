@@ -1,14 +1,14 @@
 import {BarChart3, Check, ChevronRight, CirclePlus, Copy, Flame, Link2, Lock, MessageCircle, MoreHorizontal, Plus,
-    Share2, Trash2, Users, Vote, X,Globe } from "lucide-react";
-
+    Share2, Trash2, Users, Vote, X ,ChevronDown,
+    ChevronUp, Send} from "lucide-react";
+import { sendQuestionToGroup } from "../services/messages";
 import {
     useEffect,
-    useMemo,
     useState, useRef
 } from "react";
 import {publishBuzzToGroup } from "../services/buzz";
 import icon from "../assets/icon.png";
-
+import QuestionShareCard from "../components/QuestionShareCard";
 import BottomNavigation from "../components/BottomNavigation";
 
 import {
@@ -28,18 +28,142 @@ import {
 
 import BuzzShareCard from "../components/BuzzShareCard";
 import { toBlob } from "html-to-image";
+import {useNavigate} from "react-router-dom";
 
 type Tab =
     | "create"
     | "mine"
     | "results";
+type QuestionCategory = {
+    id: string;
+    name: string;
+    emoji: string;
+    description: string;
+    questions: string[];
+};
 
+const QUESTION_CATEGORIES: QuestionCategory[] = [
+    {
+        id: "hot",
+        name: "Chaud",
+        emoji: "🔥",
+        description: "Les questions qui peuvent vraiment lancer le débat.",
+        questions: [
+            "Quelle vérité personne ici n'oserait dire à voix haute ?",
+            "Apoutchou ou Skinny ?",
+            "Qui dans le groupe cache probablement le plus de choses ?",
+            "Tu pourrais sortir avec l'ex d'un ami ?",
+            "Quel comportement te fait perdre immédiatement tout intérêt pour quelqu'un ?",
+            "Est-ce que tromper commence déjà avec les messages ?",
+            "Devrait on recommencer avec les marriages arrangé ?",
+            "Tu préfères connaître toute la vérité ou rester heureux sans savoir ?",
+            "Le Bodycount est il important ?",
+            "Peut-on vraiment aimer quelqu'un et quand même le tromper ?",
+        ],
+    },
+    {
+        id: "relationships",
+        name: "Relations",
+        emoji: "❤️",
+        description: "Amour, crushs, ex et situations compliquées.",
+        questions: [
+            "Peut-on vraiment rester ami avec son ex ?",
+            "Tu pourrais pardonner une infidélité ?",
+            "L'amour suffit-il pour faire durer une relation ?",
+            "Devoilez un couple qui crois trop se cacher",
+            "Tu pourrais sortir avec quelqu'un que tes amis détestent ?",
+            "Faut-il tout raconter à son partenaire ?",
+            "Une relation à distance peut-elle vraiment fonctionner ?",
+            "Quel est le plus gros red flag dans une relation ?",
+            "Quel est ton fantasme le plus fou?",
+            "Tu pourrais retourner avec quelqu'un qui t'a déjà brisé le cœur ?",
+        ],
+    },
+    {
+        id: "confessions",
+        name: "Confessions",
+        emoji: "🤫",
+        description: "Pour faire sortir les histoires que personne ne raconte.",
+        questions: [
+            "Pourquoi es tu encore célibataire ?",
+            "Quelle chose as-tu faite sans jamais l'avouer ?",
+            "As-tu déjà fait semblant d'aimer quelqu'un ?",
+            "Quelle décision regrettes-tu encore aujourd'hui ?",
+            "As-tu déjà trahi la confiance d'un ami ?",
+            "Quel message regrettes-tu le plus d'avoir envoyé ?",
+            "As-tu déjà été jaloux d'un ami proche ?",
+            "Quelle habitude bizarre caches-tu aux autres ?",
+            "As-tu déjà ignoré volontairement quelqu'un que tu aimais ?",
+            "Quelle vérité sur toi surprendrait le plus le groupe ?",
+        ],
+    },
+    {
+        id: "debates",
+        name: "Débats",
+        emoji: "🧠",
+        description: "Des choix impossibles et des opinions qui divisent.",
+        questions: [
+            "Tu préfères être riche et seul ou pauvre et très entouré ?",
+            "L'argent peut-il réellement rendre heureux ?",
+            "Premier Date au mc Donald ,ca passe?",
+            "Peut-on être ami avec quelqu'un qui pense totalement différemment ?",
+            "Est-ce que tout le monde mérite une seconde chance ?",
+            "Apoutchou ou Skinny ?",
+            "Le talent compte-t-il plus que le travail ?",
+            "pourquoi les femmes font moins le premier pas ?",
+            "Est-ce pire de mentir ou de cacher volontairement la vérité ?",
+            "Tu choisirais l'amour ou ta carrière si tu devais absolument sacrifier l'un des deux ?",
+        ],
+    },
+    {
+        id: "fun",
+        name: "Fun",
+        emoji: "😂",
+        description: "Des questions légères pour mettre le groupe en mouvement.",
+        questions: [
+            "Qui survivrait le moins longtemps sur une île déserte ?",
+            "Denoncez la personne la plus laide du groupe ?",
+            "Qui arriverait en retard à son propre mariage ?",
+            "Qui dépenserait un million d'euros seulement sur les femmes?",
+            "Qui pourrait disparaître une semaine sans prévenir personne ?",
+            "Qui serait le pire colocataire ?",
+            "Qui survivrait le mieux à une apocalypse ?",
+            "Qui pourrait accidentellement devenir viral sur Internet ?",
+            "Qui serait capable de dormir pendant une urgence ?",
+            "Qui pourrait partir en voyage demain sans rien préparer ?",
+        ],
+    },
+    {
+        id: "between-us",
+        name: "Entre nous",
+        emoji: "👀",
+        description: "Des questions parfaites quand tout le groupe se connaît.",
+        questions: [
+            "Quelle est la première impression que vous aviez les uns des autres ?",
+            "Qui a le plus changé depuis que vous vous connaissez ?",
+            "Quel membre du groupe connais-tu le moins bien ?",
+            "Quelle histoire du groupe ne vieillira jamais ?",
+            "Qui donne les meilleurs conseils mais ne les applique jamais ?",
+            "Quel membre du groupe serait le plus difficile à remplacer ?",
+            "Quel voyage devrait absolument faire le groupe ensemble ?",
+            "Qui connaît probablement le plus de secrets ici ?",
+            "Chacun donne un secret ",
+            "Dans dix ans, qui sera encore exactement pareil ?",
+        ],
+    },
+];
 export default function BuzzPage() {
 
     const [selectedBuzzToShare, setSelectedBuzzToShare] = useState<Buzz | null>(null);
     const [linkCopied, setLinkCopied] = useState(false);
     const shareCardRef = useRef<HTMLDivElement>(null);
 
+    const [openQuestionCategory, setOpenQuestionCategory] = useState<string | null>(null);
+    const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
+    const [selectedQuestionGroupId, setSelectedQuestionGroupId] = useState<string | null>(null);
+
+    const questionShareCardRef = useRef<HTMLDivElement>(null);
+    const [sendingQuestion, setSendingQuestion] = useState(false);
 
     const [tab, setTab] =
         useState<Tab>("create");
@@ -61,7 +185,7 @@ export default function BuzzPage() {
 
     const [menuBuzzId, setMenuBuzzId] =
         useState<string | null>(null);
-
+    const navigate = useNavigate();
 
     // FORMULAIRE
 
@@ -87,7 +211,7 @@ export default function BuzzPage() {
         useState(true);
     const [publishing, setPublishing] =
         useState(false);
-
+    const [sharingQuestion, setSharingQuestion] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -114,7 +238,42 @@ export default function BuzzPage() {
             cancelled = true;
         };
     }, []);
+    function closeQuestionShare() {
+        setSelectedQuestion(null);
+        setSelectedQuestionGroupId(null);
+    }
 
+    async function handleSendQuestionToGroup() {
+        if (
+            !selectedQuestion ||
+            !selectedQuestionGroupId ||
+            sendingQuestion
+        ) {
+            return;
+        }
+
+        try {
+            setSendingQuestion(true);
+
+            await sendQuestionToGroup(
+                selectedQuestionGroupId,
+                selectedQuestion,
+            );
+
+            closeQuestionShare();
+
+            navigate(
+                `/chat/${selectedQuestionGroupId}`,
+            );
+        } catch (error) {
+            console.error(
+                "Question send error:",
+                error,
+            );
+        } finally {
+            setSendingQuestion(false);
+        }
+    }
     // STATS
     async function handlePublishToGroup(
         buzz: Buzz,
@@ -146,36 +305,8 @@ export default function BuzzPage() {
             setPublishing(false);
         }
     }
-    const totalVotes =
-        useMemo(
-            () =>
-                buzzes.reduce(
-                    (total, buzz) =>
-                        total +
-                        (buzz.votes_count ?? 0),
-                    0,
-                ),
-            [buzzes],
-        );
 
 
-    const externalVotes =
-        useMemo(
-            () =>
-                buzzes.reduce(
-                    (total, buzz) =>
-                        total +
-                        (
-                            buzz.external_votes_count ??
-                            0
-                        ),
-                    0,
-                ),
-            [buzzes],
-        );
-
-
-    // OPTIONS
     function updateOption(
         index: number,
         value: string,
@@ -324,6 +455,22 @@ export default function BuzzPage() {
             );
 
         try {
+            const images =
+                shareCardRef.current
+                    .querySelectorAll("img");
+
+            await Promise.all(
+                Array.from(images).map(
+                    (image) =>
+                        image.complete
+                            ? Promise.resolve()
+                            : new Promise<void>((resolve) => {
+                                image.onload = () => resolve();
+                                image.onerror = () => resolve();
+                            }),
+                ),
+            );
+
             const blob =
                 await toBlob(
                     shareCardRef.current,
@@ -391,6 +538,135 @@ export default function BuzzPage() {
         }
     }
 
+    async function handleShareQuestionStatus() {
+        if (
+            sharingQuestion ||
+            !selectedQuestion ||
+            !selectedQuestionGroupId ||
+            !questionShareCardRef.current
+        ) {
+            return;
+        }
+        setSharingQuestion(true);
+
+        const group =
+            groups.find(
+                (item) =>
+                    item.id === selectedQuestionGroupId,
+            );
+
+        if (!group) {
+            return;
+        }
+
+        if (!group.invite_code) {
+            console.error(
+                "Ce groupe n'a pas de lien d'invitation.",
+            );
+
+            return;
+        }
+
+        const link =
+            `${window.location.origin}/join/${group.invite_code}`;
+
+        try {
+            const images =
+                questionShareCardRef.current
+                    .querySelectorAll("img");
+
+            await Promise.all( // pour image sur telephone sinon ca s'affiche pas
+                Array.from(images).map(
+                    (image) =>
+                        image.complete
+                            ? Promise.resolve()
+                            : new Promise<void>(
+                                (resolve) => {
+                                    image.onload = () =>
+                                        resolve();
+
+                                    image.onerror = () =>
+                                        resolve();
+                                },
+                            ),
+                ),
+            );
+
+            const blob =
+                await toBlob(
+                    questionShareCardRef.current,
+                    {
+                        pixelRatio: 3,
+                        cacheBust: true,
+                    },
+                );
+
+            if (!blob) {
+                throw new Error(
+                    "Impossible de créer l'affiche.",
+                );
+            }
+
+            const file =
+                new File(
+                    [blob],
+                    "tellme-question.png",
+                    {
+                        type: "image/png",
+                    },
+                );
+
+            if (
+                navigator.share &&
+                navigator.canShare?.({
+                    files: [file],
+                })
+            ) {
+                await navigator.share({
+                    title: "TellMe",
+                    text: `${link}`,
+                    files: [file],
+                });
+
+                            // Message envoyé slmt si le partage a été éffectué
+                await sendQuestionToGroup(
+                    selectedQuestionGroupId,
+                    selectedQuestion,
+                );
+
+                closeQuestionShare();
+
+                return;
+            }
+
+            if (navigator.share) {
+                await navigator.share({
+                    title: "TellMe",
+                    text: "Rejoins et donne ton avis",
+                    url: link,
+                });
+
+                return;
+            }
+
+            await navigator.clipboard.writeText(link);
+
+        } catch (error) {
+            if (
+                error instanceof DOMException &&
+                error.name === "AbortError"
+            ) {
+                return;
+            }
+
+            console.error(
+                "Question status share error:",
+                error,
+            );
+        } finally {
+            setSharingQuestion(false);
+        }
+    }
 
     async function toggleBuzz(
         buzz: Buzz,
@@ -536,7 +812,7 @@ export default function BuzzPage() {
                                 tab === "mine"
                             }
                             icon={
-                                <Vote size={17} />
+                                <BarChart3 size={17} />
                             }
                             label="Mes Buzz"
                             onClick={() =>
@@ -549,9 +825,9 @@ export default function BuzzPage() {
                                 tab === "results"
                             }
                             icon={
-                                <BarChart3 size={17} />
+                                <Flame size={17} />
                             }
-                            label="Résultats"
+                            label="Questions"
                             onClick={() =>
                                 setTab("results")
                             }
@@ -577,7 +853,7 @@ export default function BuzzPage() {
                                 <div>
 
                                     <h4 className="font-bold text-sky-500">
-                                        Ta question
+                                        Pose une question
                                     </h4>
 
                                     <p className="text-xs text-slate-400">
@@ -598,7 +874,7 @@ export default function BuzzPage() {
                                 }
                                 maxLength={220}
                                 rows={3}
-                                placeholder="Ex : Est-ce que tu pourrais pardonner une tromperie ?"
+                                placeholder="Comment tu me trouves ?"
                                 className="mt-3 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-base font-semibold outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-sky-950"
                             />
 
@@ -932,17 +1208,20 @@ export default function BuzzPage() {
 
                                                     <div className="flex min-w-0 items-start gap-3">
 
-                                                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-400 text-xl dark:bg-orange-950/30">
-                                                            <Flame size={20} />
+                                                        <div
+                                                            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-sky-400 text-xl dark:bg-orange-950/30">
+                                                            <Flame size={20}/>
                                                         </div>
 
                                                         <div className="min-w-0">
 
                                                             <div className="flex items-center gap-2">
 
-                                                                <span className={`h-2 w-2 rounded-full ${buzz.is_active ? "bg-emerald-500" : "bg-slate-400"}`} />
+                                                                <span
+                                                                    className={`h-4 w-4 rounded-full ${buzz.is_active ? "bg-emerald-500" : "bg-slate-400"}`}/>
 
-                                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                                                <span
+                                                                    className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                                                                     {buzz.is_active
                                                                         ? "Actif"
                                                                         : "Fermé"}
@@ -950,7 +1229,7 @@ export default function BuzzPage() {
 
                                                             </div>
 
-                                                            <h4 className="mt-1 line-clamp-2 font-black leading-5">
+                                                            <h4 className="mt-1  font-black leading-5">
                                                                 {buzz.question}
                                                             </h4>
 
@@ -972,13 +1251,14 @@ export default function BuzzPage() {
                                                             }
                                                             className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                                                         >
-                                                            <MoreHorizontal size={19} />
+                                                            <MoreHorizontal size={19}/>
                                                         </button>
 
 
                                                         {menuBuzzId === buzz.id && (
 
-                                                            <div className="absolute right-0 top-11 z-30 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-800">
+                                                            <div
+                                                                className="absolute right-0 top-11 z-30 w-44 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-800">
 
                                                                 <button
                                                                     type="button"
@@ -989,7 +1269,7 @@ export default function BuzzPage() {
                                                                     }
                                                                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-700"
                                                                 >
-                                                                    <Lock size={16} />
+                                                                    <Lock size={16}/>
 
                                                                     {buzz.is_active
                                                                         ? "Fermer le Buzz"
@@ -1005,86 +1285,100 @@ export default function BuzzPage() {
                                                                     }
                                                                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
                                                                 >
-                                                                    <Trash2 size={16} />
-
+                                                                    <Trash2 size={16}/>
                                                                     Supprimer
                                                                 </button>
-
                                                             </div>
-
                                                         )}
-
                                                     </div>
-
                                                 </div>
-
-
-                                                {/* OPTIONS PREVIEW */}
-
-                                                <div className="mt-5 space-y-2">
-
-                                                    {buzz.buzz_options
-                                                        ?.slice(
-                                                            0,
-                                                            3,
-                                                        )
-                                                        .map(
-                                                            (
-                                                                option,
-                                                                index,
-                                                            ) => (
-
-                                                                <div
-                                                                    key={option.id}
-                                                                    className="flex items-center gap-3 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-slate-800/70"
-                                                                >
-
-                                                                    <span className="text-xs font-black text-sky-500">
-                                                                        {String.fromCharCode(
-                                                                            65 + index,
-                                                                        )}
-                                                                    </span>
-
-                                                                    <span className="truncate text-sm font-medium">
-                                                                        {option.label}
-                                                                    </span>
-
-                                                                </div>
-
-                                                            ),
-                                                        )}
-
-                                                    {(buzz.buzz_options?.length ?? 0) > 3 && (
-
-                                                        <p className="pl-2 text-xs text-slate-400">
-                                                            + {(buzz.buzz_options?.length ?? 0) - 3} autres réponses
-                                                        </p>
-
-                                                    )}
-
-                                                </div>
-
 
                                                 {/* GROUP */}
-
                                                 {group && (
+                                                    <div
+                                                        className="mt-4 flex items-center gap-2 text-xs font-semibold text-violet-500">
 
-                                                    <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-violet-500">
-
-                                                        <MessageCircle size={15} />
-
+                                                        <MessageCircle size={15}/>
                                                         Discussion liée à {group.name}
 
                                                     </div>
 
                                                 )}
 
+                                                <div className="mt-2 space-y-4">
+                                                    {buzzes.map((buzz) => {
+                                                        const results = buzz.results ?? [];
+
+                                                        const totalSelections = results.reduce(
+                                                            (total, option) =>
+                                                                total + option.votes,
+                                                            0,
+                                                        );
+
+                                                        return (
+                                                            <div key={buzz.id}
+                                                                 className="w-full rounded-[1.7rem] p-3  dark:border-slate-800 dark:bg-slate-900"
+                                                            >
+                                                                <div className="mt-6 space-y-4">
+                                                                    {results.map((option) => {
+                                                                        const percentage =
+                                                                            totalSelections > 0
+                                                                                ? Math.round(
+                                                                                    (option.votes / totalSelections) * 100,
+                                                                                )
+                                                                                : 0;
+
+                                                                        return (
+                                                                            <div key={option.option_id}>
+                                                                                <div className="mb-2 flex items-center justify-between gap-3">
+                                                                                    <span
+                                                                                        className="min-w-0 truncate font-bold text-slate-700 dark:text-slate-200">
+                                                                                        {option.label}
+                                                                                    </span>
+
+                                                                                    <span
+                                                                                        className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
+                                                                                        {option.votes} personne{option.votes !== 1 ? "s" : ""} · {percentage}%
+                                                                                    </span>
+                                                                                </div>
+
+                                                                                <div
+                                                                                    className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                                                                    <div
+                                                                                        className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-700"
+                                                                                        style={{
+                                                                                            width: `${percentage}%`,
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    })}
+
+                                                                    {results.length === 0 && (
+                                                                        <div
+                                                                            className="rounded-2xl bg-slate-50 py-5 text-center dark:bg-slate-800/60">
+                                                                            <p className="text-2xl">
+                                                                                🗳️
+                                                                            </p>
+
+                                                                            <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+                                                                                Aucun résultat pour le moment
+                                                                            </p>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
 
                                                 {/* FOOTER */}
+                                                <div
+                                                    className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
 
-                                                <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-
-                                                    <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                                    <div
+                                                        className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
 
                                                         <span>{buzz.votes_count ?? 0} Votes :</span>
                                                         <span> {buzz.tellme_votes_count ?? 0} Internes</span>
@@ -1123,104 +1417,117 @@ export default function BuzzPage() {
 
 
                 {tab === "results" && (
+                    <div className="mt-5">
+                        <div className="relative overflow-hidden rounded-[2rem] p-4 text-white  backdrop-blur-xl">
+                            <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
 
-                    <div className="mt-8">
-                        <h2 className="text-2xl font-bold text-white">
-                            Statistiques des Votes
-                        </h2>
+                            <div className="relative">
+                                <div className="flex items-center justify-center rounded-2xl bg-white/15 text-2xl">
+                                    💭 {QUESTION_CATEGORIES.reduce(
+                                    (total, category) => total + category.questions.length,
+                                    0,
+                                )} questions
+                                </div>
 
-                        {/* GLOBAL STATS */}
-                        <div className="mt-6 grid grid-cols-3 gap-3">
+                                <h2 className="mt-4 text-2xl font-black">
+                                    Choisis ton Mood et lance toi
+                                </h2>
 
-                            <StatCard
-                                icon=<Flame/>
-                                value={
-                                    buzzes.length
-                                }
-                                label="Buzz"
-                            />
-
-                            <StatCard
-                                icon=<Vote/>
-                                value={
-                                    totalVotes
-                                }
-                                label="Votes"
-                            />
-
-                            <StatCard
-                                icon=<Globe/>
-                                value={
-                                    externalVotes
-                                }
-                                label="Externes"
-                            />
-
+                                <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-slate-500">
+                                    Partage les dans tes groupes ou en Story
+                                </p>
+                            </div>
                         </div>
 
-                        {/* RESULTS LIST */}
-                        <div className="mt-7 space-y-5">
-                            {buzzes.map((buzz) => {
-                                const results = buzz.results ?? [];
+                        <div className="mt-7">
+                            <div className="mt-5 space-y-3">
+                                {QUESTION_CATEGORIES.map((category) => {
+                                    const isOpen =
+                                        openQuestionCategory === category.id;
 
-                                const totalSelections = results.reduce(
-                                    (total, option) =>
-                                        total + option.votes,
-                                    0,
-                                );
+                                    return (
+                                        <div
+                                            key={category.id}
+                                            className="overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-white shadow-sm transition duration-300 dark:border-slate-800 dark:bg-slate-900"
+                                        >
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setOpenQuestionCategory(
+                                                        isOpen
+                                                            ? null
+                                                            : category.id,
+                                                    )
+                                                }
+                                                className="flex w-full items-center gap-4 p-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                                            >
+                                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-2xl dark:bg-sky-950/40">
+                                                    {category.emoji}
+                                                </div>
 
-                                return (
-                                    <div key={buzz.id}
-                                        className="w-full rounded-[1.7rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900"
-                                    >
-                                        <div className="mt-6 space-y-4">
-                                            {results.map((option) => {
-                                                const percentage =
-                                                    totalSelections > 0
-                                                        ? Math.round(
-                                                            (option.votes / totalSelections) * 100,
-                                                        )
-                                                        : 0;
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="font-black text-slate-900 dark:text-white">
+                                                            {category.name}
+                                                        </h4>
 
-                                                return (
-                                                    <div key={option.option_id}>
-                                                        <div className="mb-2 flex items-center justify-between gap-3">
-                                                            <span className="min-w-0 truncate font-bold text-slate-700 dark:text-slate-200">
-                                                                {option.label}
-                                                            </span>
-
-                                                            <span className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
-                                                                {option.votes} personne{option.votes !== 1 ? "s" : ""} · {percentage}%
-                                                            </span>
-                                                        </div>
-
-                                                        <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                                                            <div
-                                                                className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-700"
-                                                                style={{
-                                                                    width: `${percentage}%`,
-                                                                }}
-                                                            />
-                                                        </div>
+                                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                            {category.questions.length}
+                                        </span>
                                                     </div>
-                                                );
-                                            })}
 
-                                            {results.length === 0 && (
-                                                <div className="rounded-2xl bg-slate-50 py-5 text-center dark:bg-slate-800/60">
-                                                    <p className="text-2xl">
-                                                        🗳️
-                                                    </p>
-
-                                                    <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">
-                                                        Aucun résultat pour le moment
+                                                    <p className="mt-1 line-clamp-1 text-sm text-slate-500 dark:text-slate-400">
+                                                        {category.description}
                                                     </p>
                                                 </div>
-                                            )}
+
+                                                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${isOpen ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"}`}>
+                                                    {isOpen ? (
+                                                        <ChevronUp size={18} />
+                                                    ) : (
+                                                        <ChevronDown size={18} />
+                                                    )}
+                                                </div>
+                                            </button>
+
+                                            <div className={`grid transition-all duration-500 ease-in-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
+                                                <div className="overflow-hidden">
+                                                    <div className="border-t border-slate-100 px-3 pb-3 pt-2 dark:border-slate-800">
+                                                        {category.questions.map(
+                                                            (question, index) => (
+                                                                <div
+                                                                    key={`${category.id}-${index}`}
+                                                                    className="group flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-sky-50 dark:hover:bg-sky-950/20"
+                                                                >
+                                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-400 dark:bg-slate-800">
+                                                                        {index + 1}
+                                                                    </div>
+
+                                                                    <p className="min-w-0 flex-1 text-sm font-bold leading-5 text-slate-700 dark:text-slate-200">
+                                                                        {question}
+                                                                    </p>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setSelectedQuestion(question)}
+                                                                        className="flex h-10 shrink-0 items-center gap-2 rounded-xl bg-sky-500 px-3 font-bold text-white shadow-sm shadow-sky-500/20 transition hover:bg-sky-600 active:scale-95"
+                                                                    >
+                                                                        <Send size={15} />
+
+                                                                        <span className="hidden sm:inline">
+                                                            Partager
+                                                        </span>
+                                                                    </button>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -1324,8 +1631,8 @@ export default function BuzzPage() {
                             </button>
                         </div>
 
-                        <div className="mt-6 flex justify-center">
-                            <BuzzShareCard ref={shareCardRef} />
+                        <div className="pointer-events-none fixed left-0 top-0 -z-50 opacity-0">
+                            <BuzzShareCard ref={shareCardRef}/>
                         </div>
 
                         <div className="mt-6 rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
@@ -1366,8 +1673,157 @@ export default function BuzzPage() {
                     </div>
                 </div>
             )}
+            {selectedQuestion && (
+                <div
+                    className="fixed inset-0 z-[350] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center sm:p-5"
+                    onClick={closeQuestionShare}
+                >
+                    <div className="pointer-events-none fixed left-0 top-0 -z-50 opacity-0">
+                        <QuestionShareCard
+                            ref={questionShareCardRef}
+                        />
+                    </div>
+                    <div
+                        className="max-h-[90vh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-5 shadow-2xl dark:bg-slate-900 sm:max-w-lg sm:rounded-[2rem]"
+                        onClick={(event) => event.stopPropagation()}
+                    >
 
-            <BottomNavigation active="buzz" />
+                        <div className="mt-4 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 p-5 text-white">
+                            <p className="mt-2 text-lg font-black text-center leading-6">
+                                {selectedQuestion}
+                            </p>
+                        </div>
+
+                        {groups.length > 0 ? (
+                            <>
+                                <div className="mt-6">
+                                    <p className="text-sm font-black text-slate-900 dark:text-white">
+                                        Choisis un groupe :
+                                    </p>
+                                </div>
+
+                                <div className="mt-4 space-y-2">
+                                    {groups.map((group) => {
+                                        const selected =
+                                            selectedQuestionGroupId === group.id;
+
+                                        return (
+                                            <button
+                                                key={group.id}
+                                                type="button"
+                                                onClick={() =>
+                                                    setSelectedQuestionGroupId(group.id)
+                                                }
+                                                className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${selected ? "border-sky-500 bg-sky-50 dark:bg-sky-950/30" : "border-slate-200 bg-white hover:border-sky-300 dark:border-slate-700 dark:bg-slate-800"}`}
+                                            >
+                                                <div
+                                                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                                                    style={{
+                                                        backgroundColor:
+                                                            group.color ?? "#0EA5E9",
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={icon}
+                                                        alt=""
+                                                        className="h-7 w-7 object-contain"
+                                                    />
+                                                </div>
+
+                                                <div className="min-w-0 flex-1">
+                                                    <p className="truncate font-black text-slate-800 dark:text-white">
+                                                        {group.name}
+                                                    </p>
+
+                                                    <p className="mt-0.5 text-xs font-medium text-slate-400">
+                                                        {group.members_count} membres
+                                                    </p>
+                                                </div>
+
+                                                <div
+                                                    className={`flex h-6 w-6 items-center justify-center rounded-full border ${selected ? "border-sky-500 bg-sky-500 text-white" : "border-slate-300 dark:border-slate-600"}`}>
+                                                    {selected && (
+                                                        <Check
+                                                            size={14}
+                                                            strokeWidth={3}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="mt-6 grid grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={handleSendQuestionToGroup}
+                                        disabled={
+                                            !selectedQuestionGroupId ||
+                                            sendingQuestion
+                                        }
+                                        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-3 text-sm font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                                    >
+                                        <MessageCircle size={18}/>
+
+                                        {sendingQuestion
+                                            ? "Envoi..."
+                                            : "Dans le groupe"}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleShareQuestionStatus}
+                                        disabled={
+                                            !selectedQuestionGroupId ||
+                                            sharingQuestion
+                                        }
+                                        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-3 text-sm font-black text-white transition hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900"
+                                    >
+                                        <Share2 size={18}/>
+
+                                        {sharingQuestion
+                                            ? "En cours..."
+                                            : "En statut"}
+                                    </button>
+                                </div>
+
+                                {!selectedQuestionGroupId && (
+                                    <p className="mt-3 text-center text-xs font-semibold text-slate-400">
+                                        Personne ne saura que la question vient de toi
+                                    </p>
+                                )}
+                            </>
+                        ) : (
+                            <div className="mt-6 rounded-[1.5rem] bg-slate-50 p-6 text-center dark:bg-slate-800">
+                                <div
+                                    className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100 text-2xl dark:bg-sky-950/50">
+                                    <Users/>
+                                </div>
+
+                                <h3 className="mt-4 font-black text-slate-900 dark:text-white">
+                                    Tu n'as encore aucun groupe
+                                </h3>
+
+                                <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-slate-500 dark:text-slate-400">
+                                    Crée d'abord un groupe pour pouvoir y lancer une question et inviter tes amis à
+                                    participer.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    onClick={() => {navigate('/home') }}
+                                    className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-5 font-black text-white"
+                                >
+                                    <Plus size={18}/>
+                                    Créer un groupe
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            <BottomNavigation active="buzz"/>
         </main>
     );
 }
@@ -1485,33 +1941,6 @@ function ToggleRow({
 }
 
 
-function StatCard({icon, value, label}: {
-    icon: React.ReactNode;
-    value: number;
-    label: string;
-}) {
-
-    return (
-
-        <div className="rounded-[1.5rem] flex items-center justify-between border border-slate-200/80 bg-white p-4 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
-
-            <div className="text-sky-500">
-                {icon}
-            </div>
-
-            <p className="mt-2 text-xl font-black">
-                {value}
-            </p>
-
-            <p className="mt-0.5 text-xs font-medium text-slate-400">
-                {label}
-            </p>
-
-        </div>
-
-    );
-}
-
 function EmptyBuzz({
                        onCreate,
                    }: {
@@ -1523,7 +1952,7 @@ function EmptyBuzz({
         <div className="mt-7 rounded-[2rem] border border-slate-200 bg-white px-6 py-14 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[1.7rem] bg-sky-50 text-4xl dark:bg-sky-950/30">
-                🗳️
+                <Vote/>
             </div>
 
             <h4 className="mt-5 text-xl font-black">

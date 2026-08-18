@@ -941,10 +941,10 @@ export default function SettingsPage() {
                 </div>
 
                 <p className="pb-3 text-center text-xm leading-5 text-slate-400">
-                    TellMe, l'App qui te permet d'être libre en secret.
+                    TellMe, l'App qui révolutionne l'Anonymat et le Fun
                 </p>
                 <p className=" text-center text-xm leading-5 text-slate-400">
-                    -2026-
+                    ✦ 2026 ✦
                 </p>
 
             </section>

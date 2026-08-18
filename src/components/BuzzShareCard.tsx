@@ -28,7 +28,7 @@ const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
                     />
 
                     <span className="mt-1 text-2xl font-black tracking-tight">
-                        TellMe
+                        ✦TellMe✦
                     </span>
                 </div>
 

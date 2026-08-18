@@ -52,6 +52,8 @@ export type ChatMessage = {
     readCount: number;
     buzz_id: string | null;
     buzz: ChatBuzz | null;
+    message_type: "text" | "buzz" | "question";
+    question: string | null;
 };
 
 type MessageDatabaseRow = {
@@ -62,6 +64,7 @@ type MessageDatabaseRow = {
     reply_to_id: string | null;
     created_at: string;
     buzz_id: string | null;
+    message_type: "text" | "buzz" | "question";
 };
 
 type MembershipRow = {
@@ -151,6 +154,7 @@ export async function sendMessage(
                 sender_membership_id: membershipId,
                 content: savedContent,
                 reply_to_id: replyToId,
+                message_type: "text",
             })
             .select(`
                 id,
@@ -159,6 +163,7 @@ export async function sendMessage(
                 content,
                 reply_to_id,
                 buzz_id,
+                message_type,
                 created_at
             `)
             .single();
@@ -216,6 +221,7 @@ export async function getMessages(
             content,
             reply_to_id,
             buzz_id,
+            message_type,
             created_at
         `)
         .eq("group_id", groupId)
@@ -244,6 +250,7 @@ export async function getMessageById(
             content,
             reply_to_id,
             buzz_id,
+            message_type,
             created_at
         `)
         .eq("id", messageId)
@@ -330,6 +337,7 @@ async function hydrateMessages(
                 content,
                 reply_to_id,
                 buzz_id,
+                message_type,
                 created_at
             `)
             .in("id", replyIds);
@@ -513,6 +521,8 @@ async function hydrateMessages(
             created_at: row.created_at,
             buzz_id: row.buzz_id,
             buzz: row.buzz_id ? buzzMap.get(row.buzz_id) ?? null : null,
+            message_type: row.message_type,
+            question: row.message_type === "question" ? row.content : null,
             me: membership?.user_id === currentUserId,
 
             name:
@@ -710,4 +720,47 @@ export function formatMessageDate(date: Date): string {
         month: "long",
         year: "numeric",
     });
+}
+export async function sendQuestionToGroup(
+    groupId: string,
+    question: string,
+): Promise<ChatMessage> {
+    const cleanQuestion = question.trim();
+
+    if (!cleanQuestion) {
+        throw new Error("La question est vide.");
+    }
+
+    const membershipId = await getMyMembershipId(groupId);
+
+    const {
+        data,
+        error,
+    } = await supabase
+        .from("messages")
+        .insert({
+            group_id: groupId,
+            sender_membership_id: membershipId,
+            content: cleanQuestion,
+            reply_to_id: null,
+            buzz_id: null,
+            message_type: "question",
+        })
+        .select(`
+            id,
+            group_id,
+            sender_membership_id,
+            content,
+            reply_to_id,
+            buzz_id,
+            message_type,
+            created_at
+        `)
+        .single();
+
+    if (error) {
+        throw error;
+    }
+
+    return getMessageById(data.id);
 }

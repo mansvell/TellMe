@@ -172,17 +172,16 @@ export default function RegisterPage() {
 
                         <div>
                             <h2 className="max-w-md text-4xl font-extrabold leading-tight">
-                                Ton identité, tes groupes, ta liberté.
+                                TA LIBERTÉ, TES GROUPES , TON PERSONNAGE
                             </h2>
 
                             <p className="mt-5 max-w-md text-lg leading-8 text-sky-100">
-                                Enregistre-toi une seule fois. Ensuite, TellMe
-                                reconnaît automatiquement ton identité.
+                                    AUCUN MAIL NI MOT DE PASSE LIÉ A TON IDENTITÉ
                             </p>
                         </div>
 
                         <div className="flex items-center gap-3 text-sm text-sky-100">
-                            Aucun email ni mot de passe nécessaire
+                            Sentez vous libre
                         </div>
                     </div>
 
@@ -212,7 +211,7 @@ export default function RegisterPage() {
                                 htmlFor="pseudo"
                                 className="text-sm dark:text-white font-bold text-slate-700"
                             >
-                                Entrez votre pseudo:
+                                Personne ne doit te reconnaitre
                             </label>
 
                             <div
@@ -241,7 +240,7 @@ export default function RegisterPage() {
 
                         <div className="mt-6">
                             <p className="text-sm font-bold dark:text-white text-slate-700">
-                                Couleur de ton identité :
+                                Choisis une Couleur :
                             </p>
 
                             <div className="mt-3 flex flex-wrap gap-3">

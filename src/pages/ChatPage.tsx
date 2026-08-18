@@ -4,18 +4,8 @@ import {
     useState,
 } from "react";
 import BuzzMessageCard from "../components/BuzzMessageCard";
-import {
-    ArrowLeft,
-    Copy,
-    FileText,
-    LoaderCircle,
-    Paperclip,
-    Reply,
-    Send,
-    Settings,
-    UserPlus,
-    X,
-} from "lucide-react";
+import QuestionMessageCard from "../components/QuestionMessageCard";
+import {ArrowLeft, Copy, FileText, LoaderCircle, Paperclip, Reply, Send, Settings, UserPlus, X} from "lucide-react";
 
 import {
     Link,
@@ -747,14 +737,11 @@ export default function ChatPage() {
 
                                 {message.buzz ? (
                                     <BuzzMessageCard buzz={message.buzz} />
+                                ) : message.message_type === "question" && message.question ? (
+                                    <QuestionMessageCard question={message.question} />
                                 ) : (
 
-                                    <div className={`flex ${ message.me
-                                                ? "justify-end"
-                                                : "justify-start"
-                                        }`}
-                                    >
-
+                                    <div className={`flex ${ message.me ? "justify-end" : "justify-start"}`}>
                                         {/* BULLE */}
                                         <div
                                             onContextMenu={(
