@@ -846,7 +846,7 @@ export default function BuzzPage() {
 
                             <div className="flex items-center gap-3">
 
-                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-orange-500 text-xl dark:bg-orange-950/30">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-sky-500 text-xl dark:bg-orange-950/30">
                                     <Flame size={25} />
                                 </div>
 
@@ -1423,17 +1423,17 @@ export default function BuzzPage() {
 
                             <div className="relative">
                                 <div className="flex items-center justify-center rounded-2xl bg-white/15 text-2xl">
-                                    💭 {QUESTION_CATEGORIES.reduce(
+                                    ✦ {QUESTION_CATEGORIES.reduce(
                                     (total, category) => total + category.questions.length,
                                     0,
-                                )} questions
+                                )} Questions ✦
                                 </div>
 
-                                <h2 className="mt-4 text-2xl font-black">
-                                    Choisis ton Mood et lance toi
+                                <h2 className="mt-4 text-2xl font-black text-center">
+                                    ✦ Choisis ton Mood ✦
                                 </h2>
 
-                                <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-slate-500">
+                                <p className="mt-2 max-w-xl text-sm font-medium text-center leading-6 text-slate-500">
                                     Partage les dans tes groupes ou en Story
                                 </p>
                             </div>

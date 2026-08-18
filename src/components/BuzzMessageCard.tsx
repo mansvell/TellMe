@@ -177,7 +177,7 @@ export default function BuzzMessageCard({ buzz }: Props) {
 
     return (
         <div className="mx-auto my-4 w-full max-w-xl overflow-hidden rounded-[2rem] border border-sky-100 bg-white shadow-xl shadow-sky-100/60 dark:border-slate-700 dark:bg-slate-900 dark:shadow-none">
-            <div className="bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-400 px-5 py-4 text-white">
+            <div className="bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-400 px-5 py-2 text-white">
                 <div className="flex items-center gap-2">
                     <Flame size={19} />
                     <span className="text-xs font-black tracking-[0.18em]">
@@ -222,7 +222,7 @@ export default function BuzzMessageCard({ buzz }: Props) {
                                     />
                                 )}
 
-                                <div className="relative flex items-center gap-3 px-4 py-3.5">
+                                <div className="relative flex items-center gap-3 px-4 py-2">
                                     <span className={`flex h-6 w-6 shrink-0 items-center justify-center ${buzz.vote_type === "single" ? "rounded-full" : "rounded-lg"} border ${isSelected ? "border-sky-500 bg-sky-500 text-white" : "border-slate-300 dark:border-slate-600"}`}>
                                         {isSelected && (
                                             <Check size={14} strokeWidth={3} />

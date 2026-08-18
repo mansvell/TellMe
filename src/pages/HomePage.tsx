@@ -94,7 +94,7 @@ export default function HomePage() {
 
             <div className="pointer-events-none absolute inset-x-0 top-[260px] h-[200px] bg-gradient-to-b from-transparent via-slate-50/70 to-slate-50 dark:via-slate-950/70 dark:to-slate-950" />
 
-            <header className="relative z-10 mx-auto max-w-7xl px-5 pt-6">
+            <header className="relative z-10 mx-auto max-w-7xl px-5 pt-2">
 
                 <div className="flex items-center justify-between">
 
@@ -116,7 +116,7 @@ export default function HomePage() {
                     </div>
                 </div>
 
-                <div className="mt-7 flex h-15 items-center gap-3 rounded-2xl border border-white/30 bg-white/95 px-4 shadow-xl shadow-sky-900/10 backdrop-blur-xl transition-all duration-300 focus-within:-translate-y-0.5 focus-within:ring-4 focus-within:ring-white/20 dark:border-slate-700 dark:bg-slate-900/95 dark:shadow-black/20 dark:focus-within:ring-sky-500/10">
+                <div className="mt-7 flex h-12 items-center gap-3 rounded-2xl border border-white/30 bg-white/95 px-4 shadow-xl shadow-sky-900/10 backdrop-blur-xl transition-all duration-300 focus-within:-translate-y-0.5 focus-within:ring-4 focus-within:ring-white/20 dark:border-slate-700 dark:bg-slate-900/95 dark:shadow-black/20 dark:focus-within:ring-sky-500/10">
 
                     <Search size={21} className="shrink-0 text-slate-400 dark:text-slate-500"/>
 
@@ -280,12 +280,9 @@ export default function HomePage() {
                                 type="button"
                                 key={group.id}
                                 onClick={() => navigate(`/chat/${group.id}`)}
-                                className="group relative w-full overflow-hidden rounded-3xl border border-white bg-white/95 p-4 text-left shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-100 hover:shadow-xl hover:shadow-slate-200/60 active:scale-[0.99] dark:border-slate-800 dark:bg-slate-700 dark:hover:border-slate-700 dark:hover:shadow-black/20"
+                                className="group relative w-full overflow-hidden rounded-3xl border border-white bg-white/95 p-2 text-left shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-100 hover:shadow-xl hover:shadow-slate-200/60 active:scale-[0.99] dark:border-slate-800 dark:bg-slate-700 dark:hover:border-slate-700 dark:hover:shadow-black/20"
                             >
-
-                                <div className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full bg-gradient-to-br from-sky-100 to-cyan-100 opacity-0 blur-2xl transition duration-300 group-hover:opacity-100 dark:from-sky-900/30 dark:to-cyan-900/20" />
-
-                                <div className="relative flex items-center">
+                                <div className="relative flex items-center gap-2">
 
                                     <div
                                         className="flex h-17 w-17 shrink-0 items-center justify-center rounded-[1.35rem] shadow-md ring-1 ring-black/5 transition duration-300 group-hover:scale-105 dark:ring-white/10"

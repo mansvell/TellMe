@@ -36,7 +36,7 @@ export type ChatBuzz = {
 export type ChatMessage = {
     id: string;
     group_id: string;
-    sender_membership_id: string;
+    sender_membership_id: string| null ;
     content: string;
     reply_to_id: string | null;
     created_at: string;
@@ -59,12 +59,14 @@ export type ChatMessage = {
 type MessageDatabaseRow = {
     id: string;
     group_id: string;
-    sender_membership_id: string;
+    sender_membership_id: string| null ;
     content: string;
     reply_to_id: string | null;
     created_at: string;
     buzz_id: string | null;
     message_type: "text" | "buzz" | "question";
+    sender_name: string | null;
+    sender_color: string | null;
 };
 
 type MembershipRow = {
@@ -145,66 +147,130 @@ export async function sendMessage(
     const savedContent =
         cleanContent || `📎 ${file?.name ?? "Fichier"}`;
 
-    // Création du message.
-    const { data: insertedMessage, error: messageError } =
-        await supabase
-            .from("messages")
-            .insert({
-                group_id: groupId,
-                sender_membership_id: membershipId,
-                content: savedContent,
-                reply_to_id: replyToId,
-                message_type: "text",
-            })
-            .select(`
-                id,
-                group_id,
-                sender_membership_id,
-                content,
-                reply_to_id,
-                buzz_id,
-                message_type,
-                created_at
-            `)
-            .single();
+    const {
+        data: senderMembership,
+        error: senderError,
+    } = await supabase
+        .from("group_members")
+        .select(`
+            local_color,
+            profiles!group_members_user_id_fkey (
+                display_name
+            )
+        `)
+        .eq("id", membershipId)
+        .single();
 
-    if (messageError) throw messageError;
+    if (senderError) {
+        throw senderError;
+    }
+
+    // NOUVEAU : récupère proprement le profil.
+    const senderProfile =
+        getProfile(
+            senderMembership.profiles,
+        );
+
+    // Création du message.
+    const {
+        data: insertedMessage,
+        error: messageError,
+    } = await supabase
+        .from("messages")
+        .insert({
+            group_id: groupId,
+            sender_membership_id:
+            membershipId,
+
+            // NOUVEAU : copie permanente du pseudo.
+            sender_name:
+                senderProfile?.display_name ??
+                "Utilisateur",
+
+            // NOUVEAU : copie permanente de la couleur.
+            sender_color:
+                senderMembership.local_color ??
+                "#0EA5E9",
+
+            content: savedContent,
+            reply_to_id: replyToId,
+            message_type: "text",
+        })
+        .select(`
+            id,
+            group_id,
+            sender_membership_id,
+            sender_name,
+            sender_color,
+            content,
+            reply_to_id,
+            buzz_id,
+            message_type,
+            created_at
+        `)
+        .single();
+
+    if (messageError) {
+        throw messageError;
+    }
 
     // Upload facultatif d'une pièce jointe.
     if (file) {
-        const safeName = file.name.replace(
-            /[^a-zA-Z0-9._-]/g,
-            "_",
-        );
+        const safeName =
+            file.name.replace(
+                /[^a-zA-Z0-9._-]/g,
+                "_",
+            );
 
         const storagePath =
             `${groupId}/${userId}/${crypto.randomUUID()}-${safeName}`;
 
-        const { error: uploadError } = await supabase.storage
+        const {
+            error: uploadError,
+        } = await supabase.storage
             .from("chat-media")
-            .upload(storagePath, file, {
-                cacheControl: "3600",
-                upsert: false,
-                contentType: file.type || undefined,
-            });
+            .upload(
+                storagePath,
+                file,
+                {
+                    cacheControl: "3600",
+                    upsert: false,
+                    contentType:
+                        file.type ||
+                        undefined,
+                },
+            );
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+            throw uploadError;
+        }
 
-        const { error: attachmentError } = await supabase
+        const {
+            error: attachmentError,
+        } = await supabase
             .from("attachments")
             .insert({
-                message_id: insertedMessage.id,
-                storage_path: storagePath,
-                file_name: file.name,
+                message_id:
+                insertedMessage.id,
+                storage_path:
+                storagePath,
+                file_name:
+                file.name,
                 file_type:
-                    file.type || "application/octet-stream",
-                file_size: file.size,
+                    file.type ||
+                    "application/octet-stream",
+                file_size:
+                file.size,
             });
 
-        if (attachmentError) throw attachmentError;
+        if (attachmentError) {
+            throw attachmentError;
+        }
     }
 
-    return getMessageById(insertedMessage.id);
+    return getMessageById(
+        insertedMessage.id,
+    );
 }
 
 
@@ -218,6 +284,8 @@ export async function getMessages(
             id,
             group_id,
             sender_membership_id,
+            sender_name,
+            sender_color,
             content,
             reply_to_id,
             buzz_id,
@@ -334,6 +402,8 @@ async function hydrateMessages(
                 id,
                 group_id,
                 sender_membership_id,
+                sender_name,
+                sender_color,
                 content,
                 reply_to_id,
                 buzz_id,
@@ -347,42 +417,69 @@ async function hydrateMessages(
         replyRows = (data ?? []) as MessageDatabaseRow[];
     }
 
-    // Toutes les memberships nécessaires :
-    // auteurs principaux + auteurs des messages cités.
+    // NOUVEAU : ignore les memberships supprimés/null.
     const membershipIds = Array.from(
         new Set([
-            ...rows.map(
-                (row) => row.sender_membership_id,
-            ),
-            ...replyRows.map(
-                (row) => row.sender_membership_id,
-            ),
+            ...rows
+                .map(
+                    (row) =>
+                        row.sender_membership_id,
+                )
+                .filter(
+                    (id): id is string =>
+                        Boolean(id),
+                ),
+
+            ...replyRows
+                .map(
+                    (row) =>
+                        row.sender_membership_id,
+                )
+                .filter(
+                    (id): id is string =>
+                        Boolean(id),
+                ),
         ]),
     );
 
-    const { data: membershipsData, error: membershipsError } =
-        await supabase
+    // NOUVEAU : les anciens messages peuvent appartenir
+// à quelqu'un qui a déjà quitté le groupe.
+    let memberships: MembershipRow[] = [];
+
+    if (membershipIds.length > 0) {
+        const {
+            data: membershipsData,
+            error: membershipsError,
+        } = await supabase
             .from("group_members")
             .select(`
-                id,
-                user_id,
-                local_color,
-                profiles!group_members_user_id_fkey (
-                    display_name
-                )
-            `)
-            .in("id", membershipIds);
+            id,
+            user_id,
+            local_color,
+            profiles!group_members_user_id_fkey (
+                display_name
+            )
+        `)
+            .in(
+                "id",
+                membershipIds,
+            );
 
-    if (membershipsError) throw membershipsError;
+        if (membershipsError) {
+            throw membershipsError;
+        }
 
-    const memberships =
-        (membershipsData ?? []) as unknown as MembershipRow[];
+        memberships =
+            (membershipsData ?? []) as unknown as MembershipRow[];
+    }
 
     const membershipMap = new Map(
-        memberships.map((membership) => [
-            membership.id,
-            membership,
-        ]),
+        memberships.map(
+            (membership) => [
+                membership.id,
+                membership,
+            ],
+        ),
     );
 
     const replyMap = new Map(
@@ -485,9 +582,12 @@ async function hydrateMessages(
     }
 
     return rows.map((row, index) => {
-        const membership = membershipMap.get(
-            row.sender_membership_id,
-        );
+        const membership =
+            row.sender_membership_id
+                ? membershipMap.get(
+                    row.sender_membership_id,
+                )
+                : undefined;
 
         const createdAt = new Date(row.created_at);
 
@@ -502,11 +602,12 @@ async function hydrateMessages(
             ? replyMap.get(row.reply_to_id)
             : undefined;
 
-        const replyMembership = replyRow
-            ? membershipMap.get(
-                replyRow.sender_membership_id,
-            )
-            : undefined;
+        const replyMembership =
+            replyRow?.sender_membership_id
+                ? membershipMap.get(
+                    replyRow.sender_membership_id,
+                )
+                : undefined;
 
         const replyProfile = getProfile(
             replyMembership?.profiles,
@@ -527,10 +628,12 @@ async function hydrateMessages(
 
             name:
                 profile?.display_name ??
+                row.sender_name ??
                 "Utilisateur",
 
             color:
                 membership?.local_color ??
+                row.sender_color ??
                 "#0EA5E9",
 
             time: createdAt.toLocaleTimeString(
@@ -546,16 +649,22 @@ async function hydrateMessages(
                     ? formatMessageDate(createdAt)
                     : null,
 
+            // NOUVEAU : une réponse continue aussi d'afficher
+            // l'ancien auteur s'il a quitté le groupe.
             replyTo:
                 replyRow
                     ? {
                         id: replyRow.id,
-                        name:
-                            replyProfile?.display_name ??
+
+                        name: replyProfile?.display_name ??
+                            replyRow.sender_name ??
                             "Utilisateur",
-                        text: replyRow.content,
-                        color:
-                            replyMembership?.local_color ??
+
+                        text:
+                        replyRow.content,
+
+                        color: replyMembership?.local_color ??
+                            replyRow.sender_color ??
                             "#0EA5E9",
                     }
                     : null,
@@ -580,47 +689,6 @@ function getProfile(
         : profile;
 }
 
-// Décore les messages pour l'affichage.
-// Les séparateurs de dates sont calculés ici.
-export function decorateMessages(
-    messages: ChatMessage[],
-) {
-    return messages.map((message, index) => {
-
-        const currentDate = new Date(
-            message.created_at,
-        );
-
-        const previous =
-            index > 0
-                ? new Date(
-                    messages[index - 1].created_at,
-                )
-                : null;
-
-        return {
-
-            ...message,
-
-            time: currentDate.toLocaleTimeString(
-                "fr-FR",
-                {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                },
-            ),
-
-            date:
-                !previous ||
-                previous.toDateString() !==
-                currentDate.toDateString()
-                    ? formatMessageDate(currentDate)
-                    : null,
-
-        };
-
-    });
-}
 
 // RÉCUPÈRE LES IDs DES MESSAGES NON LUS
 type UnreadMessageRow = {

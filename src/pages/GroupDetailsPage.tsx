@@ -188,7 +188,7 @@ export default function GroupDetailsPage() {
                 title:
                     `Rejoindre ${group.name} sur TellMe`,
                 text:
-                    `Rejoins mon groupe "${group.name}" sur TellMe.`,
+                    `Salut, Rejoins mon groupe "${group.name}" sur TellMe.`,
                 url:
                 group.inviteLink,
             });
@@ -198,8 +198,6 @@ export default function GroupDetailsPage() {
         }
     }
 
-
-    // Le Dominus modifie la durée du groupe.
     async function handleDurationChange(
         value: GroupLifetime,
     ) {
@@ -355,7 +353,7 @@ export default function GroupDetailsPage() {
 
         <main className="min-h-screen bg-slate-100 dark:bg-slate-800">
 
-            <header className="bg-white dark:bg-slate-700 shadow-sm">
+            <header className="bg-white sticky top-0 z-30 dark:bg-slate-700 shadow-sm">
 
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
 
@@ -461,7 +459,7 @@ export default function GroupDetailsPage() {
                         Invite tes ami(e)s
                     </h3>
 
-                    <p className="mt-1 text-sm text-red-300">
+                    <p className="mt-1 text-sm text-sky-400">
                         Seules les personnes possédant ce lien pourront rejoindre le groupe.
                     </p>
 
@@ -522,12 +520,12 @@ export default function GroupDetailsPage() {
                                     Durée de vie du groupe
                                 </h3>
 
-                                <p className="mt-1 text-sm text-red-300 ">
-                                    Cette option n’est visible que par le créateur.
+                                <p className="mt-1 text-sm text-red-400 ">
+                                    Cette option n’est visible que par le créateur
                                 </p>
 
                                 <p className="mt-1 text-xs leading-5 text-slate-400 dark:text-white">
-                                    À expiration, le groupe, les messages, les membres et les médias seront supprimés. Le lien deviendra invalide.
+                                    Apres expiration, le groupe, les messages, les membres, les médias et liens seront supprimés
                                 </p>
 
                             </div>

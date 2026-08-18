@@ -95,9 +95,9 @@ export default function MembersPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100 dark:bg-slate-800">
+        <main className="min-h-screen bg-gradient-to-br from-sky-200 via-sky-50 to-white dark:bg-slate-800">
 
-            <header className="bg-white dark:bg-slate-700 shadow-sm">
+            <header className=" sticky top-0 z-30 dark:bg-slate-700 shadow-sm">
 
                 <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-5">
 

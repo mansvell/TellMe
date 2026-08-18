@@ -14,17 +14,17 @@ export default function BottomNavigation({ active }: Props) {
             <div className="mx-auto flex h-20 max-w-5xl items-center justify-around">
 
                 <Item
-                    to="/home"
-                    active={active === "home"}
-                    icon={<House size={22}/>}
-                    title="Accueil"
-                />
-
-                <Item
                     to="/invit"
                     active={active === "invitations"}
                     icon={<MailPlus size={22}/>}
                     title="Invitations"
+                />
+
+                <Item
+                    to="/home"
+                    active={active === "home"}
+                    icon={<House size={22}/>}
+                    title="Accueil"
                 />
 
                 <Item

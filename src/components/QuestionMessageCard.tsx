@@ -36,7 +36,7 @@ export default function QuestionMessageCard({
                             {question}
                         </p>
 
-                        <div className="mx-auto my-5 h-px w-20 bg-gradient-to-r from-transparent via-sky-300 to-transparent dark:via-sky-700" />
+                        <div className="mx-auto my-5 h-px w-40 bg-gradient-to-r from-transparent via-sky-300 to-transparent dark:via-sky-700" />
 
                         <div className="flex items-center justify-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400">
                             <MessageCircle

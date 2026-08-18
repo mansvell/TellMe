@@ -14,14 +14,14 @@ const QuestionShareCard = forwardRef<HTMLDivElement>(
                     <div className="flex flex-col items-center">
                         <img src={icon} alt="TellMe" className="h-24 w-24 object-contain drop-shadow-xl" />
 
-                        <span className="mt-1 text-2xl font-black tracking-tight">
+                        <span className="mt-1 text-4xl font-black tracking-tight">
                             ✦ TellMe ✦
                         </span>
                     </div>
 
                     <div className="flex flex-1 flex-col items-center justify-center">
 
-                        <p className="mt-5 text-xl py-2 font-black tracking-[0.2em] rounded-2xl bg-white text-sky-400">
+                        <p className="mt-5 text-xl py-2 font-black  rounded-2xl bg-white text-sky-400">
                             une nouveau sujet palpitant t'attends dans le groupe
                         </p>
 

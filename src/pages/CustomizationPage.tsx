@@ -126,7 +126,7 @@ export default function CustomizationPage() {
 
         <main className="min-h-screen bg-slate-100 dark:bg-slate-800" >
 
-            <header className="bg-white dark:bg-slate-600 shadow-sm">
+            <header className="bg-white sticky top-0 z-30 dark:bg-slate-600 shadow-sm">
 
                 <div className="mx-auto flex h-16 max-w-5xl items-center gap-4 px-5">
 

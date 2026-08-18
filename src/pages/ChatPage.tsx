@@ -27,9 +27,6 @@ import {
 } from "../services/messages";
 import { sendChatInvitation } from "../services/invitations";
 
-// ======================================================
-// TYPES
-// ======================================================
 
 type ContextMenu = {
     x: number;
@@ -49,6 +46,7 @@ export default function ChatPage() {
 
     const { groupId } =
         useParams<{ groupId: string }>();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Messages du groupe.
     const [messages, setMessages] =
@@ -148,6 +146,27 @@ export default function ChatPage() {
         void loadGroup();
 
     }, [groupId]);
+
+    function handleMessageChange( //pour saisir le message et augmenter l'aire
+        event: React.ChangeEvent<HTMLTextAreaElement>,
+    ) {
+        const textarea = event.target;
+
+        setMessageText(textarea.value);
+
+        textarea.style.height = "auto";
+
+        const lineHeight = 24;
+        const maxHeight = lineHeight * 4;
+
+        textarea.style.height =
+            `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+
+        textarea.style.overflowY =
+            textarea.scrollHeight > maxHeight
+                ? "auto"
+                : "hidden";
+    }
 
     // RECALCULE LES SÉPARATEURS DE DATE  "Aujourd'hui" apparaît uniquement au premier message.
     function updateMessageDates(
@@ -529,13 +548,16 @@ export default function ChatPage() {
         }
 
         try {
+            // L'auteur d'un ancien message peut avoir quitté le groupe.
+            if (!inviteMessage.sender_membership_id) {
+                alert("Ce membre a quitté le groupe.");
+                setInviteMessage(null);
+                return;
+            }
 
             await sendChatInvitation(
-
                 inviteMessage.sender_membership_id,
-
                 conversationName,
-
             );
 
             setConversationName("");
@@ -608,6 +630,10 @@ export default function ChatPage() {
 
 
             setMessageText("");
+            if (textareaRef.current) {
+                textareaRef.current.style.height = "auto";
+                textareaRef.current.style.overflowY = "hidden";
+            }
 
             setSelectedFile(null);
 
@@ -1084,36 +1110,21 @@ export default function ChatPage() {
 
                     {/* TROMBONE */}
 
-                    <button type="button" onClick={() => fileInputRef.current?.click() }
-                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-white hover:text-sky-500"
+                    <button type="button" onClick={() => fileInputRef.current?.click()}
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-white hover:text-sky-500"
                     >
                         <Paperclip size={21}/>
                     </button>
 
 
-                    {/* MESSAGE */}
-
                     <textarea
+                        ref={textareaRef}
                         rows={1}
                         value={messageText}
-
-                        onChange={(
-                            event,
-                        ) =>
-                            setMessageText(
-                                event.target
-                                    .value,
-                            )
-                        }
-                        onKeyDown={(
-                            event,
-                        ) => {
-
-                            // Entrée = envoyer.
-                            // Shift + Entrée = nouvelle ligne.
+                        onChange={handleMessageChange}
+                        onKeyDown={(event) => {
                             if (
-                                event.key ===
-                                "Enter" &&
+                                event.key === "Enter" &&
                                 !event.shiftKey
                             ) {
                                 event.preventDefault();
@@ -1121,18 +1132,17 @@ export default function ChatPage() {
                             }
                         }}
                         placeholder="Écrire un message..."
-                        className="max-h-32 min-h-10 min-w-0 flex-1 resize-none bg-transparent py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400 sm:text-base"
+                        className="min-h-10 min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-2 text-sm leading-6 text-slate-700 outline-none placeholder:text-slate-400 sm:text-base"
                     />
 
-                    {/* ENVOYER */}
 
-                    <button type="button" onClick={() => void handleSendMessage() }
-                        disabled={
-                            sending ||
-                            (!messageText.trim() &&
-                                !selectedFile)
-                        }
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                    <button type="button" onClick={() => void handleSendMessage()}
+                            disabled={
+                                sending ||
+                                (!messageText.trim() &&
+                                    !selectedFile)
+                            }
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-500 text-white transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                     >
 
                         {sending ? (
@@ -1148,18 +1158,18 @@ export default function ChatPage() {
             {menu && (
                 <div className="fixed inset-0 z-50" onClick={() => setMenu(null)}
 
-                    onContextMenu={(
-                        event,
-                    ) => {
-                        event.preventDefault();
-                        setMenu(null);
-                    }}
+                     onContextMenu={(
+                         event,
+                     ) => {
+                         event.preventDefault();
+                         setMenu(null);
+                     }}
                 >
                     <div style={{
-                            left: menu.x,
-                            top: menu.y,
-                        }}
-                        onClick={(event,) => event.stopPropagation() }
+                        left: menu.x,
+                        top: menu.y,
+                    }}
+                         onClick={(event,) => event.stopPropagation() }
                         className="absolute min-w-52 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl"
                     >
 

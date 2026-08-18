@@ -129,11 +129,6 @@ type InvitePreviewRow = {
     created_at: string;
 };
 
-
-// ============================================================
-// CRÉATION DU GROUPE
-// ============================================================
-
 export async function createGroup(
     name: string,
     color: string,
@@ -158,11 +153,6 @@ export async function createGroup(
     return data as string;
 }
 
-// CHARGE LES GROUPES DU USER
-// Un groupe n'apparaît que si le user est membre actif.
-
-// Charge uniquement les groupes du user
-// + leur nombre de messages non lus.
 export async function getMyGroups(): Promise<Group[]> {
 
     const {
@@ -180,11 +170,7 @@ export async function getMyGroups(): Promise<Group[]> {
         );
     }
 
-
-    // ----------------------------------------------
     // Groupes auxquels le user appartient.
-    // ----------------------------------------------
-
     const {
         data,
         error,
@@ -218,11 +204,7 @@ export async function getMyGroups(): Promise<Group[]> {
     }
 
 
-    // ----------------------------------------------
     // Compteurs non lus de tous les groupes.
-    // Une seule requête.
-    // ----------------------------------------------
-
     const {
         data: unreadData,
         error: unreadError,
@@ -250,11 +232,7 @@ export async function getMyGroups(): Promise<Group[]> {
         );
     }
 
-
-    // ----------------------------------------------
     // Construction finale des cartes Home.
-    // ----------------------------------------------
-
     return (
         (data ?? []) as unknown as MembershipWithGroup[]
     ).flatMap((membership) => {
@@ -311,11 +289,7 @@ export async function getMyGroups(): Promise<Group[]> {
     });
 }
 
-
-// ============================================================
 // INFORMATIONS COMPLÈTES DU GROUPE
-// ============================================================
-
 export async function getGroupDetails(
     groupId: string,
 ): Promise<GroupDetails> {
@@ -391,12 +365,7 @@ export async function getGroupDetails(
     };
 }
 
-
-// ============================================================
 // MODIFIE LA DURÉE DU GROUPE
-// RPC sécurisé : seul le Dominus peut le faire.
-// ============================================================
-
 export async function updateGroupLifetime(
     groupId: string,
     lifetime: GroupLifetime,
@@ -416,11 +385,8 @@ export async function updateGroupLifetime(
 }
 
 
-// ============================================================
-// CHARGE LES MEMBRES DU GROUPE
-// Aucun rôle/admin n'est retourné au frontend.
-// ============================================================
 
+//CHARGE LES MEMBRES DU GROUPE
 export async function getGroupMembers(
     groupId: string,
 ): Promise<GroupMember[]> {
@@ -477,11 +443,7 @@ export async function getGroupMembers(
 }
 
 
-// ============================================================
-// CHARGE TOUS LES MÉDIAS / FICHIERS DU GROUPE
-// Deux requêtes évitent les jointures PostgREST fragiles.
-// ============================================================
-
+//CHARGE TOUS LES MÉDIAS / FICHIERS DU GROUPE .Deux requêtes évitent les jointures PostgREST fragiles.
 export async function getGroupMedia(
     groupId: string,
 ): Promise<GroupMediaItem[]> {
@@ -558,11 +520,7 @@ export async function getGroupMedia(
     );
 }
 
-
-// ============================================================
 // RÉCUPÈRE LA COULEUR PERSONNELLE DU USER DANS CE GROUPE
-// ============================================================
-
 export async function getMyMessageColor(
     groupId: string,
 ): Promise<string> {
@@ -591,11 +549,7 @@ export async function getMyMessageColor(
     return data.local_color;
 }
 
-
-// ============================================================
 // MODIFIE UNIQUEMENT LA COULEUR DES MESSAGES DU USER
-// ============================================================
-
 export async function updateMyMessageColor(
     groupId: string,
     color: string,
@@ -624,11 +578,7 @@ export async function updateMyMessageColor(
     if (error) throw error;
 }
 
-
-// ============================================================
 // QUITTER LE GROUPE
-// ============================================================
-
 export async function leaveGroup(
     groupId: string,
 ): Promise<void> {
