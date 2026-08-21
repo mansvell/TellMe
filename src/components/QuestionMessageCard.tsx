@@ -10,20 +10,20 @@ export default function QuestionMessageCard({
                                             }: Props) {
     return (
         <div className="my-5 flex w-full justify-center px-3">
-            <div className="group relative w-full max-w-md overflow-hidden rounded-[2rem] border border-sky-200/70 bg-gradient-to-br from-sky-500 via-sky-500 to-cyan-400 p-[1px] shadow-xl shadow-sky-500/10 dark:border-sky-800/50">
+            <div className="group relative w-full max-w-md overflow-hidden rounded-[2rem] border border-sky-200/70 bg-cyan-400 p-[1px] shadow-xl shadow-sky-500/10 dark:border-sky-800/50">
                 <div className="relative overflow-hidden rounded-[1.95rem] bg-white p-6 text-center dark:bg-slate-900">
                     <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-sky-100 blur-3xl dark:bg-sky-900/30" />
 
                     <div className="relative">
 
-                        <div className="mt-3 flex items-center justify-center gap-1.5">
+                        <div className="mt-1 flex items-center justify-center gap-1.5">
                             <Sparkles
                                 size={13}
                                 className="text-sky-500"
                             />
 
                             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-500">
-                                Question TellMe
+                                Nouvelle Question
                             </p>
 
                             <Sparkles
@@ -32,7 +32,7 @@ export default function QuestionMessageCard({
                             />
                         </div>
 
-                        <p className="mx-auto mt-4 max-w-sm text-lg font-black leading-7 text-slate-900 dark:text-white">
+                        <p className="mx-auto mt-3 max-w-sm text-lg font-black leading-7 text-slate-900 dark:text-white">
                             {question}
                         </p>
 
@@ -43,8 +43,7 @@ export default function QuestionMessageCard({
                                 size={16}
                                 className="text-sky-500"
                             />
-
-                            Répondre dans le chat
+                            Exprimez vous sans crainte
                         </div>
                     </div>
                 </div>

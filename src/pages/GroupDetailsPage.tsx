@@ -185,12 +185,10 @@ export default function GroupDetailsPage() {
         try {
 
             await navigator.share({
-                title:
-                    `Rejoindre ${group.name} sur TellMe`,
-                text:
-                    `Salut, Rejoins mon groupe "${group.name}" sur TellMe.`,
-                url:
-                group.inviteLink,
+                title: `Rejoindre ${group.name} sur TellMe`,
+                text: `Rejoins le groupe "${group.name}" sur l'App TellMe.\n\n` +
+                    `Discute en anonyme et sans limite sur plein de sujet`,
+                url: group.inviteLink,
             });
 
         } catch {
@@ -555,7 +553,6 @@ export default function GroupDetailsPage() {
                                             GroupLifetime,
                                             null
                                         >;
-
                                 void handleDurationChange(
                                     parsed,
                                 );
@@ -579,52 +576,37 @@ export default function GroupDetailsPage() {
                                             item.label
                                         }
                                     </option>
-
                                 ),
                             )}
-
                         </select>
 
 
                         <div className="mt-4 flex items-center gap-2">
-
                             {savingDuration && (
-
                                 <LoaderCircle
                                     size={16}
                                     className="animate-spin text-sky-500"
                                 />
-
                             )}
 
                             <p className="text-sm text-slate-500">
-
                                 {group.expiresAt
                                     ? `Expiration : ${group.expiresLabel}`
                                     : "Ce groupe n’expire pas."}
-
                             </p>
-
                         </div>
-
                     </div>
-
                 )}
 
 
                 {errorMessage && (
-
                     <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-
                         {errorMessage}
-
                     </div>
-
                 )}
 
 
                 {/* Dominus supprime ; membre classique quitte */}
-
                 {group.isDominus ? (
 
                     <button

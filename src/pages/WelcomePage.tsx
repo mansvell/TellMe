@@ -95,7 +95,7 @@ type FeatureProps = {
 
 function Feature({icon, title, subtitle}: FeatureProps) {
     return (
-        <div className="rounded-3xl bg-white border border-slate-200 shadow-sm p-5 hover:shadow-md transition">
+        <div className="rounded-3xl bg-white border border-slate-200 shadow-sm px-2 py-4 hover:shadow-md transition">
 
             <div className="flex  gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">

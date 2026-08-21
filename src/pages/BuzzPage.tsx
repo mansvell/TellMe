@@ -44,20 +44,56 @@ type QuestionCategory = {
 
 const QUESTION_CATEGORIES: QuestionCategory[] = [
     {
+        id: "fun",
+        name: "Fun",
+        emoji: "😂",
+        description: "Des questions légères pour mettre le groupe en mouvement.",
+        questions: [
+            "C'est l'heure du kongossa...",
+            "Denoncez la personne la plus laide du groupe ?",
+            "Qui arriverait en retard à son propre mariage ?",
+            "Qui dépenserait un million d'euros seulement sur les femmes?",
+            "Qui aime le plus les femmes ?",
+            "Qui aime le plus les hommes ?",
+            "Qui survivrait le mieux à une apocalypse ?",
+            "Qui pourrait accidentellement devenir viral sur Internet ?",
+            "Qui serait capable de dormir pendant une urgence ?",
+            "Toi et moi dans une chambre 1h on fait quoi ?",
+        ],
+    },
+    {
+        id: "between-us",
+        name: "Entre nous",
+        emoji: "👀",
+        description: "Des questions parfaites quand tout le groupe se connaît.",
+        questions: [
+            "Quelle est la première impression que vous aviez sur -(MembreDuGroupe)- ?",
+            "Qui a le plus changé depuis que vous vous connaissez ?",
+            "Vous pouvez tout balancer ce que vous avez sur le coeur ",
+            "Quelle histoire du groupe ne vieillira jamais ?",
+            "Que reprochez vous à quelqu'un dans le groupe?",
+            "Quel membre du groupe serait le plus difficile à remplacer ?",
+            "Quel voyage devrait absolument faire le groupe ensemble ?",
+            "Qui est la personne la plus insupportable ?",
+            "Qui pense cacher sa relation pourtant on est tous au courant",
+            "Qui est selon vous les chances que -(MembreDuGroupe)- et -(MembreDuGroupe)- se mette ensemble ?",
+        ],
+    },
+    {
         id: "hot",
         name: "Chaud",
         emoji: "🔥",
-        description: "Les questions qui peuvent vraiment lancer le débat.",
+        description: "Les questions qu'il faut mieux laisser",
         questions: [
             "Quelle vérité personne ici n'oserait dire à voix haute ?",
             "Apoutchou ou Skinny ?",
             "Qui dans le groupe cache probablement le plus de choses ?",
             "Tu pourrais sortir avec l'ex d'un ami ?",
             "Quel comportement te fait perdre immédiatement tout intérêt pour quelqu'un ?",
-            "Est-ce que tromper commence déjà avec les messages ?",
+            "La Position la plus difficile a maintenir lors des bails ?",
             "Devrait on recommencer avec les marriages arrangé ?",
-            "Tu préfères connaître toute la vérité ou rester heureux sans savoir ?",
-            "Le Bodycount est il important ?",
+            "Qui est le plus attirant du groupe ?",
+            "La taille du robinet compte t'elle ?",
             "Peut-on vraiment aimer quelqu'un et quand même le tromper ?",
         ],
     },
@@ -91,8 +127,8 @@ const QUESTION_CATEGORIES: QuestionCategory[] = [
             "Quelle décision regrettes-tu encore aujourd'hui ?",
             "As-tu déjà trahi la confiance d'un ami ?",
             "Quel message regrettes-tu le plus d'avoir envoyé ?",
-            "As-tu déjà été jaloux d'un ami proche ?",
-            "Quelle habitude bizarre caches-tu aux autres ?",
+            "Qui a quelques choses à dire et veux se lancer ?",
+            "La plus grosse dinguerie que tu ais faite ?",
             "As-tu déjà ignoré volontairement quelqu'un que tu aimais ?",
             "Quelle vérité sur toi surprendrait le plus le groupe ?",
         ],
@@ -101,56 +137,21 @@ const QUESTION_CATEGORIES: QuestionCategory[] = [
         id: "debates",
         name: "Débats",
         emoji: "🧠",
-        description: "Des choix impossibles et des opinions qui divisent.",
+        description: "Des sujets palpitants et des opinions qui divisent.",
         questions: [
-            "Tu préfères être riche et seul ou pauvre et très entouré ?",
+            "20000€/mois a condition de fom 2fois/jour ,tu acceptes?",
             "L'argent peut-il réellement rendre heureux ?",
             "Premier Date au mc Donald ,ca passe?",
-            "Peut-on être ami avec quelqu'un qui pense totalement différemment ?",
+            "un homme qui se bat et fort aux fess#s ou un homme riche mais faible aux fess#s ?",
             "Est-ce que tout le monde mérite une seconde chance ?",
             "Apoutchou ou Skinny ?",
-            "Le talent compte-t-il plus que le travail ?",
-            "pourquoi les femmes font moins le premier pas ?",
+            "Le Bodycount est il important ?",
+            "Faire des bails avec un ami(e) ?",
             "Est-ce pire de mentir ou de cacher volontairement la vérité ?",
             "Tu choisirais l'amour ou ta carrière si tu devais absolument sacrifier l'un des deux ?",
         ],
     },
-    {
-        id: "fun",
-        name: "Fun",
-        emoji: "😂",
-        description: "Des questions légères pour mettre le groupe en mouvement.",
-        questions: [
-            "Qui survivrait le moins longtemps sur une île déserte ?",
-            "Denoncez la personne la plus laide du groupe ?",
-            "Qui arriverait en retard à son propre mariage ?",
-            "Qui dépenserait un million d'euros seulement sur les femmes?",
-            "Qui pourrait disparaître une semaine sans prévenir personne ?",
-            "Qui serait le pire colocataire ?",
-            "Qui survivrait le mieux à une apocalypse ?",
-            "Qui pourrait accidentellement devenir viral sur Internet ?",
-            "Qui serait capable de dormir pendant une urgence ?",
-            "Qui pourrait partir en voyage demain sans rien préparer ?",
-        ],
-    },
-    {
-        id: "between-us",
-        name: "Entre nous",
-        emoji: "👀",
-        description: "Des questions parfaites quand tout le groupe se connaît.",
-        questions: [
-            "Quelle est la première impression que vous aviez les uns des autres ?",
-            "Qui a le plus changé depuis que vous vous connaissez ?",
-            "Quel membre du groupe connais-tu le moins bien ?",
-            "Quelle histoire du groupe ne vieillira jamais ?",
-            "Qui donne les meilleurs conseils mais ne les applique jamais ?",
-            "Quel membre du groupe serait le plus difficile à remplacer ?",
-            "Quel voyage devrait absolument faire le groupe ensemble ?",
-            "Qui connaît probablement le plus de secrets ici ?",
-            "Chacun donne un secret ",
-            "Dans dix ans, qui sera encore exactement pareil ?",
-        ],
-    },
+
 ];
 export default function BuzzPage() {
 
@@ -1249,7 +1250,7 @@ export default function BuzzPage() {
                                                                         : buzz.id,
                                                                 )
                                                             }
-                                                            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                            className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-900 transition  dark:hover:bg-slate-800"
                                                         >
                                                             <MoreHorizontal size={19}/>
                                                         </button>
@@ -1295,19 +1296,26 @@ export default function BuzzPage() {
 
                                                 {/* GROUP */}
                                                 {group && (
-                                                    <div
-                                                        className="mt-4 flex items-center gap-2 text-xs font-semibold text-violet-500">
-
+                                                    <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-violet-500">
                                                         <MessageCircle size={15}/>
                                                         Discussion liée à {group.name}
-
                                                     </div>
-
                                                 )}
 
-                                                <div className="mt-2 space-y-4">
-                                                    {buzzes.map((buzz) => {
-                                                        const results = buzz.results ?? [];
+                                                <div className="mt-4 space-y-4">
+                                                    {(() => {
+                                                        // Affiche toujours toutes les options, même avec 0 vote.
+                                                        const results = (buzz.buzz_options ?? []).map((option) => {
+                                                            const result = buzz.results?.find(
+                                                                (item) => item.option_id === option.id,
+                                                            );
+
+                                                            return {
+                                                                option_id: option.id,
+                                                                label: option.label,
+                                                                votes: result?.votes ?? 0,
+                                                            };
+                                                        });
 
                                                         const totalSelections = results.reduce(
                                                             (total, option) =>
@@ -1316,61 +1324,46 @@ export default function BuzzPage() {
                                                         );
 
                                                         return (
-                                                            <div key={buzz.id}
-                                                                 className="w-full rounded-[1.7rem] p-3  dark:border-slate-800 dark:bg-slate-900"
-                                                            >
-                                                                <div className="mt-6 space-y-4">
-                                                                    {results.map((option) => {
-                                                                        const percentage =
-                                                                            totalSelections > 0
-                                                                                ? Math.round(
-                                                                                    (option.votes / totalSelections) * 100,
-                                                                                )
-                                                                                : 0;
+                                                            <>
+                                                                {results.map((option) => {
+                                                                    const percentage =
+                                                                        totalSelections > 0
+                                                                            ? Math.round(
+                                                                                (option.votes / totalSelections) * 100,
+                                                                            )
+                                                                            : 0;
 
-                                                                        return (
-                                                                            <div key={option.option_id}>
-                                                                                <div className="mb-2 flex items-center justify-between gap-3">
-                                                                                    <span
-                                                                                        className="min-w-0 truncate font-bold text-slate-700 dark:text-slate-200">
-                                                                                        {option.label}
-                                                                                    </span>
+                                                                    return (
+                                                                        <div key={option.option_id}>
+                                                                            <div className="mb-2 flex items-center justify-between gap-3">
+                                                                                <span className="min-w-0 truncate font-bold text-slate-700 dark:text-slate-200">
+                                                                                    {option.label}
+                                                                                </span>
 
-                                                                                    <span
-                                                                                        className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
-                                                                                        {option.votes} personne{option.votes !== 1 ? "s" : ""} · {percentage}%
-                                                                                    </span>
-                                                                                </div>
-
-                                                                                <div
-                                                                                    className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                                                                                    <div
-                                                                                        className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-700"
-                                                                                        style={{
-                                                                                            width: `${percentage}%`,
-                                                                                        }}
-                                                                                    />
-                                                                                </div>
+                                                                                <span
+                                                                                    className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
+                                                                                    {option.votes} personne
+                                                                                    {option.votes !== 1 ? "s" : ""}
+                                                                                    {" · "}
+                                                                                    {percentage}%
+                                                                                </span>
                                                                             </div>
-                                                                        );
-                                                                    })}
 
-                                                                    {results.length === 0 && (
-                                                                        <div
-                                                                            className="rounded-2xl bg-slate-50 py-5 text-center dark:bg-slate-800/60">
-                                                                            <p className="text-2xl">
-                                                                                🗳️
-                                                                            </p>
-
-                                                                            <p className="mt-2 text-sm font-bold text-slate-500 dark:text-slate-400">
-                                                                                Aucun résultat pour le moment
-                                                                            </p>
+                                                                            <div
+                                                                                className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                                                                <div
+                                                                                    className="h-full rounded-full bg-gradient-to-r from-sky-400 to-sky-600 transition-all duration-700"
+                                                                                    style={{
+                                                                                        width: `${percentage}%`,
+                                                                                    }}
+                                                                                />
+                                                                            </div>
                                                                         </div>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                                                    );
+                                                                })}
+                                                            </>
                                                         );
-                                                    })}
+                                                    })()}
                                                 </div>
 
                                                 {/* FOOTER */}
@@ -1419,7 +1412,7 @@ export default function BuzzPage() {
                 {tab === "results" && (
                     <div className="mt-5">
                         <div className="relative overflow-hidden rounded-[2rem] p-4 text-white  backdrop-blur-xl">
-                            <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+                            <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl"/>
 
                             <div className="relative">
                                 <div className="flex items-center justify-center rounded-2xl bg-white/15 text-2xl">
@@ -1631,8 +1624,12 @@ export default function BuzzPage() {
                             </button>
                         </div>
 
-                        <div className="pointer-events-none fixed left-0 top-0 -z-50 opacity-0">
-                            <BuzzShareCard ref={shareCardRef}/>
+                        <div className="mt-5 flex justify-center">
+                            <div className="h-[320px] w-[180px] overflow-hidden rounded-[1.5rem] shadow-xl">
+                                <div className="origin-top-left scale-50">
+                                    <BuzzShareCard/>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="mt-6 rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
