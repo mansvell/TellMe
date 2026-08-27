@@ -9,7 +9,7 @@ type Props = {
 const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
     (
         {
-            message = "J'ai quelque chose de hot pour toi",
+            message = "Donne moi ton avis en anonyme sur ce sondage",
         },
         ref,
     ) => {

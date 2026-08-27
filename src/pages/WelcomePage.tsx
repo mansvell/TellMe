@@ -78,7 +78,7 @@ export default function WelcomePage() {
             <footer className="bg-sky-500 text-white py-5 text-center">
 
                 <p className="font-medium">
-                    © 2026 TellMe par Mansvell Nkwanga
+                    © 2026 TellMe
                 </p>
 
             </footer>

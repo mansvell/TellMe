@@ -49,8 +49,8 @@ const QUESTION_CATEGORIES: QuestionCategory[] = [
         emoji: "😂",
         description: "Des questions légères pour mettre le groupe en mouvement.",
         questions: [
-            "C'est l'heure du kongossa...",
-            "Denoncez la personne la plus laide du groupe ?",
+            "premiere impression que tu as eu de moi ?",
+            "Qui est la personne la plus laide du groupe ?",
             "Qui arriverait en retard à son propre mariage ?",
             "Qui dépenserait un million d'euros seulement sur les femmes?",
             "Qui aime le plus les femmes ?",

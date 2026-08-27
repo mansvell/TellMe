@@ -944,7 +944,7 @@ export default function SettingsPage() {
                     TellMe, l'App qui révolutionne l'Anonymat et le Fun
                 </p>
                 <p className=" text-center text-xm leading-5 text-slate-400">
-                    ✦ 2026 ✦
+                    ✦ 2026 - Mansvell Nkwanga✦
                 </p>
 
             </section>
