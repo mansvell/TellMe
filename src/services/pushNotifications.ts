@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
 
@@ -78,7 +79,7 @@ async function getServiceWorkerRegistration():
     if (!supportsPushNotifications()) {
 
         throw new Error(
-            "Les notifications push ne sont pas supportées sur cet appareil.",
+            t("Les notifications push ne sont pas supportées sur cet appareil."),
         );
     }
 
@@ -147,7 +148,7 @@ export async function enablePushNotifications():
     if (!supportsPushNotifications()) {
 
         throw new Error(
-            "Les notifications push ne sont pas supportées par ce navigateur.",
+            t("Les notifications push ne sont pas supportées par ce navigateur."),
         );
     }
 
@@ -163,7 +164,7 @@ export async function enablePushNotifications():
     ) {
 
         throw new Error(
-            "L'autorisation des notifications a été refusée.",
+            t("L'autorisation des notifications a été refusée."),
         );
     }
 
@@ -232,7 +233,7 @@ export async function enablePushNotifications():
     ) {
 
         throw new Error(
-            "Abonnement push invalide.",
+            t("Abonnement push invalide."),
         );
     }
 
@@ -252,7 +253,7 @@ export async function enablePushNotifications():
     if (!user) {
 
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 
@@ -343,7 +344,7 @@ export async function disablePushNotifications():
     if (!user) {
 
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 

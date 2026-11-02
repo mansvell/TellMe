@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { forwardRef } from "react";
 import { Flame } from "lucide-react";
 import icon from "../assets/icon.png";
@@ -9,7 +10,7 @@ type Props = {
 const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
     (
         {
-            message = "Donne moi ton avis en anonyme sur ce sondage",
+            message = t("Donne moi ton avis en anonyme sur ce sondage"),
         },
         ref,
     ) => {
@@ -43,8 +44,7 @@ const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
                     </h2>
 
                     <p className="mt-8 text-xl font-bold text-sky-50">
-                        Clique et découvre
-                    </p>
+                         {t("Clique et découvre")} </p>
                 </div>
 
                 <div className="flex flex-col items-center">

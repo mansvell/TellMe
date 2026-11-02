@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     ArrowRight,
     Check,
@@ -78,7 +79,7 @@ export default function VoteBuzz() {
         useState<PublicBuzzResult[]>([]);
 
     const [loading, setLoading] =
-        useState(true);
+        useState(Boolean(shareCode));
 
     const [voting, setVoting] =
         useState(false);
@@ -92,10 +93,7 @@ export default function VoteBuzz() {
 
     useEffect(() => {
 
-        if (!shareCode) {
-            setLoading(false);
-            return;
-        }
+        if (!shareCode) return;
 
         let active = true;
 
@@ -204,7 +202,7 @@ export default function VoteBuzz() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Vous avez deja voté !",
+                    : t("Vous avez deja voté !"),
             );
 
         } finally {
@@ -255,17 +253,14 @@ export default function VoteBuzz() {
                     />
 
                     <h1 className="mt-5 text-2xl font-black dark:text-white">
-                        Oups! Ce Buzz n'existe plus...
-                    </h1>
+                         {t("Oups! Ce Buzz n'existe plus...")} </h1>
 
                     <p className="mt-2 text-sm text-slate-500">
-                        Il a été fermé par son créateur
-                    </p>
+                         {t("Il a été fermé par son créateur")} </p>
 
                     <button className="mt-5  p-2 bg-sky-500 text-xm text-white rounded-2xl" onClick={() =>
                         navigate(`/welcome`)}>
-                        Rejoins TellMe et partage des moments fun
-                    </button>
+                         {t("Rejoins TellMe et partage des moments fun")} </button>
                 </div>
 
             </main>
@@ -318,9 +313,7 @@ export default function VoteBuzz() {
 
                                 <Flame size={17} />
 
-                                QUESTION BUZZ
-
-                            </div>
+                                 {t("QUESTION BUZZ")} </div>
 
                             <h2 className="mt-4 text-2xl font-black leading-snug">
                                 {buzz.question}
@@ -409,9 +402,7 @@ export default function VoteBuzz() {
 
                             <div className="mt-5 flex items-center justify-center gap-2 text-xs font-semibold text-slate-400">
                                 <LockKeyhole size={14} />
-                                Aucun compte TellMe nécessaire
-
-                            </div>
+                                 {t("Aucun compte TellMe nécessaire")} </div>
 
                         </div>
 
@@ -426,12 +417,10 @@ export default function VoteBuzz() {
                         </div>
 
                         <h2 className="mt-4 text-center text-2xl font-black">
-                            Vote enregistré
-                        </h2>
+                             {t("Vote enregistré")} </h2>
 
                         <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
-                            Merci pour ta participation
-                        </p>
+                             {t("Merci pour ta participation")} </p>
 
                                                     {/*les results montrés aux externes */}
                         {buzz.show_results_after_vote &&
@@ -491,7 +480,7 @@ export default function VoteBuzz() {
                                     )}
 
                                     <p className="pt-2 text-center text-xs font-semibold text-slate-400">
-                                        {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
+                                        {totalVotes}  {t("vote")}{totalVotes !== 1 ? "s" : ""}
                                     </p>
 
                                 </div>
@@ -513,8 +502,7 @@ export default function VoteBuzz() {
 
                                         <div>
                                             <p className="text-xl font-bold text-slate-400">
-                                                La discussion continue dans:
-                                                <span
+                                                 {t("La discussion continue dans:")} <span
                                                     className="text-xl font-bold text-slate-800"> {buzz.group_name}</span>
                                             </p>
                                         </div>
@@ -522,9 +510,7 @@ export default function VoteBuzz() {
                                     </div>
 
                                     <p className="mt-4 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                        Ce Buzz vient d'un groupe TellMe. Rejoins la discussion pour voir ce que les
-                                        autres en pensent.
-                                    </p>
+                                         {t("Ce Buzz vient d'un groupe TellMe. Rejoins la discussion pour voir ce que les autres en pensent.")} </p>
 
                                     <button
                                         type="button"
@@ -535,14 +521,12 @@ export default function VoteBuzz() {
                                         }
                                         className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white transition hover:bg-sky-600"
                                     >
-                                        Rejoindre le groupe
-                                        <ArrowRight size={18}/>
+                                         {t("Rejoindre le groupe")} <ArrowRight size={18}/>
 
                                     </button>
                                     <button className="mt-5 pb-2 pt-1 flex  w-full text-center justify-center gap-2 rounded-2xl bg-gray-500 font-bold text-green-500" onClick={() =>
                                         navigate(`/welcome`)}>
-                                        Rejoins TellMe et partage des moments fun
-                                    </button>
+                                         {t("Rejoins TellMe et partage des moments fun")} </button>
                                 </div>
 
                             )}

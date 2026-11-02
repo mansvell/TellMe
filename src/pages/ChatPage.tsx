@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     useEffect,
     useRef,
@@ -550,7 +551,7 @@ export default function ChatPage() {
         try {
             // L'auteur d'un ancien message peut avoir quitté le groupe.
             if (!inviteMessage.sender_membership_id) {
-                alert("Ce membre a quitté le groupe.");
+                alert(t("Ce membre a quitté le groupe."));
                 setInviteMessage(null);
                 return;
             }
@@ -565,7 +566,7 @@ export default function ChatPage() {
             setInviteMessage(null);
 
             alert(
-                "Invitation envoyée.",
+                t("Invitation envoyée."),
             );
 
         } catch (error) {
@@ -575,7 +576,7 @@ export default function ChatPage() {
             alert(
                 error instanceof Error
                     ? error.message
-                    : "Impossible d'envoyer l'invitation.",
+                    : t("Impossible d'envoyer l'invitation."),
             );
 
         }
@@ -695,7 +696,7 @@ export default function ChatPage() {
                             <div className="min-w-0">
                                 <h1 className="truncate font-bold text-slate-900 dark:text-white">
                                     {group?.name ??
-                                        "Chargement..."}
+                                        t("Chargement...")}
                                 </h1>
 
                                 <p className="truncate text-sm text-emerald-500">
@@ -705,8 +706,8 @@ export default function ChatPage() {
 
                                     {group?.members ===
                                     1
-                                        ? "membre"
-                                        : "membres"}
+                                        ? t("membre")
+                                        : t("membres")}
 
                                 </p>
                             </div>
@@ -755,8 +756,7 @@ export default function ChatPage() {
                                         <div className="my-5 flex items-center gap-3">
                                             <div className="h-px flex-1 bg-sky-300" />
                                             <span className="rounded-full bg-sky-100 px-4 py-1.5 text-xs font-bold text-sky-600">
-                                            Non lus
-                                        </span>
+                                             {t("Non lus")} </span>
                                             <div className="h-px flex-1 bg-sky-300" />
                                         </div>
                                     )}
@@ -1025,7 +1025,7 @@ export default function ChatPage() {
 
                     <div className="min-w-0 flex-1">
                         <p className="text-sm font-bold text-sky-600">
-                            Réponse à{" "}
+                             {t("Réponse à")}{" "}
 
                             {replyingTo.me
                                 ? "vous"
@@ -1131,7 +1131,7 @@ export default function ChatPage() {
                                 void handleSendMessage();
                             }
                         }}
-                        placeholder="Écrire un message..."
+                        placeholder={t("Écrire un message...")}
                         className="min-h-10 min-w-0 flex-1 resize-none overflow-hidden bg-transparent py-2 text-sm leading-6 text-slate-700 outline-none placeholder:text-slate-400 sm:text-base"
                     />
 
@@ -1178,8 +1178,7 @@ export default function ChatPage() {
                             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-medium text-slate-700 transition hover:bg-slate-100"
                         >
                             <Reply size={19} className="text-sky-500" />
-                            Répondre
-                        </button>
+                             {t("Répondre")} </button>
 
                         {/* COPIER */}
 
@@ -1187,8 +1186,7 @@ export default function ChatPage() {
                             className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-medium text-slate-700 transition hover:bg-slate-100"
                         >
                             <Copy size={19} className="text-sky-500"/>
-                            Copier
-                        </button>
+                             {t("Copier")} </button>
 
                         {!menu.message.me && (
 
@@ -1196,8 +1194,7 @@ export default function ChatPage() {
                                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left font-medium text-slate-700 transition hover:bg-slate-100"
                             >
                                 <UserPlus size={19} className="text-sky-500"/>
-                                Inviter
-                            </button>
+                                 {t("Inviter")} </button>
                         )}
                     </div>
                 </div>
@@ -1219,12 +1216,11 @@ export default function ChatPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-xl font-bold text-slate-900">
-                                    Nouvelle conversation
-                                </h2>
+                                     {t("Nouvelle conversation")} </h2>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Invitation destinée à{" "}
+                                     {t("Invitation destinée à")}{" "}
                                     {inviteMessage.name ??
-                                        "ce membre"}
+                                        t("ce membre")}
                                 </p>
                             </div>
 
@@ -1236,8 +1232,7 @@ export default function ChatPage() {
                         </div>
 
                         <label htmlFor="conversationName" className="mt-7 block text-sm font-bold text-slate-700">
-                            Nom de la conversation
-                        </label>
+                             {t("Nom de la conversation")} </label>
                         <input id="conversationName" value={conversationName}
                             onChange={(event,) =>
                                 setConversationName(
@@ -1254,8 +1249,7 @@ export default function ChatPage() {
                             className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
                         >
                             <UserPlus size={20} />
-                            Envoyer l’invitation
-                        </button>
+                             {t("Envoyer l’invitation")} </button>
                     </form>
                 </div>
             )}

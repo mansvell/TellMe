@@ -1,5 +1,6 @@
 import {Routes, Route, Navigate} from "react-router-dom";
 
+import DiscoverPage from "./pages/DiscoverPage";
 import SplashPage from "./pages/SplashPage.tsx";
 import WelcomePage from "./pages/WelcomePage";
 import RegisterPage from "./pages/RegisterPage.tsx";
@@ -34,6 +35,7 @@ export default function App() {
 
           <Route path="/notif" element={<PublicOnlyRoute> <NotificationPage/> </PublicOnlyRoute>} />
 
+          <Route path="/discover" element={<ProtectedRoute><DiscoverPage /></ProtectedRoute>} />
           <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
           <Route path="/chat/:groupId" element={<ProtectedRoute> <ChatPage/> </ProtectedRoute>} />
           <Route path="/gdetailp/:groupId" element={<ProtectedRoute> <GroupDetailsPage /> </ProtectedRoute>} />

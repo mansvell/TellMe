@@ -1,3 +1,5 @@
+import { getLocale } from "../i18n/runtime";
+import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
     ExternalLink,
@@ -122,8 +124,7 @@ export default function MediaPage() {
                     </Link>
 
                     <h1 className="text-xl dark:text-white font-bold">
-                        Médias
-                    </h1>
+                         {t("Médias")} </h1>
 
                 </div>
 
@@ -146,7 +147,7 @@ export default function MediaPage() {
                         icon={
                             <ImageIcon size={18} />
                         }
-                        text={`Photos (${count("image")})`}
+                        text={t("Photos ({count})", { count: count("image") })}
                     />
 
                     <TabButton
@@ -159,7 +160,7 @@ export default function MediaPage() {
                         icon={
                             <Video size={18} />
                         }
-                        text={`Vidéos (${count("video")})`}
+                        text={t("Vidéos ({count})", { count: count("video") })}
                     />
 
                     <TabButton
@@ -172,7 +173,7 @@ export default function MediaPage() {
                         icon={
                             <FileText size={18} />
                         }
-                        text={`Fichiers (${count("file")})`}
+                        text={t("Fichiers ({count})", { count: count("file") })}
                     />
 
                 </div>
@@ -239,7 +240,7 @@ export default function MediaPage() {
                                             {new Date(
                                                 item.createdAt,
                                             ).toLocaleDateString(
-                                                "fr-FR",
+                                                getLocale(),
                                             )}
 
                                         </p>
@@ -341,8 +342,7 @@ export default function MediaPage() {
                         }
                         className="absolute right-5 top-5 rounded-full bg-white/10 px-4 py-2 font-semibold text-white backdrop-blur"
                     >
-                        Fermer
-                    </button>
+                         {t("Fermer")} </button>
 
                     {preview.kind === "image" ? (
 
@@ -419,10 +419,10 @@ function EmptyMedia({
 
     const label =
         activeTab === "image"
-            ? "Aucune photo"
+            ? t("Aucune photo")
             : activeTab === "video"
-                ? "Aucune vidéo"
-                : "Aucun fichier";
+                ? t("Aucune vidéo")
+                : t("Aucun fichier");
 
     return (
 
@@ -443,8 +443,7 @@ function EmptyMedia({
             </p>
 
             <p className="mt-1 text-sm text-slate-400">
-                Les éléments partagés dans le chat apparaîtront ici.
-            </p>
+                 {t("Les éléments partagés dans le chat apparaîtront ici.")} </p>
 
         </div>
     );
@@ -452,24 +451,9 @@ function EmptyMedia({
 
 
 // Affiche proprement la taille d'un fichier.
-function formatFileSize(
-    bytes: number | null,
-): string {
-
-    if (!bytes) return "Taille inconnue";
-
-    if (bytes < 1024) {
-        return `${bytes} o`;
-    }
-
-    if (bytes < 1024 * 1024) {
-        return `${(
-            bytes / 1024
-        ).toFixed(1)} Ko`;
-    }
-
-    return `${(
-        bytes
-        / (1024 * 1024)
-    ).toFixed(1)} Mo`;
+function formatFileSize(bytes: number | null): string {
+    if (bytes === null) return t("Taille inconnue");
+    const unit = bytes >= 1024 * 1024 ? "megabyte" : bytes >= 1024 ? "kilobyte" : "byte";
+    const value = unit === "megabyte" ? bytes / (1024 * 1024) : unit === "kilobyte" ? bytes / 1024 : bytes;
+    return new Intl.NumberFormat(getLocale(), { style: "unit", unit, unitDisplay: "short", maximumFractionDigits: 1 }).format(value);
 }

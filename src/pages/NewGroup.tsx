@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { useState } from "react";
 import {
     Check,
@@ -97,14 +98,14 @@ export default function NewGroup({
             onClose();
 
                 //pour le debug (à enlever plus tard)
-            console.log("Groupe créé :", groupId);
+            console.log(t("Groupe créé :"), groupId);
         } catch (error) {
             console.error("Create group error:", error);
 
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible de créer le groupe.",
+                    : t("Impossible de créer le groupe."),
             );
         } finally {
             setLoading(false);
@@ -126,12 +127,10 @@ export default function NewGroup({
                 <div className="flex items-center justify-between">
                     <div>
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                            Creer un nouveau groupe
-                        </h2>
+                             {t("Creer un nouveau groupe")} </h2>
 
                         <p className="mt-1 text-sm text-slate-500 dark:text-white">
-                            Invitez vos ami(e)s via le lien et discutez librement et en secret
-                        </p>
+                             {t("Invitez vos ami(e)s via le lien et discutez librement et en secret")} </p>
                     </div>
 
                     <button
@@ -161,7 +160,7 @@ export default function NewGroup({
                             }
                             maxLength={40}
                             autoFocus
-                            placeholder="Nom du Groupe"
+                            placeholder={t("Nom du Groupe")}
                             className="min-w-0 flex-1 bg-transparent text-slate-900 outline-none placeholder:text-slate-400"
                         />
 
@@ -174,8 +173,7 @@ export default function NewGroup({
                 {/* Couleur du groupe */}
                 <div className="mt-7">
                     <p className="text-sm font-bold text-slate-700 dark:text-white">
-                        Couleur du groupe
-                    </p>
+                         {t("Couleur du groupe")} </p>
 
                     <div className="mt-3 flex flex-wrap gap-3">
                         {groupColors.map((item) => {
@@ -218,8 +216,7 @@ export default function NewGroup({
                         />
 
                         <p className="text-sm font-bold text-slate-700 dark:text-white">
-                            Durée de vie
-                        </p>
+                             {t("Durée de vie")} </p>
                     </div>
 
                     <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -229,7 +226,7 @@ export default function NewGroup({
 
                             return (
                                 <button
-                                    key={item.label}
+                                    key={t(item.label)}
                                     type="button"
                                     onClick={() =>
                                         setLifetime(item.value)
@@ -240,7 +237,7 @@ export default function NewGroup({
                                             : "border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:bg-sky-50"
                                     }`}
                                 >
-                                    {item.label}
+                                    {t(item.label)}
                                 </button>
                             );
                         })}
@@ -267,13 +264,11 @@ export default function NewGroup({
                                 size={20}
                                 className="animate-spin"
                             />
-                            Création...
-                        </>
+                             {t("Création...")} </>
                     ) : (
                         <>
                             <Users size={20} />
-                            Créer le groupe
-                        </>
+                             {t("Créer le groupe")} </>
                     )}
                 </button>
             </form>

@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {BellRing, Check, LoaderCircle, LockKeyhole, MessageCircle} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
@@ -20,7 +21,7 @@ export default function NotificationPage() {
         if (userError) throw userError;
 
         if (!user) {
-            throw new Error("Utilisateur introuvable.");
+            throw new Error(t("Utilisateur introuvable."));
         }
 
         const { error: updateError } = await supabase
@@ -40,7 +41,7 @@ export default function NotificationPage() {
         try {
             if (!("Notification" in window)) {
                 throw new Error(
-                    "Les notifications ne sont pas prises en charge par ce navigateur.",
+                    t("Les notifications ne sont pas prises en charge par ce navigateur."),
                 );
             }
 
@@ -51,7 +52,7 @@ export default function NotificationPage() {
 
             if (!enabled) {
                 setErrorMessage(
-                    "L’autorisation n’a pas été accordée. Tu pourras l’activer plus tard.",
+                    t("L’autorisation n’a pas été accordée. Tu pourras l’activer plus tard."),
                 );
                 return;
             }
@@ -63,7 +64,7 @@ export default function NotificationPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible d’enregistrer ce choix.",
+                    : t("Impossible d’enregistrer ce choix."),
             );
         } finally {
             setLoading(false);
@@ -83,7 +84,7 @@ export default function NotificationPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible d’enregistrer ce choix.",
+                    : t("Impossible d’enregistrer ce choix."),
             );
         } finally {
             setLoading(false);
@@ -120,22 +121,18 @@ export default function NotificationPage() {
 
                     <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-14">
                         <span className="w-fit rounded-full bg-sky-100 px-4 py-2 text-sm font-semibold text-sky-700">
-                            Dernière étape
-                        </span>
+                             {t("Dernière étape")} </span>
 
                         <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                            Reste au courant sans être dérangé
-                        </h1>
+                             {t("Reste au courant sans être dérangé")} </h1>
 
                         <p className="mt-4 leading-7 text-slate-500">
-                            Active les notifications pour recevoir les nouveaux
-                            messages et invitations importantes.
-                        </p>
+                             {t("Active les notifications pour recevoir les nouveaux messages et invitations importantes.")} </p>
 
                         <div className="mt-7 space-y-4">
-                            <Benefit text="Nouveaux messages dans tes groupes" />
-                            <Benefit text="Invitations et réponses importantes" />
-                            <Benefit text="Contenu masqué sur l’écran verrouillé" />
+                            <Benefit text={t("Nouveaux messages dans tes groupes")} />
+                            <Benefit text={t("Invitations et réponses importantes")} />
+                            <Benefit text={t("Contenu masqué sur l’écran verrouillé")} />
                         </div>
 
                         <div className="mt-8 flex items-start gap-3 rounded-2xl bg-slate-50 p-4">
@@ -145,9 +142,7 @@ export default function NotificationPage() {
                             />
 
                             <p className="text-sm leading-6 text-slate-500">
-                                Tu pourras modifier ce choix à tout moment dans
-                                les paramètres.
-                            </p>
+                                 {t("Tu pourras modifier ce choix à tout moment dans les paramètres.")} </p>
                         </div>
 
                         {errorMessage && (
@@ -165,13 +160,11 @@ export default function NotificationPage() {
                                         size={20}
                                         className="animate-spin"
                                     />
-                                    Chargement...
-                                </>
+                                     {t("Chargement...")} </>
                             ) : (
                                 <>
                                     <BellRing size={20} />
-                                    Autoriser les notifications
-                                </>
+                                     {t("Autoriser les notifications")} </>
                             )}
                         </button>
 
@@ -179,8 +172,7 @@ export default function NotificationPage() {
                             onClick={skipNotifications}
                             className="mt-3 h-12 rounded-2xl font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
                         >
-                            Pas maintenant
-                        </button>
+                             {t("Pas maintenant")} </button>
                     </div>
                 </section>
             </div>

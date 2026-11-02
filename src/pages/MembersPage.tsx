@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
     LoaderCircle,
@@ -111,14 +112,13 @@ export default function MembersPage() {
                     <div>
 
                         <h1 className="text-xl dark:text-white font-bold">
-                            Membres du groupe
-                        </h1>
+                             {t("Membres du groupe")} </h1>
 
                         <p className="text-xs dark:text-white text-slate-400">
                             {members.length}{" "}
                             {members.length > 1
                                 ? "personnes"
-                                : "personne"}
+                                : t("personne")}
                         </p>
 
                     </div>
@@ -145,7 +145,7 @@ export default function MembersPage() {
                                 event.target.value,
                             )
                         }
-                        placeholder="Rechercher un membre..."
+                        placeholder={t("Rechercher un membre...")}
                         className="min-w-0 flex-1 outline-none"
                     />
 
@@ -189,8 +189,7 @@ export default function MembersPage() {
                                         </h3>
 
                                         <p className="mt-0.5 text-xs text-slate-400">
-                                            Membre du groupe
-                                        </p>
+                                             {t("Membre du groupe")} </p>
 
                                     </div>
 
@@ -203,8 +202,7 @@ export default function MembersPage() {
                         {filteredMembers.length === 0 && (
 
                             <div className="p-10 text-center text-sm text-slate-400">
-                                Aucun membre trouvé.
-                            </div>
+                                 {t("Aucun membre trouvé.")} </div>
 
                         )}
 

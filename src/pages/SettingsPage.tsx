@@ -1,8 +1,10 @@
+import { getLocale } from "../i18n/runtime";
+import { t } from "../i18n/runtime";
+import LanguageSelector from "../components/LanguageSelector";
 import {
     Bell,
     ChevronRight,
     FileText,
-    Languages,
     LoaderCircle, Mail,
     Moon,
     Shield,
@@ -205,7 +207,7 @@ export default function SettingsPage() {
                 }
 
                 if (!data) {
-                    console.error("Aucun profil trouvé pour cet utilisateur.");
+                    console.error(t("Aucun profil trouvé pour cet utilisateur."));
                     return;
                 }
 
@@ -222,7 +224,7 @@ export default function SettingsPage() {
 
                     displayName:
                         row.display_name ??
-                        "Utilisateur",
+                        t("Utilisateur"),
 
                     profileColor:
                         row.default_color ??
@@ -275,7 +277,7 @@ export default function SettingsPage() {
                 if (!active) return;
 
                 setErrorMessage(
-                    "Impossible de charger les paramètres.",
+                    t("Impossible de charger les paramètres."),
                 );
 
             } finally {
@@ -327,7 +329,7 @@ export default function SettingsPage() {
             return new Date(
                 profile.createdAt,
             ).toLocaleDateString(
-                "fr-FR",
+                getLocale(),
                 {
                     day: "numeric",
                     month: "long",
@@ -335,7 +337,7 @@ export default function SettingsPage() {
                 },
             );
 
-        }, [profile, clock]);
+        }, [profile]);
 
                              // PROCHAINE MODIFICATION DU PSEUDO
     const usernameAvailability = useMemo(() => {
@@ -363,7 +365,7 @@ export default function SettingsPage() {
             return {
                 canEdit: true,
                 loading: false,
-                text: "Modifiable maintenant",
+                text: t("Modifiable maintenant"),
             };
         }
 
@@ -391,7 +393,7 @@ export default function SettingsPage() {
             return {
                 canEdit: true,
                 loading: false,
-                text: "Modifiable maintenant",
+                text: t("Modifiable maintenant"),
             };
         }
 
@@ -425,7 +427,7 @@ export default function SettingsPage() {
             return {
                 canEdit: false,
                 loading: false,
-                text: `${days} j ${hours} h`,
+                text: t("{days} j {hours} h", { days, hours }),
             };
         }
 
@@ -434,7 +436,7 @@ export default function SettingsPage() {
             return {
                 canEdit: false,
                 loading: false,
-                text: `${hours} h ${minutes} min`,
+                text: t("{hours} h {minutes} min", { hours, minutes }),
             };
         }
 
@@ -505,7 +507,7 @@ export default function SettingsPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible de modifier les notifications.",
+                    : t("Impossible de modifier les notifications."),
             );
 
 
@@ -558,7 +560,7 @@ export default function SettingsPage() {
 
 
             setErrorMessage(
-                "Impossible de modifier les invitations.",
+                t("Impossible de modifier les invitations."),
             );
 
         } finally {
@@ -606,7 +608,7 @@ export default function SettingsPage() {
         ) {
 
             setErrorMessage(
-                "Le pseudo doit contenir au moins 2 caractères.",
+                t("Le pseudo doit contenir au moins 2 caractères."),
             );
 
             return;
@@ -618,7 +620,7 @@ export default function SettingsPage() {
         ) {
 
             setErrorMessage(
-                "Le pseudo ne peut pas dépasser 24 caractères.",
+                t("Le pseudo ne peut pas dépasser 24 caractères."),
             );
 
             return;
@@ -692,7 +694,7 @@ export default function SettingsPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible de modifier le pseudo.",
+                    : t("Impossible de modifier le pseudo."),
             );
 
         } finally {
@@ -735,12 +737,10 @@ export default function SettingsPage() {
                     />
 
                     <h1 className="mt-4 text-xl font-bold text-slate-900">
-                        Profil indisponible
-                    </h1>
+                         {t("Profil indisponible")} </h1>
 
                     <p className="mt-2 text-sm text-slate-500">
-                        Impossible de récupérer tes paramètres.
-                    </p>
+                         {t("Impossible de récupérer tes paramètres.")} </p>
 
                 </div>
 
@@ -757,8 +757,7 @@ export default function SettingsPage() {
                 <div className="mx-auto flex h-16 max-w-4xl items-center justify-center px-5">
 
                     <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-                        Paramètres
-                    </h1>
+                         {t("Paramètres")} </h1>
 
                 </div>
 
@@ -796,7 +795,7 @@ export default function SettingsPage() {
                         <div className="mt-6 inline-flex rounded-full bg-black/10 px-4 py-2 backdrop-blur">
 
                             <p className="text-xs font-medium text-white/90">
-                                Membre depuis le {memberSince}
+                                 {t("Membre depuis le")} {memberSince}
                             </p>
 
                         </div>
@@ -825,20 +824,19 @@ export default function SettingsPage() {
                 )}
 
                 <SettingsTitle>
-                    Compte
-                </SettingsTitle>
+                     {t("Compte")} </SettingsTitle>
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
 
                     <Row
                         icon={<UserPen size={21}/>}
-                        title="Pseudo"
+                        title={t("Pseudo")}
                         value={profile.displayName}
                         description={
                             usernameAvailability.loading
                                 ? undefined
                                 : usernameAvailability.canEdit
-                                    ? "Tu peux modifier ton pseudo une fois tous les 14 jours."
-                                    : `Prochaine modification dans ${usernameAvailability.text}.`
+                                    ? t("Tu peux modifier ton pseudo une fois tous les 14 jours.")
+                                    : t("Prochaine modification dans {time}.", { time: usernameAvailability.text })
                         }
                         disabled={
                             !usernameAvailability.canEdit || usernameAvailability.loading
@@ -851,15 +849,14 @@ export default function SettingsPage() {
                 </div>
 
                 <SettingsTitle>
-                    Préférences
-                </SettingsTitle>
+                     {t("Préférences")} </SettingsTitle>
 
 
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
                     <SwitchRow
                         icon={<Bell size={21}/>}
                         title="Notifications"
-                        description="Recevoir les notifications des conversations."
+                        description={t("Recevoir les notifications des conversations.")}
                         checked={notificationsEnabled}
                         loading={savingNotifications}
                         onChange={value =>
@@ -872,8 +869,8 @@ export default function SettingsPage() {
 
                     <SwitchRow
                         icon={<Moon size={21}/>}
-                        title="Thème sombre"
-                        description="Utiliser une apparence sombre dans TellMe."
+                        title={t("Thème sombre")}
+                        description={t("Utiliser une apparence sombre dans TellMe.")}
                         checked={darkMode}
                         onChange={handleDarkMode}
                     />
@@ -881,8 +878,8 @@ export default function SettingsPage() {
 
                     <SwitchRow
                         icon={<ShieldCheck size={21}/>}
-                        title="Autoriser les invitations"
-                        description="Les membres de tes groupes peuvent t'inviter dans une conversation privée."
+                        title={t("Autoriser les invitations")}
+                        description={t("Les utilisateurs de TellMe peuvent t’inviter dans une conversation privée.")}
                         checked={invitationsEnabled}
                         loading={savingInvitations}
                         onChange={
@@ -895,40 +892,32 @@ export default function SettingsPage() {
                 </div>
 
                 <SettingsTitle>
-                    Application
-                </SettingsTitle>
+                     {t("Application")} </SettingsTitle>
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
-                    <Row
-                        disabled
-                        icon={<Languages size={21}/>}
-                        title="Langue"
-                        value="Bientôt disponible"
-                        description="D'autres langues seront disponibles prochainement."
-                    />
+                    <LanguageSelector />
 
                 </div>
 
 
                 {/*INFORMATIONS */}
                 <SettingsTitle>
-                    Informations
-                </SettingsTitle>
+                     {t("Informations")} </SettingsTitle>
 
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
                     <Row
                         icon={<Shield size={21}/>}
-                        title="Politique de confidentialité"
-                        description="Découvre comment TellMe protège tes informations."
+                        title={t("Politique de confidentialité")}
+                        description={t("Découvre comment TellMe protège tes informations.")}
                         onClick={() => navigate("/privacy")}
                     />
 
                     <Row icon={<FileText size={21}/>}
-                         title="Conditions d'utilisation"
-                         description="Règles et conditions d'utilisation de TellMe."
+                         title={t("Conditions d'utilisation")}
+                         description={t("Règles et conditions d'utilisation de TellMe.")}
                          onClick={() => navigate("/terms")}
                     />
                     <Row icon={<Mail size={21}/>}
-                         title="Aide, Support, Bugs"
+                         title={t("Aide, Support, Bugs")}
                          description="Contact: mansvellnk@gmail.com"
                     />
 
@@ -941,8 +930,7 @@ export default function SettingsPage() {
                 </div>
 
                 <p className="pb-3 text-center text-xm leading-5 text-slate-400">
-                    TellMe, l'App qui révolutionne l'Anonymat et le Fun
-                </p>
+                     {t("TellMe, l'App qui révolutionne l'Anonymat et le Fun")} </p>
                 <p className=" text-center text-xm leading-5 text-slate-400">
                     ✦ 2026 - Mansvell Nkwanga✦
                 </p>
@@ -982,11 +970,9 @@ export default function SettingsPage() {
 
                             <div>
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                                    Modifier le pseudo
-                                </h2>
+                                     {t("Modifier le pseudo")} </h2>
                                 <p className="mt-1 text-sm leading-5 text-slate-500">
-                                    Après modification, vous devrez attendre {USERNAME_CHANGE_DELAY_DAYS} jours avant de pouvoir le changer à nouveau.
-                                </p>
+                                     {t("Après modification, vous devrez attendre")} {USERNAME_CHANGE_DELAY_DAYS}  {t("jours avant de pouvoir le changer à nouveau.")} </p>
                             </div>
 
                             <button
@@ -1005,8 +991,7 @@ export default function SettingsPage() {
 
                         <label className="mt-6 block">
                             <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                Nouveau pseudo
-                            </span>
+                                 {t("Nouveau pseudo")} </span>
 
                             <input
                                 autoFocus
@@ -1020,15 +1005,14 @@ export default function SettingsPage() {
                                             event.target.value,
                                         )
                                 }
-                                placeholder="Ton pseudo"
+                                placeholder={t("Ton pseudo")}
                                 className="mt-2 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-slate-900 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100 disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-sky-900/30"
                             />
                         </label>
 
                         <div className="mt-2 flex justify-between text-xs text-slate-400">
                             <span>
-                                2 caractères minimum
-                            </span>
+                                 {t("2 caractères minimum")} </span>
                             <span>
                                 {newUsername.length}/24
                             </span>
@@ -1047,8 +1031,7 @@ export default function SettingsPage() {
                             {savingUsername && (
                                 <LoaderCircle size={19} className="animate-spin"/>
                             )}
-                            Enregistrer
-                        </button>
+                             {t("Enregistrer")} </button>
                     </form>
                 </div>
             )}

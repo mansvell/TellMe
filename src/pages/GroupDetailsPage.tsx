@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
     ChevronRight,
@@ -131,7 +132,7 @@ export default function GroupDetailsPage() {
                 if (!active) return;
 
                 setErrorMessage(
-                    "Impossible de charger le groupe.",
+                    t("Impossible de charger le groupe."),
                 );
 
                 setLoading(false);
@@ -164,7 +165,7 @@ export default function GroupDetailsPage() {
 
         } catch {
             setErrorMessage(
-                "Impossible de copier le lien.",
+                t("Impossible de copier le lien."),
             );
         }
     }
@@ -185,9 +186,9 @@ export default function GroupDetailsPage() {
         try {
 
             await navigator.share({
-                title: `Rejoindre ${group.name} sur TellMe`,
-                text: `Rejoins le groupe "${group.name}" sur l'App TellMe.\n\n` +
-                    `Discute en anonyme et sans limite sur plein de sujet`,
+                title: t("Rejoindre {name} sur TellMe", { name: group.name }),
+                text: t("Rejoins le groupe « {name} » sur TellMe.", { name: group.name }) + "\n\n" +
+                    t("Discute en anonyme et sans limite sur plein de sujet"),
                 url: group.inviteLink,
             });
 
@@ -234,7 +235,7 @@ export default function GroupDetailsPage() {
             );
 
             setErrorMessage(
-                "Impossible de modifier la durée.",
+                t("Impossible de modifier la durée."),
             );
 
         } finally {
@@ -251,7 +252,7 @@ export default function GroupDetailsPage() {
 
         const confirmed =
             window.confirm(
-                "Quitter ce groupe ?",
+                t("Quitter ce groupe ?"),
             );
 
         if (!confirmed) return;
@@ -275,7 +276,7 @@ export default function GroupDetailsPage() {
             );
 
             setErrorMessage(
-                "Impossible de quitter le groupe.",
+                t("Impossible de quitter le groupe."),
             );
         }
     }
@@ -288,7 +289,7 @@ export default function GroupDetailsPage() {
 
         const confirmed =
             window.confirm(
-                "Supprimer définitivement ce groupe, ses messages et ses médias ?",
+                t("Supprimer définitivement ce groupe, ses messages et ses médias ?"),
             );
 
         if (!confirmed) return;
@@ -312,7 +313,7 @@ export default function GroupDetailsPage() {
             );
 
             setErrorMessage(
-                "Impossible de supprimer le groupe.",
+                t("Impossible de supprimer le groupe."),
             );
         }
     }
@@ -339,8 +340,7 @@ export default function GroupDetailsPage() {
             <main className="flex min-h-screen items-center justify-center bg-slate-100 px-5">
 
                 <p className="text-center text-slate-500">
-                    Groupe introuvable ou expiré.
-                </p>
+                     {t("Groupe introuvable ou expiré.")} </p>
 
             </main>
         );
@@ -363,8 +363,7 @@ export default function GroupDetailsPage() {
                     </Link>
 
                     <h1 className="text-lg dark:text-white font-bold">
-                        Informations
-                    </h1>
+                         {t("Informations")} </h1>
 
                     <div className="w-10" />
 
@@ -403,8 +402,8 @@ export default function GroupDetailsPage() {
                         <p className="mt-2 text-slate-500">
                             {group.membersCount}{" "}
                             {group.membersCount > 1
-                                ? "membres"
-                                : "membre"}
+                                ? t("membres")
+                                : t("membre")}
                             {" • "}
                             {group.messageCount}{" "}
                             {group.messageCount > 1
@@ -427,8 +426,8 @@ export default function GroupDetailsPage() {
                         icon={
                             <Users size={21} />
                         }
-                        title="Membres"
-                        subtitle={`${group.membersCount} dans le groupe`}
+                        title={t("Membres")}
+                        subtitle={t("{count} dans le groupe", { count: group.membersCount })}
                     />
 
                     <Item
@@ -436,8 +435,8 @@ export default function GroupDetailsPage() {
                         icon={
                             <Images size={21} />
                         }
-                        title="Médias"
-                        subtitle="Photos, vidéos et fichiers"
+                        title={t("Médias")}
+                        subtitle={t("Photos, vidéos et fichiers")}
                     />
 
                     <Item
@@ -445,8 +444,8 @@ export default function GroupDetailsPage() {
                         icon={
                             <Palette size={21} />
                         }
-                        title="Personnalisation"
-                        subtitle="Couleur de tes messages"
+                        title={t("Personnalisation")}
+                        subtitle={t("Couleur de tes messages")}
                     />
 
                 </div>
@@ -454,12 +453,10 @@ export default function GroupDetailsPage() {
                 <div className="mt-6 rounded-3xl bg-white dark:bg-slate-600 p-6 shadow-sm">
 
                     <h3 className="text-lg dark:text-white font-bold">
-                        Invite tes ami(e)s
-                    </h3>
+                         {t("Invite tes ami(e)s")} </h3>
 
                     <p className="mt-1 text-sm text-sky-400">
-                        Seules les personnes possédant ce lien pourront rejoindre le groupe.
-                    </p>
+                         {t("Seules les personnes possédant ce lien pourront rejoindre le groupe.")} </p>
 
                     <div className="mt-5 rounded-2xl bg-slate-100 p-4">
 
@@ -481,8 +478,8 @@ export default function GroupDetailsPage() {
                             <Copy size={18} />
 
                             {copied
-                                ? "Copié !"
-                                : "Copier"}
+                                ? t("Copié !")
+                                : t("Copier")}
                         </button>
 
                         <button
@@ -494,8 +491,7 @@ export default function GroupDetailsPage() {
                         >
                             <Share2 size={18} />
 
-                            Partager
-                        </button>
+                             {t("Partager")} </button>
                     </div>
                 </div>
 
@@ -515,16 +511,13 @@ export default function GroupDetailsPage() {
                             <div>
 
                                 <h3 className="font-bold text-slate-900 dark:text-white">
-                                    Durée de vie du groupe
-                                </h3>
+                                     {t("Durée de vie du groupe")} </h3>
 
                                 <p className="mt-1 text-sm text-red-400 ">
-                                    Cette option n’est visible que par le créateur
-                                </p>
+                                     {t("Cette option n’est visible que par le créateur")} </p>
 
                                 <p className="mt-1 text-xs leading-5 text-slate-400 dark:text-white">
-                                    Apres expiration, le groupe, les messages, les membres, les médias et liens seront supprimés
-                                </p>
+                                     {t("Apres expiration, le groupe, les messages, les membres, les médias et liens seront supprimés")} </p>
 
                             </div>
 
@@ -565,7 +558,7 @@ export default function GroupDetailsPage() {
 
                                     <option
                                         key={
-                                            item.label
+                                            t(item.label)
                                         }
                                         value={
                                             item.value
@@ -573,7 +566,7 @@ export default function GroupDetailsPage() {
                                         }
                                     >
                                         {
-                                            item.label
+                                            t(item.label)
                                         }
                                     </option>
                                 ),
@@ -591,8 +584,8 @@ export default function GroupDetailsPage() {
 
                             <p className="text-sm text-slate-500">
                                 {group.expiresAt
-                                    ? `Expiration : ${group.expiresLabel}`
-                                    : "Ce groupe n’expire pas."}
+                                    ? t("Expiration : {date}", { date: group.expiresLabel })
+                                    : t("Ce groupe n’expire pas.")}
                             </p>
                         </div>
                     </div>
@@ -617,8 +610,7 @@ export default function GroupDetailsPage() {
                         className="mt-8 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-500 font-bold text-white transition hover:bg-red-600"
                     >
                         <Trash2 size={20} />
-                        Supprimer le groupe
-                    </button>
+                         {t("Supprimer le groupe")} </button>
 
                 ) : (
 
@@ -630,8 +622,7 @@ export default function GroupDetailsPage() {
                         className="mt-8 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-500 font-bold text-white transition hover:bg-red-600"
                     >
                         <LogOut size={20} />
-                        Quitter le groupe
-                    </button>
+                         {t("Quitter le groupe")} </button>
 
                 )}
 

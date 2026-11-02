@@ -1,3 +1,5 @@
+import { getLocale } from "../i18n/runtime";
+import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
 // =========================================================
@@ -102,7 +104,7 @@ async function getCurrentUserId(): Promise<string> {
     if (error) throw error;
 
     if (!user) {
-        throw new Error("Utilisateur introuvable.");
+        throw new Error(t("Utilisateur introuvable."));
     }
 
     return user.id;
@@ -137,7 +139,7 @@ export async function sendMessage(
     const cleanContent = content.trim();
 
     if (!cleanContent && !file) {
-        throw new Error("Le message est vide.");
+        throw new Error(t("Le message est vide."));
     }
 
     const userId = await getCurrentUserId();
@@ -145,7 +147,7 @@ export async function sendMessage(
 
     // La colonne content ne peut pas être vide.
     const savedContent =
-        cleanContent || `📎 ${file?.name ?? "Fichier"}`;
+        cleanContent || `📎 ${file?.name ?? t("Fichier")}`;
 
     const {
         data: senderMembership,
@@ -185,7 +187,7 @@ export async function sendMessage(
             // NOUVEAU : copie permanente du pseudo.
             sender_name:
                 senderProfile?.display_name ??
-                "Utilisateur",
+                t("Utilisateur"),
 
             // NOUVEAU : copie permanente de la couleur.
             sender_color:
@@ -332,7 +334,7 @@ export async function getMessageById(
     ]);
 
     if (!messages[0]) {
-        throw new Error("Message introuvable.");
+        throw new Error(t("Message introuvable."));
     }
 
     return messages[0];
@@ -629,7 +631,7 @@ async function hydrateMessages(
             name:
                 profile?.display_name ??
                 row.sender_name ??
-                "Utilisateur",
+                t("Utilisateur"),
 
             color:
                 membership?.local_color ??
@@ -637,7 +639,7 @@ async function hydrateMessages(
                 "#0EA5E9",
 
             time: createdAt.toLocaleTimeString(
-                "fr-FR",
+                getLocale(),
                 {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -658,7 +660,7 @@ async function hydrateMessages(
 
                         name: replyProfile?.display_name ??
                             replyRow.sender_name ??
-                            "Utilisateur",
+                            t("Utilisateur"),
 
                         text:
                         replyRow.content,
@@ -773,17 +775,17 @@ export function formatMessageDate(date: Date): string {
     if (
         date.toDateString() === today.toDateString()
     ) {
-        return "Aujourd’hui";
+        return t("Aujourd’hui");
     }
 
     if (
         date.toDateString() ===
         yesterday.toDateString()
     ) {
-        return "Hier";
+        return t("Hier");
     }
 
-    return date.toLocaleDateString("fr-FR", {
+    return date.toLocaleDateString(getLocale(), {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -796,7 +798,7 @@ export async function sendQuestionToGroup(
     const cleanQuestion = question.trim();
 
     if (!cleanQuestion) {
-        throw new Error("La question est vide.");
+        throw new Error(t("La question est vide."));
     }
 
     const membershipId = await getMyMembershipId(groupId);

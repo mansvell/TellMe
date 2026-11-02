@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     Search,
     Plus,
@@ -125,7 +126,7 @@ export default function HomePage() {
                         onChange={(event) =>
                             setSearch(event.target.value)
                         }
-                        placeholder="Rechercher un groupe..."
+                        placeholder={t("Rechercher un groupe...")}
                         className="min-w-0 flex-1 bg-transparent text-slate-800 outline-none placeholder:text-slate-400 dark:text-white dark:placeholder:text-slate-500"
                     />
 
@@ -148,27 +149,19 @@ export default function HomePage() {
             </header>
 
             <section className="relative z-10 mx-auto max-w-6xl px-5 pb-32 pt-10">
+                <button type="button" onClick={() => navigate("/discover")} className="mb-6 flex w-full items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">{t("Trouver d’autres utilisateurs")} <span aria-hidden="true">↗</span></button>
                 <div className="mb-5 flex items-end justify-between">
 
                     <div>
 
                         <h2 className="text-2xl font-black tracking-tight text-white dark:text-white">
-                            Discussions
-                        </h2>
+                             {t("Discussions")} </h2>
 
                         <p className="mt-1 text-sm text-white dark:text-slate-400">
 
                             {search
-                                ? `${filteredGroups.length} résultat${
-                                    filteredGroups.length !== 1
-                                        ? "s"
-                                        : ""
-                                }`
-                                : `${groups.length} groupe${
-                                    groups.length !== 1
-                                        ? "s"
-                                        : ""
-                                }`
+                                ? t(filteredGroups.length === 1 ? t("{count} résultat") : t("{count} résultats"), { count: filteredGroups.length })
+                                : t(groups.length === 1 ? t("{count} groupe") : t("{count} groupes"), { count: groups.length })
                             }
                         </p>
                     </div>
@@ -182,8 +175,7 @@ export default function HomePage() {
                             <MessageCircle size={17} />
 
                             <span>
-                                {totalUnread} Messages non lus
-                            </span>
+                                {totalUnread}  {t("Messages non lus")} </span>
 
                         </div>
 
@@ -218,12 +210,10 @@ export default function HomePage() {
                         </div>
 
                         <h3 className="mt-6 text-xl font-bold text-slate-900 dark:text-white">
-                            Aucun groupe
-                        </h3>
+                             {t("Aucun groupe")} </h3>
 
                         <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
-                            Créez votre premier groupe et commencez à discuter anonymement.
-                        </p>
+                             {t("Créez votre premier groupe et commencez à discuter anonymement.")} </p>
 
                         <button
                             type="button"
@@ -231,9 +221,7 @@ export default function HomePage() {
                             className="mt-6 flex h-12 items-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 to-cyan-500 px-6 font-bold text-white shadow-lg shadow-sky-500/20 transition hover:-translate-y-0.5 hover:shadow-xl active:scale-95"
                         >
                             <Plus size={19} />
-                            Créer un groupe
-
-                        </button>
+                             {t("Créer un groupe")} </button>
                     </div>
 
                 )}
@@ -251,11 +239,10 @@ export default function HomePage() {
                             </div>
 
                             <h3 className="mt-4 font-bold text-slate-800 dark:text-white">
-                                Aucun résultat
-                            </h3>
+                                 {t("Aucun résultat")} </h3>
 
                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                Aucun groupe ne correspond à « {search} ».
+                                 {t("Aucun groupe ne correspond à «")} {search} ».
                             </p>
 
                             <button
@@ -263,8 +250,7 @@ export default function HomePage() {
                                 onClick={() => setSearch("")}
                                 className="mt-5 rounded-xl bg-sky-50 px-4 py-2 text-sm font-semibold text-sky-600 transition hover:bg-sky-100 dark:bg-sky-950 dark:text-sky-400 dark:hover:bg-sky-900"
                             >
-                                Effacer la recherche
-                            </button>
+                                 {t("Effacer la recherche")} </button>
 
                         </div>
 
@@ -311,8 +297,7 @@ export default function HomePage() {
                                             <Users size={15} />
 
                                             <span>
-                                                {group.members_count} membre
-                                                {group.members_count !== 1
+                                                {group.members_count}  {t("membre")} {group.members_count !== 1
                                                     ? "s"
                                                     : ""}
                                             </span>
@@ -348,7 +333,7 @@ export default function HomePage() {
             <button
                 type="button"
                 onClick={() => setShowNewGroup(true)}
-                aria-label="Créer un groupe"
+                aria-label={t("Créer un groupe")}
                 className="fixed bottom-24 right-6 z-40 flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-sky-400 via-sky-500 to-blue-600 text-white shadow-2xl shadow-sky-500/30 transition-all duration-300 hover:-translate-y-1 hover:rotate-6 hover:scale-105 hover:shadow-sky-500/40 active:scale-90 dark:border-slate-950 dark:shadow-sky-900/30"
             >
 

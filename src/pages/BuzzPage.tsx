@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {BarChart3, Check, ChevronRight, CirclePlus, Copy, Flame, Link2, Lock, MessageCircle, MoreHorizontal, Plus,
     Share2, Trash2, Users, Vote, X ,ChevronDown,
     ChevronUp, Send} from "lucide-react";
@@ -158,6 +159,8 @@ export default function BuzzPage() {
     const [selectedBuzzToShare, setSelectedBuzzToShare] = useState<Buzz | null>(null);
     const [linkCopied, setLinkCopied] = useState(false);
     const shareCardRef = useRef<HTMLDivElement>(null);
+    const [sharingBuzz, setSharingBuzz] = useState(false);
+    const [buzzShareMessage, setBuzzShareMessage] = useState("");
 
     const [openQuestionCategory, setOpenQuestionCategory] = useState<string | null>(null);
     const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
@@ -291,7 +294,7 @@ export default function BuzzPage() {
             setCreatedBuzz(null);
 
             console.log(
-                "Buzz publié dans le groupe.",
+                t("Buzz publié dans le groupe."),
             );
 
         } catch (error) {
@@ -446,10 +449,12 @@ export default function BuzzPage() {
     async function shareBuzz(
         buzz: Buzz,
     ) {
-        if (!shareCardRef.current) {
+        if (sharingBuzz || !shareCardRef.current) {
             return;
         }
 
+        setSharingBuzz(true);
+        setBuzzShareMessage("");
         const link =
             getBuzzShareLink(
                 buzz.share_code,
@@ -483,7 +488,7 @@ export default function BuzzPage() {
 
             if (!blob) {
                 throw new Error(
-                    "Impossible de créer l'affiche.",
+                    t("Impossible de créer l'affiche."),
                 );
             }
 
@@ -520,9 +525,8 @@ export default function BuzzPage() {
                 return;
             }
 
-            await navigator.clipboard.writeText(
-                link,
-            );
+            await navigator.clipboard.writeText(link);
+            setBuzzShareMessage(t("Lien copié. Le partage d’image est disponible sur un navigateur mobile compatible."));
 
         } catch (error) {
             if (
@@ -536,6 +540,9 @@ export default function BuzzPage() {
                 "Buzz share error:",
                 error,
             );
+            setBuzzShareMessage(t("Le partage a échoué. Réessaie depuis ton navigateur mobile."));
+        } finally {
+            setSharingBuzz(false);
         }
     }
 
@@ -562,7 +569,7 @@ export default function BuzzPage() {
 
         if (!group.invite_code) {
             console.error(
-                "Ce groupe n'a pas de lien d'invitation.",
+                t("Ce groupe n'a pas de lien d'invitation."),
             );
 
             return;
@@ -604,7 +611,7 @@ export default function BuzzPage() {
 
             if (!blob) {
                 throw new Error(
-                    "Impossible de créer l'affiche.",
+                    t("Impossible de créer l'affiche."),
                 );
             }
 
@@ -643,7 +650,7 @@ export default function BuzzPage() {
             if (navigator.share) {
                 await navigator.share({
                     title: "TellMe",
-                    text: "Rejoins et donne ton avis",
+                    text: t("Rejoins et donne ton avis"),
                     url: link,
                 });
 
@@ -773,8 +780,7 @@ export default function BuzzPage() {
                             </div>
 
                             <p className="mt-0.5 text-sm font-medium text-sky-100">
-                                Lance la discussion
-                            </p>
+                                 {t("Lance la discussion")} </p>
 
                         </div>
 
@@ -802,7 +808,7 @@ export default function BuzzPage() {
                             icon={
                                 <Plus size={17} />
                             }
-                            label="Créer"
+                            label={t("Créer")}
                             onClick={() =>
                                 setTab("create")
                             }
@@ -815,7 +821,7 @@ export default function BuzzPage() {
                             icon={
                                 <BarChart3 size={17} />
                             }
-                            label="Mes Buzz"
+                            label={t("Mes Buzz")}
                             onClick={() =>
                                 setTab("mine")
                             }
@@ -828,7 +834,7 @@ export default function BuzzPage() {
                             icon={
                                 <Flame size={17} />
                             }
-                            label="Questions"
+                            label={t("Questions")}
                             onClick={() =>
                                 setTab("results")
                             }
@@ -854,12 +860,10 @@ export default function BuzzPage() {
                                 <div>
 
                                     <h4 className="font-bold text-sky-500">
-                                        Pose une question
-                                    </h4>
+                                         {t("Pose une question")} </h4>
 
                                     <p className="text-xs text-slate-400">
-                                        Fais-la courte et intéressante.
-                                    </p>
+                                         {t("Fais-la courte et intéressante.")} </p>
 
                                 </div>
 
@@ -867,7 +871,7 @@ export default function BuzzPage() {
 
 
                             <textarea
-                                value={question}
+                                value={t(question)}
                                 onChange={(event) =>
                                     setQuestion(
                                         event.target.value,
@@ -875,7 +879,7 @@ export default function BuzzPage() {
                                 }
                                 maxLength={220}
                                 rows={3}
-                                placeholder="Comment tu me trouves ?"
+                                placeholder={t("Comment tu me trouves ?")}
                                 className="mt-3 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 text-base font-semibold outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-sky-950"
                             />
 
@@ -894,12 +898,10 @@ export default function BuzzPage() {
                                 <div>
 
                                     <h4 className="font-bold text-sky-500">
-                                        Réponses
-                                    </h4>
+                                         {t("Réponses")} </h4>
 
                                     <p className="mt-1 text-xs text-slate-400">
-                                        Entre 2 et 8 choix.
-                                    </p>
+                                         {t("Entre 2 et 8 choix.")} </p>
 
                                 </div>
 
@@ -936,7 +938,7 @@ export default function BuzzPage() {
                                                     )
                                                 }
                                                 maxLength={80}
-                                                placeholder={`Réponse ${index + 1}`}
+                                                placeholder={t("Réponse {number}", { number: index + 1 })}
                                                 className="h-13 min-w-0 flex-1 rounded-2xl border border-slate-200 bg-slate-50 px-4 font-medium outline-none transition focus:border-sky-400 dark:border-slate-700 dark:bg-slate-800"
                                             />
 
@@ -975,9 +977,7 @@ export default function BuzzPage() {
 
                                     <CirclePlus size={18} />
 
-                                    Ajouter une réponse
-
-                                </button>
+                                     {t("Ajouter une réponse")} </button>
 
                             )}
 
@@ -987,8 +987,7 @@ export default function BuzzPage() {
                         <div className="mt-4 rounded-[1.8rem] border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
                             <h4 className="font-bold text-sky-500">
-                                Type de vote
-                            </h4>
+                                 {t("Type de vote")} </h4>
 
 
                             <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -998,8 +997,8 @@ export default function BuzzPage() {
                                         voteType ===
                                         "single"
                                     }
-                                    title="Un seul choix"
-                                    description="Une seule réponse par participant."
+                                    title={t("Un seul choix")}
+                                    description={t("Une seule réponse par participant.")}
                                     onClick={() =>
                                         setVoteType(
                                             "single",
@@ -1012,8 +1011,8 @@ export default function BuzzPage() {
                                         voteType ===
                                         "multiple"
                                     }
-                                    title="Plusieurs choix"
-                                    description="Plusieurs réponses peuvent être sélectionnées."
+                                    title={t("Plusieurs choix")}
+                                    description={t("Plusieurs réponses peuvent être sélectionnées.")}
                                     onClick={() =>
                                         setVoteType(
                                             "multiple",
@@ -1041,12 +1040,10 @@ export default function BuzzPage() {
                                 <div>
 
                                     <h4 className="font-bold text-sky-500">
-                                        Lier le Buzz à un groupe
-                                    </h4>
+                                         {t("Lier le Buzz à un groupe")} </h4>
 
                                     <p className="text-xs text-slate-400">
-                                        Facultatif
-                                    </p>
+                                         {t("Facultatif")} </p>
 
                                 </div>
 
@@ -1054,11 +1051,9 @@ export default function BuzzPage() {
 
 
                             <p className="mt-4 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                Ton Buzz sera visible dans ce groupe
-                            </p>
+                                 {t("Ton Buzz sera visible dans ce groupe")} </p>
                             <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                Les personnes qui découvrent ton Buzz pourront être invitées à rejoindre ce groupe.
-                            </p>
+                                 {t("Les personnes qui découvrent ton Buzz pourront être invitées à rejoindre ce groupe.")} </p>
 
 
                             <select
@@ -1075,8 +1070,7 @@ export default function BuzzPage() {
                             >
 
                                 <option value="">
-                                    Aucun groupe
-                                </option>
+                                     {t("Aucun groupe")} </option>
 
                                 {groups.map(
                                     (group) => (
@@ -1104,8 +1098,8 @@ export default function BuzzPage() {
                                 icon={
                                     <Link2 size={20} />
                                 }
-                                title="Votes externes"
-                                description="Les personnes sans compte TellMe peuvent voter."
+                                title={t("Votes externes")}
+                                description={t("Les personnes sans compte TellMe peuvent voter.")}
                                 checked={
                                     allowExternal
                                 }
@@ -1120,8 +1114,8 @@ export default function BuzzPage() {
                                 icon={
                                     <BarChart3 size={20} />
                                 }
-                                title="Afficher les résultats"
-                                description="Les participants voient les résultats après leur vote."
+                                title={t("Afficher les résultats")}
+                                description={t("Les participants voient les résultats après leur vote.")}
                                 checked={
                                     showResults
                                 }
@@ -1154,8 +1148,8 @@ export default function BuzzPage() {
                             <Flame size={20} />
 
                             {creating
-                                ? "Création..."
-                                : "Créer le Buzz"}
+                                ? t("Création...")
+                                : t("Créer le Buzz")}
 
                         </button>
 
@@ -1168,7 +1162,7 @@ export default function BuzzPage() {
 
                     <div className="mt-8">
 
-                        <h2 className="text-2xl text-white font-bold"> Activité </h2>
+                        <h2 className="text-2xl text-white font-bold">  {t("Activité")} </h2>
 
 
                         {loading ? (
@@ -1225,7 +1219,7 @@ export default function BuzzPage() {
                                                                     className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                                                                     {buzz.is_active
                                                                         ? "Actif"
-                                                                        : "Fermé"}
+                                                                        : t("Fermé")}
                                                                 </span>
 
                                                             </div>
@@ -1273,8 +1267,8 @@ export default function BuzzPage() {
                                                                     <Lock size={16}/>
 
                                                                     {buzz.is_active
-                                                                        ? "Fermer le Buzz"
-                                                                        : "Réactiver"}
+                                                                        ? t("Fermer le Buzz")
+                                                                        : t("Réactiver")}
                                                                 </button>
 
                                                                 <button
@@ -1287,8 +1281,7 @@ export default function BuzzPage() {
                                                                     className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
                                                                 >
                                                                     <Trash2 size={16}/>
-                                                                    Supprimer
-                                                                </button>
+                                                                     {t("Supprimer")} </button>
                                                             </div>
                                                         )}
                                                     </div>
@@ -1298,7 +1291,7 @@ export default function BuzzPage() {
                                                 {group && (
                                                     <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-violet-500">
                                                         <MessageCircle size={15}/>
-                                                        Discussion liée à {group.name}
+                                                         {t("Discussion liée à")} {group.name}
                                                     </div>
                                                 )}
 
@@ -1342,8 +1335,7 @@ export default function BuzzPage() {
 
                                                                                 <span
                                                                                     className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
-                                                                                    {option.votes} personne
-                                                                                    {option.votes !== 1 ? "s" : ""}
+                                                                                    {option.votes}  {t("personne")} {option.votes !== 1 ? "s" : ""}
                                                                                     {" · "}
                                                                                     {percentage}%
                                                                                 </span>
@@ -1373,9 +1365,9 @@ export default function BuzzPage() {
                                                     <div
                                                         className="mt-3 flex flex-wrap gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
 
-                                                        <span>{buzz.votes_count ?? 0} Votes :</span>
-                                                        <span> {buzz.tellme_votes_count ?? 0} Internes</span>
-                                                        <span>{buzz.external_votes_count ?? 0} Externes</span>
+                                                        <span>{buzz.votes_count ?? 0}  {t("Votes :")}</span>
+                                                        <span> {buzz.tellme_votes_count ?? 0}  {t("Internes")}</span>
+                                                        <span>{buzz.external_votes_count ?? 0}  {t("Externes")}</span>
                                                     </div>
 
                                                     <div className="flex items-center gap-2">
@@ -1386,8 +1378,7 @@ export default function BuzzPage() {
                                                             className="flex items-center gap-2 rounded-2xl bg-sky-200 px-4 py-3 font-bold text-sky-600 transition hover:bg-sky-100 dark:bg-sky-950/40 dark:text-sky-300"
                                                         >
                                                             <Share2 size={18}/>
-                                                            Partager
-                                                        </button>
+                                                             {t("Partager")} </button>
 
                                                     </div>
 
@@ -1419,16 +1410,13 @@ export default function BuzzPage() {
                                     ✦ {QUESTION_CATEGORIES.reduce(
                                     (total, category) => total + category.questions.length,
                                     0,
-                                )} Questions ✦
-                                </div>
+                                )}  {t("Questions ✦")} </div>
 
                                 <h2 className="mt-4 text-2xl font-black text-center">
-                                    ✦ Choisis ton Mood ✦
-                                </h2>
+                                     {t("✦ Choisis ton Mood ✦")} </h2>
 
                                 <p className="mt-2 max-w-xl text-sm font-medium text-center leading-6 text-slate-500">
-                                    Partage les dans tes groupes ou en Story
-                                </p>
+                                     {t("Partage les dans tes groupes ou en Story")} </p>
                             </div>
                         </div>
 
@@ -1461,7 +1449,7 @@ export default function BuzzPage() {
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2">
                                                         <h4 className="font-black text-slate-900 dark:text-white">
-                                                            {category.name}
+                                                            {t(category.name)}
                                                         </h4>
 
                                                         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
@@ -1470,7 +1458,7 @@ export default function BuzzPage() {
                                                     </div>
 
                                                     <p className="mt-1 line-clamp-1 text-sm text-slate-500 dark:text-slate-400">
-                                                        {category.description}
+                                                        {t(category.description)}
                                                     </p>
                                                 </div>
 
@@ -1497,19 +1485,18 @@ export default function BuzzPage() {
                                                                     </div>
 
                                                                     <p className="min-w-0 flex-1 text-sm font-bold leading-5 text-slate-700 dark:text-slate-200">
-                                                                        {question}
+                                                                        {t(question)}
                                                                     </p>
 
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => setSelectedQuestion(question)}
+                                                                        onClick={() => setSelectedQuestion(t(question))}
                                                                         className="flex h-10 shrink-0 items-center gap-2 rounded-xl bg-sky-500 px-3 font-bold text-white shadow-sm shadow-sky-500/20 transition hover:bg-sky-600 active:scale-95"
                                                                     >
                                                                         <Send size={15} />
 
                                                                         <span className="hidden sm:inline">
-                                                            Partager
-                                                        </span>
+                                                             {t("Partager")} </span>
                                                                     </button>
                                                                 </div>
                                                             ),
@@ -1551,12 +1538,10 @@ export default function BuzzPage() {
 
 
                         <h3 className="mt-4 text-center text-2xl font-black">
-                            Ton Buzz est prêt !
-                        </h3>
+                             {t("Ton Buzz est prêt !")} </h3>
 
                         <p className="mt-2 text-center text-xl leading-6 text-slate-500 dark:text-slate-400">
-                            Retrouve le sous l'onglet "Mes Buzz" et partage ton lien
-                        </p>
+                             {t("Retrouve le sous l'onglet \"Mes Buzz\" et partage ton lien")} </p>
 
                         {/* GROUPE */}
                         {createdBuzz.group_id && (
@@ -1578,7 +1563,7 @@ export default function BuzzPage() {
 
                                     {publishing
                                         ? "Publication..."
-                                        : "Publier dans le groupe"}
+                                        : t("Publier dans le groupe")}
 
                                 </span>
 
@@ -1596,8 +1581,7 @@ export default function BuzzPage() {
                             }
                             className="mx-auto flex items-center justify-center p-4 rounded-xl item-center font-bold text-white bg-sky-400 transition hover:text-slate-600 dark:hover:text-white"
                         >
-                            Okay
-                        </button>
+                             {t("Okay")} </button>
                     </div>
                 </div>
             )}
@@ -1610,8 +1594,7 @@ export default function BuzzPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-xm font-black">
-                                    Partage et obtiens des reponses
-                                </h2>
+                                     {t("Partage et obtiens des reponses")} </h2>
 
                             </div>
 
@@ -1627,15 +1610,14 @@ export default function BuzzPage() {
                         <div className="mt-5 flex justify-center">
                             <div className="h-[320px] w-[180px] overflow-hidden rounded-[1.5rem] shadow-xl">
                                 <div className="origin-top-left scale-50">
-                                    <BuzzShareCard/>
+                                    <BuzzShareCard ref={shareCardRef}/>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-6 rounded-2xl bg-slate-100 p-3 dark:bg-slate-800">
                             <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-slate-400">
-                                Lien du Buzz
-                            </p>
+                                 {t("Lien du Buzz")} </p>
 
                             <div className="flex items-center gap-2">
                                 <div className="min-w-0 flex-1 truncate px-2 text-sm font-semibold">
@@ -1650,14 +1632,14 @@ export default function BuzzPage() {
                                     <Copy size={17} />
 
                                     {linkCopied
-                                        ? "Copié ✓"
-                                        : "Copier"}
+                                        ? t("Copié ✓")
+                                        : t("Copier")}
                                 </button>
                             </div>
                         </div>
 
                         <button
-                            type="button"  onClick={() =>
+                            type="button" disabled={sharingBuzz} onClick={() =>
                             void shareBuzz(
                                 selectedBuzzToShare,
                             )
@@ -1665,8 +1647,9 @@ export default function BuzzPage() {
                             className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98]"
                         >
                             <Share2 size={19} />
-                            Partager en status
+                            {sharingBuzz ? t("Préparation…") : t("Partager en statut")}
                         </button>
+                        {buzzShareMessage && <p role="status" className="mt-3 text-center text-sm text-slate-500 dark:text-slate-400">{buzzShareMessage}</p>}
                     </div>
                 </div>
             )}
@@ -1695,8 +1678,7 @@ export default function BuzzPage() {
                             <>
                                 <div className="mt-6">
                                     <p className="text-sm font-black text-slate-900 dark:text-white">
-                                        Choisis un groupe :
-                                    </p>
+                                         {t("Choisis un groupe :")} </p>
                                 </div>
 
                                 <div className="mt-4 space-y-2">
@@ -1733,8 +1715,7 @@ export default function BuzzPage() {
                                                     </p>
 
                                                     <p className="mt-0.5 text-xs font-medium text-slate-400">
-                                                        {group.members_count} membres
-                                                    </p>
+                                                        {group.members_count}  {t("membres")} </p>
                                                 </div>
 
                                                 <div
@@ -1764,8 +1745,8 @@ export default function BuzzPage() {
                                         <MessageCircle size={18}/>
 
                                         {sendingQuestion
-                                            ? "Envoi..."
-                                            : "Dans le groupe"}
+                                            ? t("Envoi...")
+                                            : t("Dans le groupe")}
                                     </button>
 
                                     <button
@@ -1780,15 +1761,14 @@ export default function BuzzPage() {
                                         <Share2 size={18}/>
 
                                         {sharingQuestion
-                                            ? "En cours..."
-                                            : "En statut"}
+                                            ? t("En cours...")
+                                            : t("En statut")}
                                     </button>
                                 </div>
 
                                 {!selectedQuestionGroupId && (
                                     <p className="mt-3 text-center text-xs font-semibold text-slate-400">
-                                        Personne ne saura que la question vient de toi
-                                    </p>
+                                         {t("Personne ne saura que la question vient de toi")} </p>
                                 )}
                             </>
                         ) : (
@@ -1799,13 +1779,10 @@ export default function BuzzPage() {
                                 </div>
 
                                 <h3 className="mt-4 font-black text-slate-900 dark:text-white">
-                                    Tu n'as encore aucun groupe
-                                </h3>
+                                     {t("Tu n'as encore aucun groupe")} </h3>
 
                                 <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-slate-500 dark:text-slate-400">
-                                    Crée d'abord un groupe pour pouvoir y lancer une question et inviter tes amis à
-                                    participer.
-                                </p>
+                                     {t("Crée d'abord un groupe pour pouvoir y lancer une question et inviter tes amis à participer.")} </p>
 
                                 <button
                                     type="button"
@@ -1813,8 +1790,7 @@ export default function BuzzPage() {
                                     className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-5 font-black text-white"
                                 >
                                     <Plus size={18}/>
-                                    Créer un groupe
-                                </button>
+                                     {t("Créer un groupe")} </button>
                             </div>
                         )}
                     </div>
@@ -1953,12 +1929,10 @@ function EmptyBuzz({
             </div>
 
             <h4 className="mt-5 text-xl font-black">
-                Aucun Buzz pour le moment.
-            </h4>
+                 {t("Aucun Buzz pour le moment.")} </h4>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
-                Pose une question et laisse les autres décider.
-            </p>
+                 {t("Pose une question et laisse les autres décider.")} </p>
 
             <button
                 type="button"
@@ -1967,8 +1941,7 @@ function EmptyBuzz({
             >
                 <Plus size={18} />
 
-                Créer un Buzz
-            </button>
+                 {t("Créer un Buzz")} </button>
 
         </div>
 

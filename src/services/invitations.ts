@@ -1,3 +1,5 @@
+import { getLocale } from "../i18n/runtime";
+import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
 
@@ -81,7 +83,7 @@ export async function sendChatInvitation(
     if (!cleanName) {
 
         throw new Error(
-            "Le nom de la conversation est obligatoire.",
+            t("Le nom de la conversation est obligatoire."),
         );
     }
 
@@ -108,7 +110,7 @@ export async function sendChatInvitation(
     if (!data) {
 
         throw new Error(
-            "Impossible d’envoyer l’invitation.",
+            t("Impossible d’envoyer l’invitation."),
         );
     }
 
@@ -141,9 +143,12 @@ export async function getMyChatInvitations():
         (data ?? []) as InvitationDatabaseRow[];
 
 
-    return rows.map(
-        mapInvitation,
-    );
+    const { data: directory, error: directoryError } = await supabase.rpc("get_my_directory_invitations");
+    // Compatibilité tant que la migration de découverte n'a pas été exécutée.
+    if (directoryError && !["PGRST202", "42883"].includes(directoryError.code)) throw directoryError;
+    return [...rows.map(mapInvitation), ...((directory ?? []) as InvitationDatabaseRow[]).map(row => ({
+        ...mapInvitation(row), id: `directory:${row.id}`,
+    }))].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 }
 
 
@@ -159,10 +164,10 @@ export async function acceptChatInvitation(
 
     const { data, error } =
         await supabase.rpc(
-            "accept_chat_invitation",
+            invitationId.startsWith("directory:") ? "accept_directory_invitation" : "accept_chat_invitation",
             {
                 target_invitation_id:
-                invitationId,
+                invitationId.replace(/^directory:/, ""),
             },
         );
 
@@ -176,7 +181,7 @@ export async function acceptChatInvitation(
     if (!data) {
 
         throw new Error(
-            "Impossible de créer la conversation.",
+            t("Impossible de créer la conversation."),
         );
     }
 
@@ -195,10 +200,10 @@ export async function rejectChatInvitation(
 
     const { error } =
         await supabase.rpc(
-            "reject_chat_invitation",
+            invitationId.startsWith("directory:") ? "reject_directory_invitation" : "reject_chat_invitation",
             {
                 target_invitation_id:
-                invitationId,
+                invitationId.replace(/^directory:/, ""),
             },
         );
 
@@ -235,7 +240,7 @@ export async function updateInvitationsEnabled(
     if (!user) {
 
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 
@@ -283,7 +288,7 @@ export async function getInvitationsEnabled():
     if (!user) {
 
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 
@@ -385,7 +390,7 @@ export function formatInvitationDate(
         today.toDateString()
     ) {
 
-        return "Aujourd’hui";
+        return t("Aujourd’hui");
     }
 
 
@@ -395,12 +400,12 @@ export function formatInvitationDate(
         yesterday.toDateString()
     ) {
 
-        return "Hier";
+        return t("Hier");
     }
 
 
     return date.toLocaleDateString(
-        "fr-FR",
+        getLocale(),
         {
             day: "numeric",
             month: "short",
@@ -420,7 +425,7 @@ export function formatInvitationTime(
     return new Date(
         value,
     ).toLocaleTimeString(
-        "fr-FR",
+        getLocale(),
         {
             hour: "2-digit",
             minute: "2-digit",
