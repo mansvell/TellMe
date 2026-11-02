@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { getLocale } from "../i18n/runtime";
 import { t } from "../i18n/runtime";
 import LanguageSelector from "../components/LanguageSelector";
@@ -856,7 +857,8 @@ export default function SettingsPage() {
                     <SwitchRow
                         icon={<Bell size={21}/>}
                         title="Notifications"
-                        description={t("Recevoir les notifications des conversations.")}
+                        disabled={Capacitor.isNativePlatform()}
+                        description={Capacitor.isNativePlatform() ? t("Les notifications ne sont pas encore disponibles sur cette version mobile.") : t("Recevoir les notifications des conversations.")}
                         checked={notificationsEnabled}
                         loading={savingNotifications}
                         onChange={value =>

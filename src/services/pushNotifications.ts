@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
@@ -62,6 +63,7 @@ export function supportsPushNotifications():
     boolean {
 
     return (
+        !Capacitor.isNativePlatform() &&
         "serviceWorker" in navigator &&
         "PushManager" in window &&
         "Notification" in window

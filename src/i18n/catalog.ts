@@ -1,4 +1,8 @@
 export const catalog: Record<string, { en: string; de: string }> = {
+  "Les notifications ne sont pas encore disponibles sur cette version mobile.": {
+    "en": "Notifications are not available in this mobile version yet.",
+    "de": "Benachrichtigungen sind in dieser mobilen Version noch nicht verfügbar."
+  },
   "Accueil": {
     "en": "Home",
     "de": "Startseite"

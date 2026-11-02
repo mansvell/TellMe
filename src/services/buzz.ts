@@ -1,3 +1,4 @@
+import { getPublicOrigin } from "../mobile/links";
 import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
@@ -553,7 +554,7 @@ export function getBuzzShareLink(
     shareCode: string,
 ): string {
 
-    return `${window.location.origin}/b/${shareCode}`;
+    return `${getPublicOrigin()}/b/${shareCode}`;
 }
 // ============================================================
 // PUBLIER LE BUZZ DANS SON GROUPE

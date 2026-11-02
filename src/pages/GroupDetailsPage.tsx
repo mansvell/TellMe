@@ -1,3 +1,4 @@
+import { copyText, shareLink } from "../mobile/sharing";
 import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
@@ -152,7 +153,7 @@ export default function GroupDetailsPage() {
 
         try {
 
-            await navigator.clipboard.writeText(
+            await copyText(
                 group.inviteLink,
             );
 
@@ -176,22 +177,12 @@ export default function GroupDetailsPage() {
 
         if (!group) return;
 
-        if (!navigator.share) {
-
-            await copyInviteLink();
-
-            return;
-        }
-
         try {
-
-            await navigator.share({
-                title: t("Rejoindre {name} sur TellMe", { name: group.name }),
-                text: t("Rejoins le groupe « {name} » sur TellMe.", { name: group.name }) + "\n\n" +
-                    t("Discute en anonyme et sans limite sur plein de sujet"),
-                url: group.inviteLink,
-            });
-
+            await shareLink(
+                t("Rejoindre {name} sur TellMe", { name: group.name }),
+                t("Rejoins le groupe « {name} » sur TellMe.", { name: group.name }),
+                group.inviteLink,
+            );
         } catch {
             // Annulation du partage : aucune erreur à afficher.
         }

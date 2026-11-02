@@ -1,3 +1,4 @@
+import { getPublicOrigin } from "../mobile/links";
 import { getLocale } from "../i18n/runtime";
 import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
@@ -360,7 +361,7 @@ export async function getGroupDetails(
 
         // Le lien peut être copié et ouvert sur un autre appareil.
         inviteLink:
-            `${window.location.origin}/join/${data.invite_code}`,
+            `${getPublicOrigin()}/join/${data.invite_code}`,
 
         isDominus:
             data.dominus_id === user.id,
