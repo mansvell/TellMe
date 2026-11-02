@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, X, XCircle} from "lucide-react";
 
 import {useNavigate} from "react-router-dom";
@@ -67,7 +68,7 @@ export default function InvitationsPage() {
                 if (!active) return;
 
                 setErrorMessage(
-                    "Impossible de charger les invitations.",
+                    t("Impossible de charger les invitations."),
                 );
 
                 setLoading(false);
@@ -108,6 +109,7 @@ export default function InvitationsPage() {
                         }
                     },
                 )
+                .on("postgres_changes", { event: "*", schema: "public", table: "directory_invitations" }, () => { void loadInvitations(); })
                 .subscribe(
                     (status, error) => {
 
@@ -242,7 +244,7 @@ export default function InvitationsPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible d’accepter l’invitation.",
+                    : t("Impossible d’accepter l’invitation."),
             );
 
         } finally {
@@ -284,7 +286,7 @@ export default function InvitationsPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible de refuser l’invitation.",
+                    : t("Impossible de refuser l’invitation."),
             );
 
         } finally {
@@ -314,13 +316,13 @@ export default function InvitationsPage() {
                             className="w-15 h-12 rounded-2xl"
                         />
                         <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-                            Invitations
-                        </h1>
+                             {t("Invitations")} </h1>
                     </div>
 
             </header>
 
             <section className="mx-auto max-w-5xl p-4 sm:p-5">
+                <button type="button" onClick={() => navigate("/discover")} className="mb-6 flex w-full items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">{t("Trouver d’autres utilisateurs")} <span aria-hidden="true">↗</span></button>
                 <div
                     className="rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-lg shadow-sky-100 sm:p-7">
 
@@ -332,12 +334,10 @@ export default function InvitationsPage() {
 
                         <div>
                             <h2 className="text-xl font-bold sm:text-2xl">
-                                Conversations privées
-                            </h2>
+                                 {t("Conversations privées")} </h2>
 
                             <p className="mt-2 max-w-xl text-sm leading-6 text-sky-100">
-                                Une nouvelle conversation n’est créée que lorsque l’invitation est acceptée.
-                            </p>
+                                 {t("Une nouvelle conversation n’est créée que lorsque l’invitation est acceptée.")} </p>
 
                         </div>
 
@@ -352,7 +352,7 @@ export default function InvitationsPage() {
                             activeTab ===
                             "pending"
                         }
-                        label="En cours"
+                        label={t("En cours")}
                         count={
                             pendingCount
                         }
@@ -369,7 +369,7 @@ export default function InvitationsPage() {
                             activeTab ===
                             "accepted"
                         }
-                        label="Acceptées"
+                        label={t("Acceptées")}
                         count={
                             acceptedCount
                         }
@@ -386,7 +386,7 @@ export default function InvitationsPage() {
                             activeTab ===
                             "rejected"
                         }
-                        label="Refusées"
+                        label={t("Refusées")}
                         count={
                             rejectedCount
                         }
@@ -599,8 +599,8 @@ function InvitationCard({
                                 <p className="mt-1 text-sm text-slate-500">
 
                                     {isReceived
-                                        ? "Invitation reçue de "
-                                        : "Invitation envoyée à "}
+                                        ? "" + t("Invitation reçue de") + " "
+                                        : "" + t("Invitation envoyée à") + " "}
 
                                     <span className="font-semibold text-slate-700 dark:text-white">
 
@@ -651,12 +651,10 @@ function InvitationCard({
                             />
                             <div>
                                 <p className="text-sm font-semibold text-amber-700">
-                                    En attente d’une réponse
-                                </p>
+                                     {t("En attente d’une réponse")} </p>
 
                                 <p className="mt-1 text-xs leading-5 text-amber-600">
-                                    Tu seras informé automatiquement lorsque cette personne acceptera ou refusera.
-                                </p>
+                                     {t("Tu seras informé automatiquement lorsque cette personne acceptera ou refusera.")} </p>
                             </div>
                         </div>
                     )}
@@ -672,13 +670,12 @@ function InvitationCard({
                         <div>
 
                             <p className="text-sm font-semibold text-slate-700">
-                                Invitations désactivées
-                            </p>
+                                 {t("Invitations désactivées")} </p>
 
                             <p className="mt-1 text-xs leading-5 text-slate-500">
 
                                 {invitation.statusReason ??
-                                    "Cet utilisateur n’autorise pas les invitations."}
+                                    t("Cet utilisateur n’autorise pas les invitations.")}
 
                             </p>
 
@@ -701,14 +698,13 @@ function InvitationCard({
                         <div>
 
                             <p className="text-sm font-semibold text-red-600">
-                                Invitation refusée
-                            </p>
+                                 {t("Invitation refusée")} </p>
 
                             <p className="mt-1 text-xs leading-5 text-red-500">
 
                                 {isSent
-                                    ? `${invitation.counterpartName} a refusé cette invitation.`
-                                    : "Tu as refusé cette invitation."}
+                                    ? t("{name} a refusé cette invitation.", { name: invitation.counterpartName })
+                                    : t("Tu as refusé cette invitation.")}
 
                             </p>
 
@@ -731,12 +727,10 @@ function InvitationCard({
                         <div>
 
                             <p className="text-sm font-semibold text-emerald-700">
-                                Conversation créée
-                            </p>
+                                 {t("Conversation créée")} </p>
 
                             <p className="mt-1 text-xs leading-5 text-emerald-600">
-                                Vous pouvez maintenant discuter dans votre nouveau groupe privé.
-                            </p>
+                                 {t("Vous pouvez maintenant discuter dans votre nouveau groupe privé.")} </p>
 
                         </div>
 
@@ -785,9 +779,7 @@ function InvitationCard({
 
                             )}
 
-                            Refuser
-
-                        </button>
+                             {t("Refuser")} </button>
 
 
                         <button
@@ -819,9 +811,7 @@ function InvitationCard({
 
                             )}
 
-                            Accepter
-
-                        </button>
+                             {t("Accepter")} </button>
 
                     </div>
 
@@ -847,9 +837,7 @@ function InvitationCard({
                                 size={19}
                             />
 
-                            Ouvrir la conversation
-
-                        </button>
+                             {t("Ouvrir la conversation")} </button>
 
                     </div>
 
@@ -962,8 +950,7 @@ function StatusBadge({
         return (
 
             <span className="shrink-0 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-600">
-                Acceptée
-            </span>
+                 {t("Acceptée")} </span>
 
         );
     }
@@ -977,8 +964,7 @@ function StatusBadge({
         return (
 
             <span className="shrink-0 rounded-full bg-red-100 px-3 py-1.5 text-xs font-bold text-red-500">
-                Refusée
-            </span>
+                 {t("Refusée")} </span>
 
         );
     }
@@ -992,8 +978,7 @@ function StatusBadge({
         return (
 
             <span className="shrink-0 rounded-full bg-slate-200 px-3 py-1.5 text-xs font-bold text-slate-500">
-                Indisponible
-            </span>
+                 {t("Indisponible")} </span>
 
         );
     }
@@ -1002,8 +987,7 @@ function StatusBadge({
     return (
 
         <span className="shrink-0 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-600">
-            En cours
-        </span>
+             {t("En cours")} </span>
 
     );
 }
@@ -1020,10 +1004,10 @@ function EmptyState({
 }) {
 
     let title =
-        "Aucune invitation";
+        t("Aucune invitation");
 
     let description =
-        "Les invitations apparaîtront ici.";
+        t("Les invitations apparaîtront ici.");
 
     let icon:
         React.ReactNode =
@@ -1031,22 +1015,22 @@ function EmptyState({
 
 
     if (tab === "pending") {
-        title = "Aucune invitation en cours";
-        description = "Les invitations envoyées ou reçues en attente apparaîtront ici.";
+        title = t("Aucune invitation en cours");
+        description = t("Les invitations envoyées ou reçues en attente apparaîtront ici.");
         icon = <Clock3 size={28} />;
     }
 
 
     if (tab === "accepted") {
-        title = "Aucune invitation acceptée";
-        description = "Tes conversations créées à partir d’invitations apparaîtront ici.";
+        title = t("Aucune invitation acceptée");
+        description = t("Tes conversations créées à partir d’invitations apparaîtront ici.");
         icon = <CheckCircle2 size={28} />;
     }
 
 
     if (tab === "rejected") {
-        title = "Aucune invitation refusée";
-        description = "Les invitations refusées ou indisponibles apparaîtront ici.";
+        title = t("Aucune invitation refusée");
+        description = t("Les invitations refusées ou indisponibles apparaîtront ici.");
         icon = <XCircle size={28} />;
     }
 

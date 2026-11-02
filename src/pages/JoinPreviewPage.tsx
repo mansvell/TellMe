@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     LoaderCircle,
     Lock,
@@ -90,7 +91,7 @@ export default function JoinPreviewPage() {
 
                 if (!active) return;
 
-                setErrorMessage("Ce lien est invalide ou a expiré.");
+                setErrorMessage(t("Ce lien est invalide ou a expiré."));
                 setLoading(false);
 
             });
@@ -154,7 +155,7 @@ export default function JoinPreviewPage() {
             setErrorMessage(
                 error instanceof Error
                     ? error.message
-                    : "Impossible de rejoindre le groupe.",
+                    : t("Impossible de rejoindre le groupe."),
             );
 
         } finally {
@@ -183,8 +184,7 @@ export default function JoinPreviewPage() {
         return (
             <main className="min-h-screen flex items-center justify-center bg-slate-100">
                 <p className="text-slate-500">
-                    Lien d’invitation invalide.
-                </p>
+                     {t("Lien d’invitation invalide.")} </p>
             </main>
         );
 
@@ -228,8 +228,8 @@ export default function JoinPreviewPage() {
 
                             {group.membersCount}{" "}
                             {group.membersCount > 1
-                                ? "membres"
-                                : "membre"}
+                                ? t("membres")
+                                : t("membre")}
 
                         </div>
 
@@ -244,12 +244,10 @@ export default function JoinPreviewPage() {
                             <div>
 
                                 <p className="font-semibold">
-                                    Groupe privé
-                                </p>
+                                     {t("Groupe privé")} </p>
 
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Tu as reçu un lien pour rejoindre cette discussion TellMe.
-                                </p>
+                                     {t("Tu as reçu un lien pour rejoindre cette discussion TellMe.")} </p>
 
                             </div>
 
@@ -272,9 +270,7 @@ export default function JoinPreviewPage() {
                                 />
                             )}
 
-                            Rejoindre le groupe
-
-                        </button>
+                             {t("Rejoindre le groupe")} </button>
 
                     </>
 
@@ -287,8 +283,7 @@ export default function JoinPreviewPage() {
                         </p>
 
                         <p className="mt-2 text-sm text-slate-400">
-                            Le groupe a peut-être expiré ou été supprimé.
-                        </p>
+                             {t("Le groupe a peut-être expiré ou été supprimé.")} </p>
 
                     </div>
 

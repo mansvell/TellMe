@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
@@ -88,8 +89,7 @@ export default function ProtectedRoute({
                     <div className="h-9 w-9 animate-spin rounded-full border-4 border-sky-100 border-t-sky-500 dark:border-slate-800 dark:border-t-sky-500" />
 
                     <p className="text-sm font-medium text-slate-400">
-                        Chargement...
-                    </p>
+                         {t("Chargement...")} </p>
                 </div>
             </main>
         );

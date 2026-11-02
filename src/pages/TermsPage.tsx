@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
     Ban,
@@ -30,8 +31,7 @@ export default function TermsPage() {
 
 
                     <h1 className="ml-3 text-lg font-bold text-slate-900 dark:text-white">
-                        Conditions d'utilisation
-                    </h1>
+                         {t("Conditions d'utilisation")} </h1>
 
                 </div>
 
@@ -47,14 +47,10 @@ export default function TermsPage() {
                     />
 
                     <h2 className="mt-5 text-2xl font-black">
-                        Utiliser TellMe
-                    </h2>
+                         {t("Utiliser TellMe")} </h2>
 
                     <p className="mt-3 max-w-xl text-sm leading-6 text-white/80">
-                        TellMe est un espace de discussion anonyme.
-                        L'anonymat ne dispense cependant pas chaque
-                        utilisateur de respecter les autres membres.
-                    </p>
+                         {t("TellMe est un espace de discussion anonyme. L'anonymat ne dispense cependant pas chaque utilisateur de respecter les autres membres.")} </p>
 
                 </div>
 
@@ -64,12 +60,9 @@ export default function TermsPage() {
                     icon={
                         <Users size={20}/>
                     }
-                    title="Respect des membres"
+                    title={t("Respect des membres")}
                 >
-                    Les comportements destinés à harceler, menacer,
-                    intimider ou nuire volontairement aux autres
-                    utilisateurs ne sont pas autorisés.
-                </TermsCard>
+                     {t("Les comportements destinés à harceler, menacer, intimider ou nuire volontairement aux autres utilisateurs ne sont pas autorisés.")} </TermsCard>
 
 
                 <TermsCard
@@ -77,12 +70,9 @@ export default function TermsPage() {
                     icon={
                         <MessageCircle size={20}/>
                     }
-                    title="Utilisation responsable"
+                    title={t("Utilisation responsable")}
                 >
-                    Chaque utilisateur reste responsable du contenu qu'il
-                    publie et des interactions qu'il engage dans les groupes
-                    auxquels il participe.
-                </TermsCard>
+                     {t("Chaque utilisateur reste responsable du contenu qu'il publie et des interactions qu'il engage dans les groupes auxquels il participe.")} </TermsCard>
 
 
                 <TermsCard
@@ -90,12 +80,9 @@ export default function TermsPage() {
                     icon={
                         <Ban size={20}/>
                     }
-                    title="Contenus interdits"
+                    title={t("Contenus interdits")}
                 >
-                    TellMe ne doit pas être utilisé pour diffuser des contenus
-                    illégaux ou pour utiliser l'application dans un objectif
-                    contraire à la loi.
-                </TermsCard>
+                     {t("TellMe ne doit pas être utilisé pour diffuser des contenus illégaux ou pour utiliser l'application dans un objectif contraire à la loi.")} </TermsCard>
 
 
                 <TermsCard
@@ -103,17 +90,13 @@ export default function TermsPage() {
                     icon={
                         <ShieldCheck size={20}/>
                     }
-                    title="Invitations"
+                    title={t("Invitations")}
                 >
-                    Chaque utilisateur peut choisir d'autoriser ou non les
-                    invitations privées. Ce choix doit être respecté par les
-                    autres membres.
-                </TermsCard>
+                     {t("Chaque utilisateur peut choisir d'autoriser ou non les invitations privées. Ce choix doit être respecté par les autres membres.")} </TermsCard>
 
 
                 <p className="px-2 text-center text-xs leading-5 text-slate-400">
-                    © 2026 TellMe - Tous droits reservés
-                </p>
+                     {t("© 2026 TellMe - Tous droits reservés")} </p>
 
             </section>
 

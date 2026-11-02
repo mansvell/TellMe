@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { Plus, Link2, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,12 +15,10 @@ export default function ChooseGroupPage() {
                 <div className="text-center">
 
                     <h1 className="text-5xl font-extrabold text-slate-900">
-                        Que souhaites-tu faire ?
-                    </h1>
+                         {t("Que souhaites-tu faire ?")} </h1>
 
                     <p className="mt-4 text-slate-500 text-lg">
-                        Commence une nouvelle conversation ou rejoins un groupe.
-                    </p>
+                         {t("Commence une nouvelle conversation ou rejoins un groupe.")} </p>
 
                 </div>
 
@@ -37,18 +36,14 @@ export default function ChooseGroupPage() {
                         </div>
 
                         <h2 className="mt-8 text-3xl font-bold text-slate-900">
-                            Créer un groupe
-                        </h2>
+                             {t("Créer un groupe")} </h2>
 
                         <p className="mt-3 text-slate-500">
-                            Crée ton propre espace privé et invite tes proches.
-                        </p>
+                             {t("Crée ton propre espace privé et invite tes proches.")} </p>
 
                         <div className="mt-10 flex items-center gap-2 text-sky-600 font-semibold">
 
-                            Commencer
-
-                            <ArrowRight size={18}/>
+                             {t("Commencer")} <ArrowRight size={18}/>
 
                         </div>
 
@@ -66,18 +61,14 @@ export default function ChooseGroupPage() {
                         </div>
 
                         <h2 className="mt-8 text-3xl font-bold text-slate-900">
-                            Rejoindre un groupe
-                        </h2>
+                             {t("Rejoindre un groupe")} </h2>
 
                         <p className="mt-3 text-slate-500">
-                            Colle un lien ou ouvre une invitation reçue.
-                        </p>
+                             {t("Colle un lien ou ouvre une invitation reçue.")} </p>
 
                         <div className="mt-10 flex items-center gap-2 text-sky-600 font-semibold">
 
-                            Rejoindre
-
-                            <ArrowRight size={18}/>
+                             {t("Rejoindre")} <ArrowRight size={18}/>
 
                         </div>
 

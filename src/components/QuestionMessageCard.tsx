@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { MessageCircle, Sparkles } from "lucide-react";
 //carte de Question envoyé dans les groupes
 
@@ -23,8 +24,7 @@ export default function QuestionMessageCard({
                             />
 
                             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-500">
-                                Nouvelle Question
-                            </p>
+                                 {t("Nouvelle Question")} </p>
 
                             <Sparkles
                                 size={13}
@@ -43,8 +43,7 @@ export default function QuestionMessageCard({
                                 size={16}
                                 className="text-sky-500"
                             />
-                            Exprimez vous sans crainte
-                        </div>
+                             {t("Exprimez vous sans crainte")} </div>
                     </div>
                 </div>
             </div>

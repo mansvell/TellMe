@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { forwardRef } from "react";
 import icon from "../assets/icon.png";
 
@@ -22,18 +23,15 @@ const QuestionShareCard = forwardRef<HTMLDivElement>(
                     <div className="flex flex-1 flex-col items-center justify-center">
 
                         <p className="mt-5 text-xl py-2 font-black  rounded-2xl bg-white text-sky-400">
-                            une nouveau sujet palpitant t'attends dans le groupe
-                        </p>
+                             {t("une nouveau sujet palpitant t'attends dans le groupe")} </p>
 
                         <p className="mt-6 text-lg font-bold text-sky-50">
-                            Come on, and let's have fun!
-                        </p>
+                             {t("Come on, and let's have fun!")} </p>
                     </div>
 
                     <div className="flex flex-col items-center">
                         <p className="mt-1 text-sm font-bold text-white/80">
-                            Rejoins la discussion
-                        </p>
+                             {t("Rejoins la discussion")} </p>
 
                         <div className="mt-3 flex gap-5 text-4xl font-black">
                             <span>↓</span>

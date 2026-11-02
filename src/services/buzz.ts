@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
 
@@ -183,7 +184,7 @@ export async function createBuzz(
 
     if (!user) {
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 
@@ -202,14 +203,14 @@ export async function createBuzz(
 
     if (!question) {
         throw new Error(
-            "La question est obligatoire.",
+            t("La question est obligatoire."),
         );
     }
 
 
     if (options.length < 2) {
         throw new Error(
-            "Ajoute au moins deux réponses.",
+            t("Ajoute au moins deux réponses."),
         );
     }
 
@@ -559,13 +560,13 @@ export function getBuzzShareLink(
 // ============================================================
 export async function publishBuzzToGroup(buzz: Buzz): Promise<void> {
     if (!buzz.group_id) {
-        throw new Error("Ce Buzz n'est lié à aucun groupe.");
+        throw new Error(t("Ce Buzz n'est lié à aucun groupe."));
     }
 
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) throw userError;
-    if (!user) throw new Error("Utilisateur introuvable.");
+    if (!user) throw new Error(t("Utilisateur introuvable."));
 
     const { data: membership, error: membershipError } = await supabase
         .from("group_members")
@@ -587,7 +588,7 @@ export async function publishBuzzToGroup(buzz: Buzz): Promise<void> {
     if (existingError) throw existingError;
 
     if (existingMessage) {
-        throw new Error("Ce Buzz est déjà publié dans ce groupe.");
+        throw new Error(t("Ce Buzz est déjà publié dans ce groupe."));
     }
 
     const { error } = await supabase
@@ -619,14 +620,14 @@ export async function voteBuzz(
 
     if (!user) {
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 
 
     if (optionIds.length === 0) {
         throw new Error(
-            "Sélectionne une réponse.",
+            t("Sélectionne une réponse."),
         );
     }
 
@@ -656,7 +657,7 @@ export async function voteBuzz(
 
     if (!buzz.is_active) {
         throw new Error(
-            "Ce Buzz est fermé.",
+            t("Ce Buzz est fermé."),
         );
     }
 
@@ -666,7 +667,7 @@ export async function voteBuzz(
         optionIds.length !== 1
     ) {
         throw new Error(
-            "Une seule réponse est autorisée.",
+            t("Une seule réponse est autorisée."),
         );
     }
 
@@ -696,7 +697,7 @@ export async function voteBuzz(
 
     if (existingVote) {
         throw new Error(
-            "Tu as déjà voté à ce Buzz.",
+            t("Tu as déjà voté à ce Buzz."),
         );
     }
 

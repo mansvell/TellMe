@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import { Check, Flame, LoaderCircle, Vote } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { ChatBuzz } from "../services/messages";
@@ -262,11 +263,10 @@ export default function BuzzMessageCard({ buzz }: Props) {
                 ) : (
                     <div className="mt-4 flex items-center justify-between text-sm">
                         <span className="font-bold text-emerald-500">
-                            ✓ Vote enregistré
-                        </span>
+                             {t("✓ Vote enregistré")} </span>
 
                         <span className="font-semibold text-slate-400">
-                            {totalVotes} vote{totalVotes !== 1 ? "s" : ""}
+                            {totalVotes}  {t("vote")}{totalVotes !== 1 ? "s" : ""}
                         </span>
                     </div>
                 )}
@@ -274,8 +274,8 @@ export default function BuzzMessageCard({ buzz }: Props) {
                 {!hasVoted && (
                     <p className="mt-3 text-center text-xs font-medium text-slate-400">
                         {buzz.vote_type === "single"
-                            ? "Une seule réponse autorisée"
-                            : "Plusieurs réponses autorisées"}
+                            ? t("Une seule réponse autorisée")
+                            : t("Plusieurs réponses autorisées")}
                     </p>
                 )}
             </div>

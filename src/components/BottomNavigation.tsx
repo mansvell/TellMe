@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {House, MailPlus, Settings, Flame } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -17,14 +18,14 @@ export default function BottomNavigation({ active }: Props) {
                     to="/invit"
                     active={active === "invitations"}
                     icon={<MailPlus size={22}/>}
-                    title="Invitations"
+                    title={t("Invitations")}
                 />
 
                 <Item
                     to="/home"
                     active={active === "home"}
                     icon={<House size={22}/>}
-                    title="Accueil"
+                    title={t("Accueil")}
                 />
 
                 <Item
@@ -38,7 +39,7 @@ export default function BottomNavigation({ active }: Props) {
                     to="/settings"
                     active={active === "settings"}
                     icon={<Settings size={22}/>}
-                    title="Paramètres"
+                    title={t("Paramètres")}
                 />
 
             </div>

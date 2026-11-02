@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
     Check,
@@ -138,8 +139,7 @@ export default function CustomizationPage() {
                     </Link>
 
                     <h1 className="text-xl  dark:text-white font-bold">
-                        Personnalisation
-                    </h1>
+                         {t("Personnalisation")} </h1>
 
                 </div>
 
@@ -163,12 +163,10 @@ export default function CustomizationPage() {
                         <div>
 
                             <h2 className="font-bold text-slate-900 dark:text-white">
-                                Aperçu
-                            </h2>
+                                 {t("Aperçu")} </h2>
 
                             <p className="text-sm text-slate-400 dark:text-white/70">
-                                Cette couleur s’applique uniquement dans ce groupe.
-                            </p>
+                                 {t("Cette couleur s’applique uniquement dans ce groupe.")} </p>
 
                         </div>
 
@@ -180,8 +178,7 @@ export default function CustomizationPage() {
                         <div className="flex justify-start">
 
                             <div className="max-w-[80%] rounded-2xl rounded-bl-md bg-white px-4 py-3 text-slate-800 shadow-sm">
-                                Salut ! Tu viens ce soir ?
-                            </div>
+                                 {t("Salut ! Tu viens ce soir ?")} </div>
 
                         </div>
 
@@ -194,8 +191,7 @@ export default function CustomizationPage() {
                                     selectedColor,
                                 }}
                             >
-                                Oui, je serai là 👌
-                            </div>
+                                 {t("Oui, je serai là 👌")} </div>
 
                         </div>
 
@@ -209,12 +205,10 @@ export default function CustomizationPage() {
                 <div className="rounded-3xl bg-white p-6 shadow-sm">
 
                     <h2 className="text-lg font-bold text-slate-900">
-                        Couleur de mes messages
-                    </h2>
+                         {t("Couleur de mes messages")} </h2>
 
                     <p className="mt-1 text-sm text-slate-400">
-                        Les autres membres verront tes messages avec cette couleur.
-                    </p>
+                         {t("Les autres membres verront tes messages avec cette couleur.")} </p>
 
 
                     {loading ? (
@@ -304,19 +298,17 @@ export default function CustomizationPage() {
                                 size={20}
                                 className="animate-spin"
                             />
-                            Enregistrement...
-                        </>
+                             {t("Enregistrement...")} </>
 
                     ) : saved ? (
 
                         <>
                             <Check size={20} />
-                            Enregistré
-                        </>
+                             {t("Enregistré")} </>
 
                     ) : (
 
-                        "Enregistrer"
+                        t("Enregistrer")
 
                     )}
 

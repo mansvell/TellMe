@@ -1,3 +1,4 @@
+import { t } from "../i18n/runtime";
 import {
     ArrowLeft,
     Database,
@@ -29,8 +30,7 @@ const  navigate = useNavigate();
 
 
                     <h1 className="ml-3 text-lg font-bold text-slate-900 dark:text-white">
-                        Politique de confidentialité
-                    </h1>
+                         {t("Politique de confidentialité")} </h1>
 
                 </div>
 
@@ -48,14 +48,10 @@ const  navigate = useNavigate();
                     />
 
                     <h2 className="mt-5 text-2xl font-black">
-                        Ta vie privée compte.
-                    </h2>
+                         {t("Ta vie privée compte.")} </h2>
 
                     <p className="mt-3 max-w-xl text-sm leading-6 text-white/85">
-                        TellMe est conçu pour permettre des discussions
-                        simples et anonymes tout en limitant les informations
-                        personnelles visibles par les autres membres.
-                    </p>
+                         {t("TellMe est conçu pour permettre des discussions simples et anonymes tout en limitant les informations personnelles visibles par les autres membres.")} </p>
 
                 </div>
 
@@ -64,55 +60,41 @@ const  navigate = useNavigate();
                     icon={
                         <EyeOff size={21}/>
                     }
-                    title="Anonymat"
+                    title={t("Anonymat")}
                 >
-                    Les autres membres d'un groupe voient uniquement
-                    ton pseudo utilisé dans la conversation. Ton adresse
-                    e-mail et ton identifiant technique ne sont pas affichés
-                    aux autres utilisateurs.
-                </PrivacyCard>
+                    <span className="mb-3 block">{t("Ton pseudo et ta couleur apparaissent dans la recherche d’utilisateurs lorsque tu autorises les invitations. Tu peux désactiver les invitations dans les paramètres.")}</span>
+                     {t("Les autres membres d'un groupe voient uniquement ton pseudo utilisé dans la conversation. Ton adresse e-mail et ton identifiant technique ne sont pas affichés aux autres utilisateurs.")} </PrivacyCard>
 
 
                 <PrivacyCard
                     icon={
                         <UserRoundX size={21}/>
                     }
-                    title="Rôles privés"
+                    title={t("Rôles privés")}
                 >
-                    Les rôles techniques utilisés pour administrer un groupe
-                    ne sont pas affichés publiquement dans la liste des
-                    membres. Cela permet de conserver le fonctionnement
-                    anonyme de TellMe.
-                </PrivacyCard>
+                     {t("Les rôles techniques utilisés pour administrer un groupe ne sont pas affichés publiquement dans la liste des membres. Cela permet de conserver le fonctionnement anonyme de TellMe.")} </PrivacyCard>
 
 
                 <PrivacyCard
                     icon={
                         <Database size={21}/>
                     }
-                    title="Données"
+                    title={t("Données")}
                 >
-                    Certaines informations sont nécessaires au fonctionnement
-                    de l'application, notamment ton compte, tes appartenances
-                    aux groupes, tes messages et tes préférences.
-                </PrivacyCard>
+                     {t("Certaines informations sont nécessaires au fonctionnement de l'application, notamment ton compte, tes appartenances aux groupes, tes messages et tes préférences.")} </PrivacyCard>
 
 
                 <PrivacyCard
                     icon={
                         <LockKeyhole size={21}/>
                     }
-                    title="Accès aux groupes"
+                    title={t("Accès aux groupes")}
                 >
-                    Un groupe n'est accessible qu'aux utilisateurs qui en
-                    sont membres. Un utilisateur peut notamment rejoindre un
-                    groupe grâce à un lien d'invitation valide.
-                </PrivacyCard>
+                     {t("Un groupe n'est accessible qu'aux utilisateurs qui en sont membres. Un utilisateur peut notamment rejoindre un groupe grâce à un lien d'invitation valide.")} </PrivacyCard>
 
 
                 <p className="px-2 text-center text-xs leading-5 text-slate-400">
-                    © 2026 TellMe - Tous droits reservés
-                </p>
+                     {t("© 2026 TellMe - Tous droits reservés")} </p>
 
             </section>
 

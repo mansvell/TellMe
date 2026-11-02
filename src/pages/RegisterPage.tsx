@@ -1,3 +1,5 @@
+import { t } from "../i18n/runtime";
+import { getLanguage, setLanguage as saveLanguage } from "../i18n/runtime";
 import { useState } from "react";
 import {ArrowRight, Check, Globe2, LoaderCircle, UserRound} from "lucide-react";
 import {useLocation, useNavigate} from "react-router-dom";
@@ -24,7 +26,7 @@ export default function RegisterPage() {
     const navigate = useNavigate();
 
     const [pseudo, setPseudo] = useState("");
-    const [language, setLanguage] = useState("fr");
+    const [language, setLanguage] = useState(getLanguage());
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [accepted, setAccepted] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -62,7 +64,7 @@ export default function RegisterPage() {
         if (existingUser) {
 
             setErrorMessage(
-                "Ce pseudo est déjà utilisé."
+                t("Ce pseudo est déjà utilisé.")
             );
 
             setLoading(false);
@@ -101,7 +103,7 @@ export default function RegisterPage() {
 
             if (!user) {
                 throw new Error(
-                    "Supabase n’a pas retourné d’utilisateur.",
+                    t("Supabase n’a pas retourné d’utilisateur."),
                 );
             }
 
@@ -129,6 +131,7 @@ export default function RegisterPage() {
              * Le token sera traité plus tard lorsque nous connecterons
              * les invitations. Pour l'instant, on conserve le parcours.
              */
+            saveLanguage(language);
             if (inviteToken) {
                 navigate(`/join/preview?token=${inviteToken}`, {
                     replace: true,
@@ -146,11 +149,11 @@ export default function RegisterPage() {
                 "code" in error &&
                 error.code === "23505"
             ) {
-                setErrorMessage("Ce pseudo est déjà utilisé.");
+                setErrorMessage(t("Ce pseudo est déjà utilisé."));
             } else if (error instanceof Error) {
                 setErrorMessage(error.message);
             } else {
-                setErrorMessage("Impossible de créer ton identité.");
+                setErrorMessage(t("Impossible de créer ton identité."));
             }
         } finally {
             setLoading(false);
@@ -172,17 +175,14 @@ export default function RegisterPage() {
 
                         <div>
                             <h2 className="max-w-md text-4xl font-extrabold leading-tight">
-                                TA LIBERTÉ, TES GROUPES , TON PERSONNAGE
-                            </h2>
+                                 {t("TA LIBERTÉ, TES GROUPES , TON PERSONNAGE")} </h2>
 
                             <p className="mt-5 max-w-md text-lg leading-8 text-sky-100">
-                                    AUCUN MAIL NI MOT DE PASSE LIÉ A TON IDENTITÉ
-                            </p>
+                                     {t("AUCUN MAIL NI MOT DE PASSE LIÉ A TON IDENTITÉ")} </p>
                         </div>
 
                         <div className="flex items-center gap-3 text-sm text-sky-100">
-                            Sentez vous libre
-                        </div>
+                             {t("Sentez vous libre")} </div>
                     </div>
 
                     <form onSubmit={handleSubmit} className="flex flex-col justify-center p-6 sm:p-10 lg:p-14">
@@ -202,8 +202,7 @@ export default function RegisterPage() {
                         <div className="mt-8 lg:mt-0">
                             <span
                                 className="inline-flex text-center rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white">
-                                Choisissez un nom au hasard pour garder l'anonymat !!
-                            </span>
+                                 {t("Choisissez un nom au hasard pour garder l'anonymat !!")} </span>
                         </div>
 
                         <div className="mt-3">
@@ -211,8 +210,7 @@ export default function RegisterPage() {
                                 htmlFor="pseudo"
                                 className="text-sm dark:text-white font-bold text-slate-700"
                             >
-                                Personne ne doit te reconnaitre
-                            </label>
+                                 {t("Personne ne doit te reconnaitre")} </label>
 
                             <div
                                 className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 transition focus-within:border-sky-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-sky-100">
@@ -240,8 +238,7 @@ export default function RegisterPage() {
 
                         <div className="mt-6">
                             <p className="text-sm font-bold dark:text-white text-slate-700">
-                                Choisis une Couleur :
-                            </p>
+                                 {t("Choisis une Couleur :")} </p>
 
                             <div className="mt-3 flex flex-wrap gap-3">
                                 {colors.map((color) => (
@@ -272,8 +269,7 @@ export default function RegisterPage() {
                                 htmlFor="language"
                                 className="text-sm dark:text-white font-bold text-slate-700"
                             >
-                                Langue :
-                            </label>
+                                 {t("Langue :")} </label>
 
                             <div
                                 className="mt-2 flex h-14 items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-100">
@@ -286,7 +282,7 @@ export default function RegisterPage() {
                                     id="language"
                                     value={language}
                                     onChange={(event) =>
-                                        setLanguage(event.target.value)
+                                        setLanguage(event.target.value as "fr" | "en" | "de")
                                     }
                                     className="min-w-0 flex-1 bg-transparent text-slate-900 outline-none"
                                 >
@@ -307,9 +303,7 @@ export default function RegisterPage() {
                                 className="mt-1 h-5 w-5 accent-sky-500"
                             />
 
-                            <p className="text-sm leading-6 text-slate-600"> J’accepte les
-                                <span className="text-blue-500" onClick={() => navigate("/terms")}> conditions d’utilisation</span> et la
-                                <span className="text-blue-500" onClick={() => navigate("/privacy")}> politique de confidentialité</span>.
+                            <p className="text-sm leading-6 text-slate-600">  {t("J’accepte les")} <span className="text-blue-500" onClick={() => navigate("/terms")}>  {t("conditions d’utilisation")}</span>  {t("et la")} <span className="text-blue-500" onClick={() => navigate("/privacy")}>  {t("politique de confidentialité")}</span>.
                             </p>
                         </label>
 
@@ -331,12 +325,10 @@ export default function RegisterPage() {
                                         size={20}
                                         className="animate-spin"
                                     />
-                                    Création...
-                                </>
+                                     {t("Création...")} </>
                             ) : (
                                 <>
-                                    Créer mon identité
-                                    <ArrowRight size={20}/>
+                                     {t("Créer mon identité")} <ArrowRight size={20}/>
                                 </>
                             )}
                         </button>

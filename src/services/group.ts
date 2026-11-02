@@ -1,3 +1,5 @@
+import { getLocale } from "../i18n/runtime";
+import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
 export type GroupLifetime =
@@ -147,7 +149,7 @@ export async function createGroup(
     if (error) throw error;
 
     if (!data) {
-        throw new Error("Le groupe n’a pas été créé.");
+        throw new Error(t("Le groupe n’a pas été créé."));
     }
 
     return data as string;
@@ -166,7 +168,7 @@ export async function getMyGroups(): Promise<Group[]> {
 
     if (!user) {
         throw new Error(
-            "Utilisateur introuvable.",
+            t("Utilisateur introuvable."),
         );
     }
 
@@ -302,7 +304,7 @@ export async function getGroupDetails(
     if (userError) throw userError;
 
     if (!user) {
-        throw new Error("Utilisateur introuvable.");
+        throw new Error(t("Utilisateur introuvable."));
     }
 
     const { data, error } = await supabase
@@ -338,7 +340,7 @@ export async function getGroupDetails(
             data.messages?.[0]?.count ?? 0,
 
         createdAt: created.toLocaleDateString(
-            "fr-FR",
+            getLocale(),
         ),
 
         createdAtLabel:
@@ -427,7 +429,7 @@ export async function getGroupMembers(
 
             name:
                 profile?.display_name
-                ?? "Utilisateur",
+                ?? t("Utilisateur"),
 
             color:
                 row.local_color
@@ -533,7 +535,7 @@ export async function getMyMessageColor(
     if (userError) throw userError;
 
     if (!user) {
-        throw new Error("Utilisateur introuvable.");
+        throw new Error(t("Utilisateur introuvable."));
     }
 
     const { data, error } = await supabase
@@ -563,7 +565,7 @@ export async function updateMyMessageColor(
     if (userError) throw userError;
 
     if (!user) {
-        throw new Error("Utilisateur introuvable.");
+        throw new Error(t("Utilisateur introuvable."));
     }
 
     const { error } = await supabase
@@ -668,7 +670,7 @@ export async function getGroupPreviewByInviteCode(
 
     if (!row) {
         throw new Error(
-            "Ce lien est invalide ou a expiré.",
+            t("Ce lien est invalide ou a expiré."),
         );
     }
 
@@ -703,7 +705,7 @@ export async function joinGroupByInviteCode(
 
     if (!data) {
         throw new Error(
-            "Impossible de rejoindre le groupe.",
+            t("Impossible de rejoindre le groupe."),
         );
     }
 
@@ -753,20 +755,18 @@ function formatRelativeDate(
         );
 
     if (days <= 0) {
-        return "Créé aujourd’hui";
+        return t("Créé aujourd’hui");
     }
 
     if (days === 1) {
-        return "Créé hier";
+        return t("Créé hier");
     }
 
     if (days < 30) {
-        return `Créé il y a ${days} jours`;
+        return t("Créé il y a {days} jours", { days });
     }
 
-    return `Créé le ${date.toLocaleDateString(
-        "fr-FR",
-    )}`;
+    return t("Créé le {date}", { date: date.toLocaleDateString(getLocale()) });
 }
 
 
@@ -776,12 +776,12 @@ function formatExpiration(
 ): string {
 
     if (!expiresAt) {
-        return "Aucune expiration";
+        return t("Aucune expiration");
     }
 
     return new Date(
         expiresAt,
-    ).toLocaleString("fr-FR", {
+    ).toLocaleString(getLocale(), {
         dateStyle: "medium",
         timeStyle: "short",
     });
