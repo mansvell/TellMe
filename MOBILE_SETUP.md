@@ -52,7 +52,7 @@ npm run mobile:ios
 
 Dans Xcode, sélectionner la cible **App**, ouvrir **Signing & Capabilities**, choisir une équipe Apple et un iPhone connecté, puis lancer l'app. Un compte Apple et une signature sont nécessaires pour l'installer sur un iPhone physique ; aucune signature ni compte développeur n'est embarqué dans le dépôt.
 
-Le workflow manuel GitHub **TellMe mobile builds** peut aussi construire une application pour simulateur iOS en cochant `build_ios`. L'artefact simulateur ne s'installe pas sur un iPhone. Pour distribuer à des testeurs avec TestFlight, il faudra configurer le compte Apple Developer et la signature de distribution.
+Le workflow GitHub **TellMe mobile builds** construit aussi une application pour simulateur iOS sur les demandes d’intégration. Il peut être lancé manuellement après intégration, en cochant `build_ios`. L'artefact simulateur ne s'installe pas sur un iPhone. Pour distribuer à des testeurs avec TestFlight, il faudra configurer le compte Apple Developer et la signature de distribution.
 
 ## Points restant à configurer avec les comptes du propriétaire
 
