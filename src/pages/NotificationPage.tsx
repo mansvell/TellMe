@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { t } from "../i18n/runtime";
 import {BellRing, Check, LoaderCircle, LockKeyhole, MessageCircle} from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +40,10 @@ export default function NotificationPage() {
         setErrorMessage("");
 
         try {
+            if (Capacitor.isNativePlatform()) {
+                setErrorMessage(t("Les notifications ne sont pas encore disponibles sur cette version mobile."));
+                return;
+            }
             if (!("Notification" in window)) {
                 throw new Error(
                     t("Les notifications ne sont pas prises en charge par ce navigateur."),

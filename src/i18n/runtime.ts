@@ -1,3 +1,4 @@
+import { setDevicePreference } from "../mobile/storage";
 import { catalog } from "./catalog";
 export type Language = "fr" | "en" | "de";
 const KEY = "tellme-language";
@@ -7,7 +8,7 @@ export function getLanguage(): Language {
     return value === "en" || value === "de" ? value : "fr";
 }
 export function setLanguage(language: Language) {
-    localStorage.setItem(KEY, language);
+    setDevicePreference(KEY, language);
     document.documentElement.lang = language;
     listeners.forEach(listener => listener());
 }

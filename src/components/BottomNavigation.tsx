@@ -10,7 +10,7 @@ export default function BottomNavigation({ active }: Props) {
 
     return (
 
-        <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/30 bg-white/90 dark:bg-slate-600 backdrop-blur-xl">
+        <nav style={{ paddingBottom: "env(safe-area-inset-bottom)" }} className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/30 bg-white/90 dark:bg-slate-600 backdrop-blur-xl">
 
             <div className="mx-auto flex h-20 max-w-5xl items-center justify-around">
 

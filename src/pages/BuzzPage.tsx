@@ -1,3 +1,5 @@
+import { copyText, shareImage } from "../mobile/sharing";
+import { getPublicOrigin } from "../mobile/links";
 import { t } from "../i18n/runtime";
 import {BarChart3, Check, ChevronRight, CirclePlus, Copy, Flame, Link2, Lock, MessageCircle, MoreHorizontal, Plus,
     Share2, Trash2, Users, Vote, X ,ChevronDown,
@@ -326,11 +328,11 @@ export default function BuzzPage() {
         );
     }
     function getBuzzPublicUrl(buzz: Buzz) {
-        return `${window.location.origin}/b/${buzz.share_code}`;
+        return `${getPublicOrigin()}/b/${buzz.share_code}`;
     }
 
     async function copyBuzzLink(buzz: Buzz) {
-        await navigator.clipboard.writeText(
+        await copyText(
             getBuzzPublicUrl(buzz),
         );
 
@@ -492,41 +494,10 @@ export default function BuzzPage() {
                 );
             }
 
-            const file =
-                new File(
-                    [blob],
-                    "tellme-buzz.png",
-                    {
-                        type: "image/png",
-                    },
-                );
-
-            if (
-                navigator.share &&
-                navigator.canShare?.({
-                    files: [file],
-                })
-            ) {
-                await navigator.share({
-                    title: "TellMe Buzz",
-                    text: `${link}`,
-                    files: [file],
-                });
-
-                return;
+            const outcome = await shareImage(blob, "tellme-buzz.png", "TellMe Buzz", link);
+            if (outcome === "copied") {
+                setBuzzShareMessage(t("Lien copié. Le partage d’image est disponible sur un navigateur mobile compatible."));
             }
-
-            if (navigator.share) {
-                await navigator.share({
-                    title: "TellMe Buzz",
-                    url: link,
-                });
-
-                return;
-            }
-
-            await navigator.clipboard.writeText(link);
-            setBuzzShareMessage(t("Lien copié. Le partage d’image est disponible sur un navigateur mobile compatible."));
 
         } catch (error) {
             if (
@@ -576,7 +547,7 @@ export default function BuzzPage() {
         }
 
         const link =
-            `${window.location.origin}/join/${group.invite_code}`;
+            `${getPublicOrigin()}/join/${group.invite_code}`;
 
         try {
             const images =
@@ -615,49 +586,11 @@ export default function BuzzPage() {
                 );
             }
 
-            const file =
-                new File(
-                    [blob],
-                    "tellme-question.png",
-                    {
-                        type: "image/png",
-                    },
-                );
-
-            if (
-                navigator.share &&
-                navigator.canShare?.({
-                    files: [file],
-                })
-            ) {
-                await navigator.share({
-                    title: "TellMe",
-                    text: `${link}`,
-                    files: [file],
-                });
-
-                            // Message envoyé slmt si le partage a été éffectué
-                await sendQuestionToGroup(
-                    selectedQuestionGroupId,
-                    selectedQuestion,
-                );
-
+            const outcome = await shareImage(blob, "tellme-question.png", "TellMe", link);
+            if (outcome === "image") {
+                await sendQuestionToGroup(selectedQuestionGroupId, selectedQuestion);
                 closeQuestionShare();
-
-                return;
             }
-
-            if (navigator.share) {
-                await navigator.share({
-                    title: "TellMe",
-                    text: t("Rejoins et donne ton avis"),
-                    url: link,
-                });
-
-                return;
-            }
-
-            await navigator.clipboard.writeText(link);
 
         } catch (error) {
             if (

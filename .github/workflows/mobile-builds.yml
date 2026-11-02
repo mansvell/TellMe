@@ -1,0 +1,70 @@
+name: TellMe mobile builds
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'android/**'
+      - 'ios/**'
+      - 'capacitor.config.ts'
+      - 'package*.json'
+      - 'index.html'
+      - 'tests/**'
+      - '.github/workflows/mobile-builds.yml'
+  workflow_dispatch:
+    inputs:
+      build_ios:
+        description: 'Also build the iOS simulator app (requires a macOS runner)'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: tellme-android-debug-signing-v1
+      - run: npm ci
+      - run: npm run lint && npm run test:mobile
+      - run: npm run build && npx cap sync android
+      - run: chmod +x android/gradlew && cd android && ./gradlew --no-daemon assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TellMe-Android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+  ios-simulator:
+    if: github.event_name == 'workflow_dispatch' && inputs.build_ios
+    runs-on: macos-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build && npx cap sync ios
+      - run: xcodebuild -project ios/App/App.xcodeproj -scheme App -sdk iphonesimulator -configuration Debug -derivedDataPath ios/DerivedData CODE_SIGNING_ALLOWED=NO build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TellMe-iOS-simulator
+          path: ios/DerivedData/Build/Products/Debug-iphonesimulator/App.app
+          if-no-files-found: error

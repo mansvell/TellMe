@@ -1,3 +1,4 @@
+import { copyText } from "../mobile/sharing";
 import { t } from "../i18n/runtime";
 import {
     useEffect,
@@ -515,7 +516,7 @@ export default function ChatPage() {
 
         if (!menu) return;
 
-        await navigator.clipboard.writeText(
+        await copyText(
             menu.message.content,
         );
 

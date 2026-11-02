@@ -1,3 +1,4 @@
+import { setDevicePreference } from "../mobile/storage";
 export type AppTheme = "light" | "dark";
 
 const THEME_KEY = "tellme-theme";
@@ -11,7 +12,7 @@ export function applyTheme(theme: AppTheme) {
         theme === "dark",
     );
 
-    localStorage.setItem(
+    setDevicePreference(
         THEME_KEY,
         theme,
     );
