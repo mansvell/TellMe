@@ -13,7 +13,8 @@
     "mobile:ios": "npm run mobile:sync && cap open ios",
     "mobile:run:android": "npm run mobile:sync && cap run android",
     "mobile:run:ios": "npm run mobile:sync && cap run ios",
-    "test:mobile": "node --test tests/mobile.test.cjs"
+    "test:mobile": "node --test tests/mobile.test.cjs",
+    "test:receipts": "node --test tests/receipts.test.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

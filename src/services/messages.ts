@@ -135,6 +135,7 @@ export async function sendMessage(
     content: string,
     replyToId: string | null = null,
     file: File | null = null,
+    clientMessageId?: string,
 ): Promise<ChatMessage> {
     const cleanContent = content.trim();
 
@@ -180,6 +181,7 @@ export async function sendMessage(
     } = await supabase
         .from("messages")
         .insert({
+            ...(clientMessageId ? { id: clientMessageId } : {}),
             group_id: groupId,
             sender_membership_id:
             membershipId,
@@ -317,6 +319,8 @@ export async function getMessageById(
             id,
             group_id,
             sender_membership_id,
+            sender_name,
+            sender_color,
             content,
             reply_to_id,
             buzz_id,
@@ -742,6 +746,12 @@ export async function markMessageAsRead(
     groupId: string,
     messageId: string,
 ): Promise<void> {
+
+    const { error: rpcError } = await supabase.rpc("mark_visible_message_read", {
+        target_group_id: groupId, target_message_id: messageId,
+    });
+    if (!rpcError) return;
+    if (!["PGRST202", "42883"].includes(rpcError.code)) throw rpcError;
 
     const membershipId =
         await getMyMembershipId(groupId);

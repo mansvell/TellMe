@@ -69,3 +69,7 @@ button {
   animation:fadeIn .8s ease;
 
 }
+
+/* Le document reste fixe dans le chat : seul le fil de messages défile. */
+html.chat-open, html.chat-open body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+html.chat-open #root { height: 100%; min-height: 0; }

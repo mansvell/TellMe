@@ -1858,5 +1858,165 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Ton pseudo et ta couleur apparaissent dans la recherche d’utilisateurs lorsque tu autorises les invitations. Tu peux désactiver les invitations dans les paramètres.": {
     "en": "Your nickname and colour appear in user search when you allow invitations. You can disable invitations in settings.",
     "de": "Dein Pseudonym und deine Farbe erscheinen in der Nutzersuche, wenn du Einladungen erlaubst. Du kannst Einladungen in den Einstellungen deaktivieren."
+  },
+  "Le message est envoyé, mais la pièce jointe n’a pas pu être confirmée.": {
+    "en": "The message was sent, but the attachment could not be confirmed.",
+    "de": "Die Nachricht wurde gesendet, der Anhang konnte aber nicht bestätigt werden."
+  },
+  "Envoi non confirmé. Ton message est conservé dans la zone de saisie.": {
+    "en": "Sending could not be confirmed. Your message is still in the input field.",
+    "de": "Der Versand konnte nicht bestätigt werden. Deine Nachricht steht weiterhin im Eingabefeld."
+  },
+  "Messages": {
+    "en": "Messages",
+    "de": "Nachrichten"
+  },
+  "Impossible de charger la conversation.": {
+    "en": "Unable to load the conversation.",
+    "de": "Das Gespräch konnte nicht geladen werden."
+  },
+  "La conversation commence ici.": {
+    "en": "The conversation starts here.",
+    "de": "Hier beginnt das Gespräch."
+  },
+  "Actions du message": {
+    "en": "Message actions",
+    "de": "Nachrichtenaktionen"
+  },
+  "Derniers messages": {
+    "en": "Latest messages",
+    "de": "Neueste Nachrichten"
+  },
+  "Vous": {
+    "en": "You",
+    "de": "Du"
+  },
+  "Annuler la réponse": {
+    "en": "Cancel reply",
+    "de": "Antwort abbrechen"
+  },
+  "Retirer le fichier": {
+    "en": "Remove file",
+    "de": "Datei entfernen"
+  },
+  "Joindre un fichier": {
+    "en": "Attach a file",
+    "de": "Datei anhängen"
+  },
+  "Impossible de copier le message.": {
+    "en": "Unable to copy the message.",
+    "de": "Die Nachricht konnte nicht kopiert werden."
+  },
+  "Informations du message": {
+    "en": "Message info",
+    "de": "Nachrichteninfo"
+  },
+  "Un espace à toi, une place pour tes proches.": {
+    "en": "Your own space, with room for your people.",
+    "de": "Dein eigener Raum, mit Platz für deine Freunde."
+  },
+  "Parler librement.": {
+    "en": "Speak freely.",
+    "de": "Frei sprechen."
+  },
+  "Tout simplement.": {
+    "en": "Simply.",
+    "de": "Ganz einfach."
+  },
+  "Un pseudo, des groupes privés et des conversations qui te ressemblent. Retrouve tes proches, partage un Buzz et laisse la discussion commencer.": {
+    "en": "A nickname, private groups and conversations that feel like you. Get your friends together, share a Buzz and let the conversation begin.",
+    "de": "Ein Pseudonym, private Gruppen und Gespräche, die zu dir passen. Bring deine Freunde zusammen, teile einen Buzz und lass das Gespräch beginnen."
+  },
+  "Aucun e-mail ni mot de passe à renseigner.": {
+    "en": "No email address or password to enter.",
+    "de": "Keine E-Mail-Adresse und kein Passwort nötig."
+  },
+  "Les proches": {
+    "en": "Close friends",
+    "de": "Freundeskreis"
+  },
+  "Un aperçu de TellMe": {
+    "en": "A glimpse of TellMe",
+    "de": "Ein Einblick in TellMe"
+  },
+  "On se retrouve ce soir ?": {
+    "en": "Shall we meet up tonight?",
+    "de": "Treffen wir uns heute Abend?"
+  },
+  "Oui, à 20 h. Je ramène de quoi grignoter.": {
+    "en": "Yes, at 8. I'll bring some snacks.",
+    "de": "Ja, um 20 Uhr. Ich bringe etwas zum Knabbern mit."
+  },
+  "Parfait. Et on choisit le film avec un Buzz ?": {
+    "en": "Perfect. Shall we pick the film with a Buzz?",
+    "de": "Perfekt. Wählen wir den Film mit einem Buzz aus?"
+  },
+  "À chaque groupe, sa conversation.": {
+    "en": "A conversation for every group.",
+    "de": "Für jede Gruppe ein eigenes Gespräch."
+  },
+  "Un lien suffit pour réunir tout le monde.": {
+    "en": "One link brings everyone together.",
+    "de": "Ein Link bringt alle zusammen."
+  },
+  "Ton pseudo, ton espace.": {
+    "en": "Your nickname, your space.",
+    "de": "Dein Pseudonym, dein Raum."
+  },
+  "Choisis comment tu apparais et discute à ton rythme.": {
+    "en": "Choose how you appear and chat at your own pace.",
+    "de": "Entscheide, wie du auftrittst, und chatte in deinem Tempo."
+  },
+  "Tes proches, réunis.": {
+    "en": "Your people, together.",
+    "de": "Deine Freunde, vereint."
+  },
+  "Crée un groupe et invite les bonnes personnes avec un lien.": {
+    "en": "Create a group and invite your people with a link.",
+    "de": "Erstelle eine Gruppe und lade deine Freunde über einen Link ein."
+  },
+  "Une question, un Buzz.": {
+    "en": "One question, one Buzz.",
+    "de": "Eine Frage, ein Buzz."
+  },
+  "Sonde le groupe, lance une idée et fais vivre les échanges.": {
+    "en": "Poll the group, share an idea and keep the conversation going.",
+    "de": "Frag die Gruppe, teile eine Idee und bringe das Gespräch in Gang."
+  },
+  "Envoi en cours": {
+    "en": "Sending",
+    "de": "Wird gesendet"
+  },
+  "Lu par tous": {
+    "en": "Read by everyone",
+    "de": "Von allen gelesen"
+  },
+  "Reçu par tous": {
+    "en": "Delivered to everyone",
+    "de": "Allen zugestellt"
+  },
+  "Envoyé": {
+    "en": "Sent",
+    "de": "Gesendet"
+  },
+  "Lu par": {
+    "en": "Read by",
+    "de": "Gelesen von"
+  },
+  "Reçu par": {
+    "en": "Delivered to",
+    "de": "Zugestellt an"
+  },
+  "En attente de réception": {
+    "en": "Waiting for delivery",
+    "de": "Zustellung ausstehend"
+  },
+  "Impossible de charger les lecteurs.": {
+    "en": "Unable to load message readers.",
+    "de": "Die Leser konnten nicht geladen werden."
+  },
+  "Pas encore lu": {
+    "en": "Not read yet",
+    "de": "Noch nicht gelesen"
   }
 };

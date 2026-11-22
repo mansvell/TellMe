@@ -1,3 +1,4 @@
+import DeliveryTracker from "./components/DeliveryTracker";
 import { Capacitor } from "@capacitor/core";
 import NativeNavigation from "./components/NativeNavigation";
 import { restoreDevicePreferences } from "./mobile/storage";
@@ -19,7 +20,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
             <NativeNavigation />
-            <LanguageRoot><AccountGuard><App /></AccountGuard></LanguageRoot>
+            <LanguageRoot><AccountGuard><DeliveryTracker /><App /></AccountGuard></LanguageRoot>
         </BrowserRouter>
     </React.StrictMode>
 );
