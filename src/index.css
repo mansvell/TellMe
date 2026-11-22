@@ -25,6 +25,7 @@ html {
 body {
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   background:
           radial-gradient(circle at top left, rgba(186, 230, 253, 0.45), transparent 35%),
@@ -49,6 +50,7 @@ button {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 @keyframes fadeIn {
 
