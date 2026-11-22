@@ -12,7 +12,7 @@ import {
 import {publishBuzzToGroup } from "../services/buzz";
 import icon from "../assets/icon.png";
 import QuestionShareCard from "../components/QuestionShareCard";
-import BottomNavigation from "../components/BottomNavigation";
+import TellMeHeader from "../components/TellMeHeader";
 
 import {
     getMyGroups,
@@ -676,59 +676,10 @@ export default function BuzzPage() {
 
     return (
 
-        <main className="relative min-h-screen overflow-x-hidden bg-slate-50 pb-28 text-slate-900 duration-500 dark:bg-slate-950 dark:text-white">
+        <main className="min-h-full bg-slate-100 pb-8 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+            <TellMeHeader />
 
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-[430px] bg-gradient-to-br from-sky-600 via-sky-500 to-cyan-400 dark:from-sky-950 dark:via-sky-900 dark:to-slate-900" />
-
-            <div className="pointer-events-none absolute inset-x-0 top-[250px] h-[220px] bg-gradient-to-b from-transparent via-slate-50/70 to-slate-50 dark:via-slate-950/70 dark:to-slate-950" />
-
-            <div className="pointer-events-none absolute -right-28 top-10 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-
-            <div className="pointer-events-none absolute -left-32 top-40 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
-
-            <header className="relative z-10 mx-auto max-w-7xl px-5 pt-6">
-
-                <div className="flex items-center justify-between">
-
-                    <div className="flex items-center gap-3">
-
-                        <img
-                            src={icon}
-                            alt="TellMe"
-                            className="h-16 w-16 object-contain drop-shadow-md"
-                        />
-
-                        <div>
-
-                            <div className="flex items-center gap-2">
-
-                                <h1 className="text-3xl font-black tracking-tight text-white">
-                                    TellMe
-                                </h1>
-
-                                <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur-xl">
-                                    Buzz
-                                </span>
-
-                            </div>
-
-                            <p className="mt-0.5 text-sm font-medium text-sky-100">
-                                 {t("Lance la discussion")} </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-white/15 text-white shadow-lg backdrop-blur-xl">
-                        <Flame size={23} />
-                    </div>
-
-                </div>
-
-            </header>
-
-            <section className="relative z-10 mx-auto mt-9 max-w-7xl px-5">
+            <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-5">
 
                 <div className="rounded-[1.5rem] border border-white/50 bg-white/90 p-1.5 shadow-xl shadow-sky-900/10 backdrop-blur-xl dark:border-slate-700/70 dark:bg-slate-900/90">
 
@@ -856,7 +807,7 @@ export default function BuzzPage() {
                                             className="flex items-center gap-3"
                                         >
 
-                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-sm font-black text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-sm font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300">
                                                 {String.fromCharCode(
                                                     65 + index,
                                                 )}
@@ -1075,7 +1026,7 @@ export default function BuzzPage() {
                             onClick={() =>
                                 void handleCreate()
                             }
-                            className="mt-6 flex h-15 w-full items-center justify-center gap-2 rounded-[1.3rem] bg-sky-500 font-black text-white shadow-xl shadow-sky-500/20 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-600 active:scale-[0.98] disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
+                            className="mt-6 flex h-15 w-full items-center justify-center gap-2 rounded-[1.3rem] bg-sky-500 font-bold text-white shadow-xl shadow-sky-500/20 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-600 active:scale-[0.98] disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-40"
                         >
 
                             <Flame size={20} />
@@ -1149,7 +1100,7 @@ export default function BuzzPage() {
                                                                     className={`h-4 w-4 rounded-full ${buzz.is_active ? "bg-emerald-500" : "bg-slate-400"}`}/>
 
                                                                 <span
-                                                                    className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                                                    className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                                                                     {buzz.is_active
                                                                         ? "Actif"
                                                                         : t("Fermé")}
@@ -1157,7 +1108,7 @@ export default function BuzzPage() {
 
                                                             </div>
 
-                                                            <h4 className="mt-1  font-black leading-5">
+                                                            <h4 className="mt-1  font-bold leading-5">
                                                                 {buzz.question}
                                                             </h4>
 
@@ -1267,7 +1218,7 @@ export default function BuzzPage() {
                                                                                 </span>
 
                                                                                 <span
-                                                                                    className="shrink-0 text-sm font-black text-sky-600 dark:text-sky-400">
+                                                                                    className="shrink-0 text-sm font-bold text-sky-600 dark:text-sky-400">
                                                                                     {option.votes}  {t("personne")} {option.votes !== 1 ? "s" : ""}
                                                                                     {" · "}
                                                                                     {percentage}%
@@ -1345,7 +1296,7 @@ export default function BuzzPage() {
                                     0,
                                 )}  {t("Questions ✦")} </div>
 
-                                <h2 className="mt-4 text-2xl font-black text-center">
+                                <h2 className="mt-4 text-2xl font-bold text-center">
                                      {t("✦ Choisis ton Mood ✦")} </h2>
 
                                 <p className="mt-2 max-w-xl text-sm font-medium text-center leading-6 text-slate-500">
@@ -1381,7 +1332,7 @@ export default function BuzzPage() {
 
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2">
-                                                        <h4 className="font-black text-slate-900 dark:text-white">
+                                                        <h4 className="font-bold text-slate-900 dark:text-white">
                                                             {t(category.name)}
                                                         </h4>
 
@@ -1413,7 +1364,7 @@ export default function BuzzPage() {
                                                                     key={`${category.id}-${index}`}
                                                                     className="group flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-sky-50 dark:hover:bg-sky-950/20"
                                                                 >
-                                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-black text-slate-400 dark:bg-slate-800">
+                                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-400 dark:bg-slate-800">
                                                                         {index + 1}
                                                                     </div>
 
@@ -1470,7 +1421,7 @@ export default function BuzzPage() {
                         </div>
 
 
-                        <h3 className="mt-4 text-center text-2xl font-black">
+                        <h3 className="mt-4 text-center text-2xl font-bold">
                              {t("Ton Buzz est prêt !")} </h3>
 
                         <p className="mt-2 text-center text-xl leading-6 text-slate-500 dark:text-slate-400">
@@ -1526,7 +1477,7 @@ export default function BuzzPage() {
                     <div className="max-h-[95vh] w-full overflow-y-auto rounded-t-[2rem] bg-white p-5 dark:bg-slate-900 sm:max-w-lg sm:rounded-[2rem]">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-xm font-black">
+                                <h2 className="text-xm font-bold">
                                      {t("Partage et obtiens des reponses")} </h2>
 
                             </div>
@@ -1577,7 +1528,7 @@ export default function BuzzPage() {
                                 selectedBuzzToShare,
                             )
                         }
-                            className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98]"
+                            className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98]"
                         >
                             <Share2 size={19} />
                             {sharingBuzz ? t("Préparation…") : t("Partager en statut")}
@@ -1602,7 +1553,7 @@ export default function BuzzPage() {
                     >
 
                         <div className="mt-4 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 p-5 text-white">
-                            <p className="mt-2 text-lg font-black text-center leading-6">
+                            <p className="mt-2 text-lg font-bold text-center leading-6">
                                 {selectedQuestion}
                             </p>
                         </div>
@@ -1610,7 +1561,7 @@ export default function BuzzPage() {
                         {groups.length > 0 ? (
                             <>
                                 <div className="mt-6">
-                                    <p className="text-sm font-black text-slate-900 dark:text-white">
+                                    <p className="text-sm font-bold text-slate-900 dark:text-white">
                                          {t("Choisis un groupe :")} </p>
                                 </div>
 
@@ -1643,7 +1594,7 @@ export default function BuzzPage() {
                                                 </div>
 
                                                 <div className="min-w-0 flex-1">
-                                                    <p className="truncate font-black text-slate-800 dark:text-white">
+                                                    <p className="truncate font-bold text-slate-800 dark:text-white">
                                                         {group.name}
                                                     </p>
 
@@ -1673,7 +1624,7 @@ export default function BuzzPage() {
                                             !selectedQuestionGroupId ||
                                             sendingQuestion
                                         }
-                                        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-3 text-sm font-black text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+                                        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-3 text-sm font-bold text-white shadow-lg shadow-sky-500/20 transition hover:bg-sky-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                                     >
                                         <MessageCircle size={18}/>
 
@@ -1689,7 +1640,7 @@ export default function BuzzPage() {
                                             !selectedQuestionGroupId ||
                                             sharingQuestion
                                         }
-                                        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-3 text-sm font-black text-white transition hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900"
+                                        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-slate-900 px-3 text-sm font-bold text-white transition hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-slate-900"
                                     >
                                         <Share2 size={18}/>
 
@@ -1711,7 +1662,7 @@ export default function BuzzPage() {
                                     <Users/>
                                 </div>
 
-                                <h3 className="mt-4 font-black text-slate-900 dark:text-white">
+                                <h3 className="mt-4 font-bold text-slate-900 dark:text-white">
                                      {t("Tu n'as encore aucun groupe")} </h3>
 
                                 <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-slate-500 dark:text-slate-400">
@@ -1720,7 +1671,7 @@ export default function BuzzPage() {
                                 <button
                                     type="button"
                                     onClick={() => {navigate('/home') }}
-                                    className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-5 font-black text-white"
+                                    className="mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-sky-500 px-5 font-bold text-white"
                                 >
                                     <Plus size={18}/>
                                      {t("Créer un groupe")} </button>
@@ -1729,7 +1680,6 @@ export default function BuzzPage() {
                     </div>
                 </div>
             )}
-            <BottomNavigation active="buzz"/>
         </main>
     );
 }
@@ -1861,7 +1811,7 @@ function EmptyBuzz({
                 <Vote/>
             </div>
 
-            <h4 className="mt-5 text-xl font-black">
+            <h4 className="mt-5 text-xl font-bold">
                  {t("Aucun Buzz pour le moment.")} </h4>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">

@@ -16,7 +16,6 @@ import {
 
 import {useEffect, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import BottomNavigation from "../components/BottomNavigation.tsx";
 import { supabase } from "../lib/supabase";
 
 import {
@@ -712,7 +711,7 @@ export default function SettingsPage() {
 
         return (
 
-            <main className="flex min-h-screen items-center justify-center bg-slate-100">
+            <main className="flex min-h-full items-center justify-center bg-slate-100 dark:bg-slate-800">
 
                 <LoaderCircle
                     size={34}
@@ -728,7 +727,7 @@ export default function SettingsPage() {
 
         return (
 
-            <main className="flex min-h-screen items-center justify-center bg-slate-100 p-5">
+            <main className="flex min-h-full items-center justify-center bg-slate-100 dark:bg-slate-800 p-5">
 
                 <div className="max-w-md rounded-3xl bg-white p-8 text-center shadow-sm">
 
@@ -751,9 +750,9 @@ export default function SettingsPage() {
 
     return (
 
-        <main className="min-h-screen bg-slate-100 pb-28 dark:bg-slate-800">
+        <main className="min-h-full bg-slate-100 pb-8 dark:bg-slate-800">
 
-            <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-700">
+            <header className="sticky top-0 z-30 bg-white dark:bg-slate-700">
 
                 <div className="mx-auto flex h-16 max-w-4xl items-center justify-center px-5">
 
@@ -781,14 +780,8 @@ export default function SettingsPage() {
                     <div className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full bg-black/5"/>
 
 
-                    <div className="relative">
-
-                        <p className="text-xs font-bold uppercase tracking-[0.22em] text-white/70">
-                            TellMe
-                        </p>
-
-
-                        <h2 className="mt-5 break-words text-3xl font-black tracking-tight text-white sm:text-4xl">
+                    <div className="relative text-center">
+                        <h2 className="break-words text-3xl font-bold tracking-tight text-white sm:text-4xl">
                             {profile.displayName}
                         </h2>
 
@@ -933,9 +926,6 @@ export default function SettingsPage() {
 
                 <p className="pb-3 text-center text-xm leading-5 text-slate-400">
                      {t("TellMe, l'App qui révolutionne l'Anonymat et le Fun")} </p>
-                <p className=" text-center text-xm leading-5 text-slate-400">
-                    ✦ 2026 - Mansvell Nkwanga✦
-                </p>
 
             </section>
 
@@ -1039,10 +1029,6 @@ export default function SettingsPage() {
             )}
 
 
-
-            <BottomNavigation
-                active="settings"
-            />
 
         </main>
     );

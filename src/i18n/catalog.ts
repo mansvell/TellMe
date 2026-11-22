@@ -2018,5 +2018,33 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Pas encore lu": {
     "en": "Not read yet",
     "de": "Noch nicht gelesen"
+  },
+  "Navigation principale": {
+    "en": "Main navigation",
+    "de": "Hauptnavigation"
+  },
+  "Impossible de charger les groupes.": {
+    "en": "Could not load your groups.",
+    "de": "Die Gruppen konnten nicht geladen werden."
+  },
+  "Discute sous pseudo avec tes proches.": {
+    "en": "Chat with friends using a nickname.",
+    "de": "Schreib deinen Freunden unter einem Spitznamen."
+  },
+  "Liens d’invitation": {
+    "en": "Invite links",
+    "de": "Einladungslinks"
+  },
+  "Sondages Buzz": {
+    "en": "Buzz polls",
+    "de": "Buzz-Umfragen"
+  },
+  "Questions à partager": {
+    "en": "Shareable questions",
+    "de": "Fragen zum Teilen"
+  },
+  "Découvrir": {
+    "en": "Discover",
+    "de": "Entdecken"
   }
 };

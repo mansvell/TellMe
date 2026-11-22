@@ -1,6 +1,7 @@
 import {Routes, Route, Navigate} from "react-router-dom";
 
 import DiscoverPage from "./pages/DiscoverPage";
+import AppTabsLayout from "./components/AppTabsLayout";
 import SplashPage from "./pages/SplashPage.tsx";
 import WelcomePage from "./pages/WelcomePage";
 import RegisterPage from "./pages/RegisterPage.tsx";
@@ -35,8 +36,13 @@ export default function App() {
 
           <Route path="/notif" element={<PublicOnlyRoute> <NotificationPage/> </PublicOnlyRoute>} />
 
-          <Route path="/discover" element={<ProtectedRoute><DiscoverPage /></ProtectedRoute>} />
-          <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+          <Route element={<ProtectedRoute><AppTabsLayout /></ProtectedRoute>}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/invit" element={<InvitationsPage />} />
+              <Route path="/discover" element={<DiscoverPage />} />
+              <Route path="/buzz" element={<BuzzPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+          </Route>
           <Route path="/chat/:groupId" element={<ProtectedRoute> <ChatPage/> </ProtectedRoute>} />
           <Route path="/gdetailp/:groupId" element={<ProtectedRoute> <GroupDetailsPage /> </ProtectedRoute>} />
 
@@ -44,16 +50,12 @@ export default function App() {
           <Route path="/media/:groupId" element={<ProtectedRoute><MediaPage /></ProtectedRoute>} />
           <Route path="/custom/:groupId" element={<ProtectedRoute><CustomizationPage /></ProtectedRoute>} />
 
-          <Route path="/invit" element={<ProtectedRoute><InvitationsPage /></ProtectedRoute>} />
-          <Route path="/settings" element={<ProtectedRoute> <SettingsPage/> </ProtectedRoute>} />
-
           <Route path="/join/preview" element={<JoinPreviewPage/>} />
           <Route path="/join/:inviteCode" element={<JoinPreviewPage />}/>
 
           <Route path="/privacy" element={<PrivacyPage/>}/>
            <Route path="/terms" element={<TermsPage/>}/>
 
-          <Route path="/buzz" element={<ProtectedRoute><BuzzPage /></ProtectedRoute>}/>
           <Route path="/b/:shareCode" element={<VoteBuzz />}/>
 
           <Route path="*" element={<Navigate to="/" replace />}/>

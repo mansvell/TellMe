@@ -3,7 +3,6 @@ import { Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, X,
 
 import {useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
-import BottomNavigation from "../components/BottomNavigation";
 import { supabase } from "../lib/supabase";
 
 import {
@@ -304,9 +303,9 @@ export default function InvitationsPage() {
     }
 
     return (
-        <main className="min-h-screen bg-slate-100 dark:bg-slate-900 pb-28">
+        <main className="min-h-full bg-slate-100 pb-8 dark:bg-slate-900">
 
-            <header className="sticky top-0 z-20 border-b border-slate-200 bg-white dark:bg-slate-700 ">
+            <header className="sticky top-0 z-20 bg-white dark:bg-slate-800">
 
                     <div className="flex items-center justify-center gap-3 p-2">
 
@@ -476,10 +475,6 @@ export default function InvitationsPage() {
                 )}
 
             </section>
-
-            <BottomNavigation
-                active="invitations"
-            />
 
         </main>
     );
