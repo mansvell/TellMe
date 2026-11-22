@@ -24,6 +24,7 @@ export type Group = {
     created_at: string;
     members_count: number;
     unread_count: number;
+    lastActivityAt: number;
 };
 
 type DatabaseGroup = {
@@ -36,10 +37,11 @@ type DatabaseGroup = {
     expires_at: string | null;
     created_at: string;
     group_members: { count: number }[];
+    latest_message: { created_at: string }[];
 };
 
 type MembershipWithGroup = {
-    group_id: string;
+    joined_at: string;
     groups: DatabaseGroup | DatabaseGroup[] | null;
 };
 type UnreadCountRow = {
@@ -157,137 +159,58 @@ export async function createGroup(
 }
 
 export async function getMyGroups(): Promise<Group[]> {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!user) throw new Error(t("Utilisateur introuvable."));
 
-    const {
-        data: { user },
-        error: userError,
-    } = await supabase.auth.getUser();
+    const [memberships, unread] = await Promise.all([
+        supabase.from("group_members")
+            .select(`
+                joined_at,
+                groups (
+                    id,
+                    name,
+                    color,
+                    dominus_id,
+                    invite_code,
+                    lifetime_minutes,
+                    expires_at,
+                    created_at,
+                    group_members(count),
+                    latest_message:messages(created_at)
+                )
+            `)
+            .eq("user_id", user.id)
+            .eq("status", "active")
+            .is("groups.latest_message.deleted_at", null)
+            .order("created_at", { referencedTable: "groups.latest_message", ascending: false })
+            .limit(1, { referencedTable: "groups.latest_message" })
+            .order("joined_at", { ascending: false }),
+        supabase.rpc("get_my_unread_counts"),
+    ]);
 
-    if (userError) {
-        throw userError;
-    }
+    if (memberships.error) throw memberships.error;
+    if (unread.error) throw unread.error;
 
-    if (!user) {
-        throw new Error(
-            t("Utilisateur introuvable."),
-        );
-    }
-
-    // Groupes auxquels le user appartient.
-    const {
-        data,
-        error,
-    } = await supabase
-        .from("group_members")
-        .select(`
-            group_id,
-            groups (
-                id,
-                name,
-                color,
-                dominus_id,
-                invite_code,
-                lifetime_minutes,
-                expires_at,
-                created_at,
-                group_members(count)
-            )
-        `)
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .order(
-            "joined_at",
-            {
-                ascending: false,
-            },
-        );
-
-    if (error) {
-        throw error;
-    }
-
-
-    // Compteurs non lus de tous les groupes.
-    const {
-        data: unreadData,
-        error: unreadError,
-    } = await supabase.rpc(
-        "get_my_unread_counts",
+    const unreadCounts = new Map(
+        ((unread.data ?? []) as UnreadCountRow[]).map(row => [row.group_id, Number(row.unread_count)]),
     );
-
-    if (unreadError) {
-        throw unreadError;
-    }
-
-
-    const unreadMap =
-        new Map<string, number>();
-
-
-    for (
-        const row of
-        (unreadData ?? []) as UnreadCountRow[]
-        ) {
-
-        unreadMap.set(
-            row.group_id,
-            Number(row.unread_count),
-        );
-    }
-
-    // Construction finale des cartes Home.
-    return (
-        (data ?? []) as unknown as MembershipWithGroup[]
-    ).flatMap((membership) => {
-
-        if (!membership.groups) {
-            return [];
-        }
-
-        const group =
-            Array.isArray(
-                membership.groups,
-            )
-                ? membership.groups[0]
-                : membership.groups;
-
-
-        if (!group) {
-            return [];
-        }
-
+    return ((memberships.data ?? []) as unknown as MembershipWithGroup[]).flatMap(membership => {
+        const group = Array.isArray(membership.groups) ? membership.groups[0] : membership.groups;
+        if (!group) return [];
 
         return [{
             id: group.id,
             name: group.name,
             color: group.color,
-
-            dominus_id:
-            group.dominus_id,
-
-            invite_code:
-            group.invite_code,
-
-            lifetime_minutes:
-            group.lifetime_minutes,
-
-            expires_at:
-            group.expires_at,
-
-            created_at:
-            group.created_at,
-
-
-            // Nombre réel de membres.
-            members_count:
-                group.group_members?.[0]?.count ??
-                0,
-
-
-            // Nombre réel de messages non lus.
-            unread_count:
-                unreadMap.get(group.id) ??
-                0,
+            dominus_id: group.dominus_id,
+            invite_code: group.invite_code,
+            lifetime_minutes: group.lifetime_minutes,
+            expires_at: group.expires_at,
+            created_at: group.created_at,
+            members_count: group.group_members?.[0]?.count ?? 0,
+            unread_count: unreadCounts.get(group.id) ?? 0,
+            lastActivityAt: Date.parse(group.latest_message?.[0]?.created_at ?? membership.joined_at ?? group.created_at),
         }];
     });
 }

@@ -266,63 +266,6 @@ export async function updateInvitationsEnabled(
 
 
 // ============================================================
-// RÉCUPÈRE LE PARAMÈTRE ACTUEL
-// ============================================================
-
-export async function getInvitationsEnabled():
-    Promise<boolean> {
-
-    const {
-        data: { user },
-        error: userError,
-    } =
-        await supabase.auth.getUser();
-
-
-    if (userError) {
-
-        throw userError;
-    }
-
-
-    if (!user) {
-
-        throw new Error(
-            t("Utilisateur introuvable."),
-        );
-    }
-
-
-    const {
-        data,
-        error,
-    } =
-        await supabase
-            .from("profiles")
-            .select(
-                "invitations_enabled",
-            )
-            .eq(
-                "id",
-                user.id,
-            )
-            .single();
-
-
-    if (error) {
-
-        throw error;
-    }
-
-
-    return (
-        data.invitations_enabled ??
-        true
-    );
-}
-
-
-// ============================================================
 // NORMALISE UNE INVITATION SUPABASE
 // ============================================================
 

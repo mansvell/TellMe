@@ -1,123 +1,56 @@
-// Reçoit une notification push.
-self.addEventListener("push", (event) => {
-
-    if (!event.data) {
-        return;
-    }
-    let payload;
-    try {
-        payload =
-            event.data.json();
-
-    } catch {
-        payload = {
-            title: "TellMe",
-            body: "Tu as reçu un nouveau message.",
-            groupId: null,
-        };
-    }
-
-    const groupId =
-        payload.groupId ?? null;
-
-    const title =
-        payload.title ?? "TellMe";
-
-    const options = {
-        // Texte principal.
-        body:
-            payload.body ??
-            "Tu as reçu un nouveau message.",
-
-        // Logo principal TellMe.
-        icon:
-            "/tellme-icon.png",
-
-        // Petite icône système.
-        badge:
-            "/tellme-icon.png",
-
-        // Regroupe les notifications du même groupe.
-        tag:
-            groupId
-                ? `tellme-chat-${groupId}`
-                : "tellme-message",
-
-        // Une nouvelle notification du groupe
-        // remplace/actualise la précédente.
-        renotify: true,
-
-        // Vibration mobile.
-        vibrate: [
-            150,
-            80,
-            150,
-        ],
-
-        // Informations utilisées au clic.
-        data: {
-            groupId,
-            url:
-                groupId
-                    ? `/chat/${groupId}`
-                    : "/home",
-        },
-    };
-
-    event.waitUntil(
-        self.registration.showNotification(
-            title,
-            options,
-        ),
-    );
+self.addEventListener("install", event => {
+    event.waitUntil(self.skipWaiting());
 });
 
-// CLIC SUR LA NOTIFICATION
-self.addEventListener(
-    "notificationclick",
-    (event) => {
-        event.notification.close();
-        const targetUrl =
-            event.notification.data?.url ??
-            "/home";
+self.addEventListener("activate", event => {
+    event.waitUntil(self.clients.claim());
+});
 
-        // Transforme /chat/... en URL complète.
-        const destination =
-            new URL(
-                targetUrl,
-                self.location.origin,
-            ).href;
+function chatPath(groupId) {
+    return typeof groupId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(groupId)
+        ? `/chat/${groupId}`
+        : "/home";
+}
 
-        event.waitUntil(
-            clients
-                .matchAll({
-                    type: "window",
-                    includeUncontrolled: true,
-                })
-                .then(
-                    async (windowClients) => {
-                        // TellMe est déjà ouvert.
-                        for (
-                            const client
-                            of windowClients
-                            ) {
+self.addEventListener("push", event => {
+    let payload = {};
+    try {
+        payload = event.data?.json() ?? {};
+    } catch {
+        // Affiche aussi une notification si le serveur n'envoie pas de JSON.
+    }
 
-                            if (
-                                "navigate" in client
-                            ) {
+    const { title, body, groupId } = payload;
+    const url = chatPath(groupId);
+    event.waitUntil(self.registration.showNotification(
+        typeof title === "string" && title.trim() ? title : "TellMe",
+        {
+            body: typeof body === "string" && body.trim() ? body : "Tu as reçu un nouveau message.",
+            icon: "/tellme-icon-192.png",
+            badge: "/tellme-icon-192.png",
+            tag: url === "/home" ? "tellme-message" : `tellme-chat-${groupId}`,
+            renotify: true,
+            vibrate: [150, 80, 150],
+            data: { groupId },
+        },
+    ));
+});
 
-                                await client.navigate(
-                                    destination,
-                                );
-                                return client.focus();
-                            }
-                        }
-                        // TellMe n'est pas ouvert.
-                        return clients.openWindow(
-                            destination,
-                        );
-                    },
-                ),
-        );
-    },
-);
+self.addEventListener("notificationclick", event => {
+    event.notification.close();
+    const destination = new URL(chatPath(event.notification.data?.groupId), self.location.origin).href;
+    event.waitUntil((async () => {
+        const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+        const match = windows.find(client => client.url === destination);
+        if (match) return match.focus();
+        for (const client of windows) {
+            try {
+                const opened = await client.navigate(destination);
+                if (opened) return opened.focus();
+            } catch {
+                // Un onglet déjà fermé ne doit pas empêcher l'ouverture du chat.
+            }
+        }
+        return self.clients.openWindow(destination);
+    })());
+});

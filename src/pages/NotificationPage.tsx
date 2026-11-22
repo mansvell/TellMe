@@ -1,99 +1,23 @@
-import { Capacitor } from "@capacitor/core";
 import { t } from "../i18n/runtime";
 import {BellRing, Check, LoaderCircle, LockKeyhole, MessageCircle} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import icon from "../assets/icon.png";
-import { supabase } from "../lib/supabase";
-import {useState} from "react";
+import usePushNotifications from "../hooks/usePushNotifications";
 
 
 export default function NotificationPage() {
     const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const push = usePushNotifications();
+    const preparing = push.status === "checking";
+    const canEnable = push.status === "disabled" || push.status === "enabled";
 
-    async function savePreference(enabled: boolean) {
-        const {
-            data: { user },
-            error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError) throw userError;
-
-        if (!user) {
-            throw new Error(t("Utilisateur introuvable."));
-        }
-
-        const { error: updateError } = await supabase
-            .from("profiles")
-            .update({
-                notifications_enabled: enabled,
-            })
-            .eq("id", user.id);
-
-        if (updateError) throw updateError;
+    function continueToHome() {
+        navigate("/home", { replace: true });
     }
 
     async function enableNotifications() {
-        setLoading(true);
-        setErrorMessage("");
-
-        try {
-            if (Capacitor.isNativePlatform()) {
-                setErrorMessage(t("Les notifications ne sont pas encore disponibles sur cette version mobile."));
-                return;
-            }
-            if (!("Notification" in window)) {
-                throw new Error(
-                    t("Les notifications ne sont pas prises en charge par ce navigateur."),
-                );
-            }
-
-            const permission = await Notification.requestPermission();
-            const enabled = permission === "granted";
-
-            await savePreference(enabled);
-
-            if (!enabled) {
-                setErrorMessage(
-                    t("L’autorisation n’a pas été accordée. Tu pourras l’activer plus tard."),
-                );
-                return;
-            }
-
-            navigate("/home", { replace: true });
-        } catch (error) {
-            console.error("Notification error:", error);
-
-            setErrorMessage(
-                error instanceof Error
-                    ? error.message
-                    : t("Impossible d’enregistrer ce choix."),
-            );
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function skipNotifications() {
-        setLoading(true);
-        setErrorMessage("");
-
-        try {
-            await savePreference(false);
-            navigate("/home", { replace: true });
-        } catch (error) {
-            console.error("Notification preference error:", error);
-
-            setErrorMessage(
-                error instanceof Error
-                    ? error.message
-                    : t("Impossible d’enregistrer ce choix."),
-            );
-        } finally {
-            setLoading(false);
-        }
+        if (push.status === "enabled" || await push.change(true)) continueToHome();
     }
 
     return (
@@ -150,34 +74,26 @@ export default function NotificationPage() {
                                  {t("Tu pourras modifier ce choix à tout moment dans les paramètres.")} </p>
                         </div>
 
-                        {errorMessage && (
-                            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                                {errorMessage}
-                            </div>
-                        )}
-                        <button disabled={loading}
-                            onClick={enableNotifications}
-                            className="mt-8 flex h-14 items-center justify-center gap-2 rounded-2xl bg-sky-500 font-bold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-600 active:scale-[0.98]"
-                        >
-                            {loading ? (
-                                <>
-                                    <LoaderCircle
-                                        size={20}
-                                        className="animate-spin"
-                                    />
-                                     {t("Chargement...")} </>
-                            ) : (
-                                <>
-                                    <BellRing size={20} />
-                                     {t("Autoriser les notifications")} </>
-                            )}
-                        </button>
+                        {push.description && <p role="status" className="mt-5 text-sm leading-6 text-slate-600">{push.description}</p>}
+                        {push.error && <p role="alert" className="mt-5 text-sm text-red-600">{push.error}</p>}
 
-                        <button
-                            onClick={skipNotifications}
-                            className="mt-3 h-12 rounded-2xl font-semibold text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
-                        >
-                             {t("Pas maintenant")} </button>
+                        {(preparing || canEnable) && (
+                            <button type="button" disabled={preparing || push.saving} onClick={() => void enableNotifications()}
+                                className="mt-8 flex h-14 items-center justify-center gap-2 rounded-2xl bg-sky-600 font-bold text-white hover:bg-sky-700 disabled:opacity-60">
+                                {preparing || push.saving ? <LoaderCircle size={20} className="animate-spin" /> : <BellRing size={20} />}
+                                {preparing || push.saving ? t("Chargement...") : t("Autoriser les notifications")}
+                            </button>
+                        )}
+                        {push.status === "unavailable" && (
+                            <button type="button" onClick={push.retry} className="mt-4 text-sm font-semibold text-sky-700">
+                                {t("Réessayer")}
+                            </button>
+                        )}
+
+                        <button type="button" disabled={push.saving} onClick={continueToHome}
+                            className="mt-3 h-12 rounded-2xl font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-800">
+                            {preparing || canEnable ? t("Pas maintenant") : t("Continuer")}
+                        </button>
                     </div>
                 </section>
             </div>

@@ -34,7 +34,7 @@ export default function App() {
           <Route path="/welcome" element={<PublicOnlyRoute><WelcomePage /></PublicOnlyRoute>} />
           <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
-          <Route path="/notif" element={<PublicOnlyRoute> <NotificationPage/> </PublicOnlyRoute>} />
+          <Route path="/notif" element={<ProtectedRoute><NotificationPage /></ProtectedRoute>} />
 
           <Route element={<ProtectedRoute><AppTabsLayout /></ProtectedRoute>}>
               <Route path="/home" element={<HomePage />} />

@@ -10,11 +10,13 @@ import App from "./App";
 import AccountGuard from "./components/AccountGuard";
 import "./index.css";
 import { initializeTheme } from "./services/theme";
+import { prepareWebPush } from "./services/pushNotifications";
 
 //ca Charge le thème enregistré avant l'affichage
 await restoreDevicePreferences().catch(() => { console.error("Could not restore app preferences."); });
 initializeTheme();
 document.documentElement.classList.toggle("native-app", Capacitor.isNativePlatform());
+prepareWebPush();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>

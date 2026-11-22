@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import icon from "../assets/icon.png";
 import TellMeHeader from "../components/TellMeHeader";
 import { t } from "../i18n/runtime";
+import { supabase } from "../lib/supabase";
 import { getMyGroups, type Group } from "../services/group";
 import NewGroup from "./NewGroup";
 
@@ -17,31 +18,73 @@ export default function HomePage() {
 
     useEffect(() => {
         let active = true;
+        let hasLoaded = false;
+        let request = 0;
+        let timer: number | undefined;
+        const latestEvents = new Map<string, number>();
 
-        getMyGroups().then(data => {
-            if (active) {
-                setGroups(data);
+        async function loadGroups() {
+            const current = ++request;
+            try {
+                const data = await getMyGroups();
+                if (!active || current !== request) return;
+                hasLoaded = true;
+                setGroups(data.map(group => ({
+                    ...group,
+                    lastActivityAt: Math.max(group.lastActivityAt, latestEvents.get(group.id) ?? 0),
+                })));
                 setFailed(false);
+            } catch (error) {
+                console.error("Erreur chargement groupes :", error);
+                if (active && current === request && !hasLoaded) setFailed(true);
+            } finally {
+                if (active && current === request) setLoading(false);
             }
-        }).catch(error => {
-            console.error("Erreur chargement groupes :", error);
-            if (active) setFailed(true);
-        }).finally(() => {
-            if (active) setLoading(false);
-        });
+        }
 
-        return () => { active = false; };
+        function refresh() {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(() => void loadGroups(), 150);
+        }
+
+        const channel = supabase.channel("home-activity")
+            .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, ({ new: message }) => {
+                if (!active) return;
+                const activity = Date.parse(message.created_at);
+                if (message.deleted_at || typeof message.group_id !== "string" || !Number.isFinite(activity)) return;
+                const groupId = message.group_id;
+                if (activity <= (latestEvents.get(groupId) ?? 0)) return;
+                latestEvents.set(groupId, activity);
+                setGroups(current => current.map(group => group.id === groupId && activity > group.lastActivityAt
+                    ? { ...group, lastActivityAt: activity }
+                    : group));
+                refresh();
+            })
+            .subscribe(status => { if (status === "SUBSCRIBED") refresh(); });
+
+        const onVisible = () => { if (document.visibilityState === "visible") refresh(); };
+        document.addEventListener("visibilitychange", onVisible);
+        window.addEventListener("focus", onVisible);
+        void loadGroups();
+        return () => {
+            active = false;
+            window.clearTimeout(timer);
+            document.removeEventListener("visibilitychange", onVisible);
+            window.removeEventListener("focus", onVisible);
+            void supabase.removeChannel(channel);
+        };
     }, [reloadGroups]);
 
     const query = search.trim().toLowerCase();
-    const visibleGroups = groups.filter(group => group.name.toLowerCase().includes(query));
+    const visibleGroups = groups.filter(group => group.name.toLowerCase().includes(query))
+        .sort((a, b) => b.lastActivityAt - a.lastActivityAt);
     function reload() {
         setLoading(true);
         setReloadGroups(value => value + 1);
     }
 
     return (
-        <main className="flex h-full min-h-0 flex-col bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">
+        <main className="tellme-tab-surface flex h-full min-h-0 flex-col bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">
             <TellMeHeader />
 
             <section aria-labelledby="discussions-title" className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col">

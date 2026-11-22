@@ -2046,5 +2046,41 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Découvrir": {
     "en": "Discover",
     "de": "Entdecken"
+  },
+  "Partage les dans tes groupes ou en Statut/Story": {
+    "en": "Share them in your groups or as a status or story",
+    "de": "Teile sie in deinen Gruppen oder als Status oder Story"
+  },
+  "Sur iPhone ou iPad, ajoute TellMe à l’écran d’accueil depuis Partager, puis ouvre son icône.": {
+    "en": "On iPhone or iPad, choose Add to Home Screen from the Share menu, then open TellMe from its icon.",
+    "de": "Wähle auf dem iPhone oder iPad im Teilen-Menü „Zum Home-Bildschirm“ und öffne TellMe über das Symbol."
+  },
+  "Impossible de préparer les notifications. Réessaie.": {
+    "en": "Could not prepare notifications. Please try again.",
+    "de": "Die Benachrichtigungen konnten nicht vorbereitet werden. Versuch es erneut."
+  },
+  "Autorise les notifications pour TellMe dans les réglages de ton appareil ou de ton navigateur.": {
+    "en": "Allow TellMe notifications in your device or browser settings.",
+    "de": "Erlaube Benachrichtigungen für TellMe in den Geräte- oder Browsereinstellungen."
+  },
+  "Les notifications sont indisponibles pour le moment.": {
+    "en": "Notifications are currently unavailable.",
+    "de": "Benachrichtigungen sind derzeit nicht verfügbar."
+  },
+  "Recevoir les notifications des conversations sur cet appareil.": {
+    "en": "Receive conversation notifications on this device.",
+    "de": "Chat-Benachrichtigungen auf diesem Gerät erhalten."
+  },
+  "Pour recevoir les notifications, ajoute TellMe à l’écran d’accueil avant de t’inscrire.": {
+    "en": "For notifications, add TellMe to your Home Screen before signing up.",
+    "de": "Füge TellMe vor der Registrierung zum Home-Bildschirm hinzu, um Benachrichtigungen zu erhalten."
+  },
+  "Continuer": {
+    "en": "Continue",
+    "de": "Weiter"
+  },
+  "Un compte créé dans Safari reste lié à Safari. L’inscription depuis l’icône crée un compte distinct.": {
+    "en": "An account created in Safari stays in Safari. Signing up from the Home Screen icon creates a separate account.",
+    "de": "Ein in Safari erstelltes Konto bleibt mit Safari verknüpft. Die Registrierung über das Home-Bildschirm-Symbol erstellt ein separates Konto."
   }
 };

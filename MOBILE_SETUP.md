@@ -62,6 +62,12 @@ Le workflow GitHub **TellMe mobile builds** construit aussi une application pour
 
 Les modifications de l'interface web ne mettent pas automatiquement à jour un APK déjà installé. Après une modification, reconstruire puis distribuer la nouvelle application native.
 
+## Notifications du site sur téléphone
+
+Sur Android, ouvre le site HTTPS dans un navigateur compatible avec Web Push, puis active **Paramètres → Notifications**. Sur iPhone et iPad, ajoute TellMe à l’écran d’accueil depuis **Partager**, ouvre son icône et active le même réglage. Pour un nouveau compte sur iPhone ou iPad, effectue l’inscription depuis l’icône. Un compte anonyme déjà enregistré dans Safari reste lié à la session de Safari.
+
+Pour vérifier la réception, place le destinataire dans un groupe avec un deuxième compte, mets TellMe en arrière-plan et envoie un message avec ce deuxième compte. La notification doit ouvrir la conversation en question. La désactivation du réglage retire uniquement l’abonnement de l’appareil utilisé. Les abonnements du site réutilisent la clé publique VAPID et le service d’envoi existants.
+
 ## Vérifications
 
 `npm run test:mobile` couvre les liens publics, les liens entrants autorisés, le partage d'image et sa légende, l'annulation, le stockage de session et la continuité de navigation pendant le contrôle du compte. La compilation native et le partage WhatsApp doivent aussi être essayés sur de vrais appareils avant une diffusion publique.

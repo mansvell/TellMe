@@ -1,5 +1,5 @@
 import { t } from "../i18n/runtime";
-import { Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, X, XCircle} from "lucide-react";
+import { Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, UserRoundPlus, X, XCircle} from "lucide-react";
 
 import {useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
@@ -321,9 +321,13 @@ export default function InvitationsPage() {
             </header>
 
             <section className="mx-auto max-w-5xl p-4 sm:p-5">
-                <button type="button" onClick={() => navigate("/discover")} className="mb-6 flex w-full items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">{t("Trouver d’autres utilisateurs")} <span aria-hidden="true">↗</span></button>
+                <button type="button" onClick={() => navigate("/discover")}
+                    className="mb-6 flex w-full items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">
+                    {t("Trouver d’autres utilisateurs")}
+                    <UserRoundPlus size={22} className="shrink-0" aria-hidden="true" />
+                </button>
                 <div
-                    className="rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 p-5 text-white shadow-lg shadow-sky-100 sm:p-7">
+                    className="rounded-3xl bg-linear-to-br from-sky-600 to-blue-700 p-5 text-white sm:p-7 dark:bg-none dark:bg-slate-700">
 
                 <div className="flex items-start gap-4">
 
@@ -335,7 +339,7 @@ export default function InvitationsPage() {
                             <h2 className="text-xl font-bold sm:text-2xl">
                                  {t("Conversations privées")} </h2>
 
-                            <p className="mt-2 max-w-xl text-sm leading-6 text-sky-100">
+                            <p className="mt-2 max-w-xl text-sm leading-6 text-sky-100 dark:text-slate-200">
                                  {t("Une nouvelle conversation n’est créée que lorsque l’invitation est acceptée.")} </p>
 
                         </div>
@@ -1036,14 +1040,14 @@ function EmptyState({
                 {icon}
             </div>
 
-            <h2 className="mt-5 text-xl font-bold text-slate-800">
+            <h2 className="mt-5 text-xl font-bold text-slate-800 dark:text-slate-100">
 
                 {title}
 
             </h2>
 
 
-            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
+            <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-300">
 
                 {description}
 

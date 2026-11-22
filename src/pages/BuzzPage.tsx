@@ -676,7 +676,7 @@ export default function BuzzPage() {
 
     return (
 
-        <main className="min-h-full bg-slate-100 pb-8 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+        <main className="tellme-tab-surface min-h-full bg-white pb-8 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
             <TellMeHeader />
 
             <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-5">
@@ -1286,23 +1286,9 @@ export default function BuzzPage() {
 
                 {tab === "results" && (
                     <div className="mt-5">
-                        <div className="relative overflow-hidden rounded-[2rem] p-4 text-white  backdrop-blur-xl">
-                            <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl"/>
-
-                            <div className="relative">
-                                <div className="flex items-center justify-center rounded-2xl bg-white/15 text-2xl">
-                                    ✦ {QUESTION_CATEGORIES.reduce(
-                                    (total, category) => total + category.questions.length,
-                                    0,
-                                )}  {t("Questions ✦")} </div>
-
-                                <h2 className="mt-4 text-2xl font-bold text-center">
-                                     {t("✦ Choisis ton Mood ✦")} </h2>
-
-                                <p className="mt-2 max-w-xl text-sm font-medium text-center leading-6 text-slate-500">
-                                     {t("Partage les dans tes groupes ou en Story")} </p>
-                            </div>
-                        </div>
+                        <h2 className="px-1 pt-2 text-base font-semibold text-slate-700 dark:text-slate-200">
+                            {t("Partage les dans tes groupes ou en Statut/Story")}
+                        </h2>
 
                         <div className="mt-7">
                             <div className="mt-5 space-y-3">

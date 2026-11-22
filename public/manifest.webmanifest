@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "TellMe",
+  "short_name": "TellMe",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#0EA5E9",
+  "background_color": "#F8FCFF",
+  "icons": [
+    { "src": "/tellme-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/tellme-icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

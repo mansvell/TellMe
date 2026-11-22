@@ -2,422 +2,143 @@ import { Capacitor } from "@capacitor/core";
 import { t } from "../i18n/runtime";
 import { supabase } from "../lib/supabase";
 
+type UnsupportedPush = "native" | "install" | "unsupported";
+export type PushStatus = UnsupportedPush | "checking" | "unavailable" | "denied" | "disabled" | "enabled";
 
-// ============================================================
-// TYPES
-// ============================================================
+let readyWorker: ServiceWorkerRegistration | undefined;
+let preparingWorker: Promise<ServiceWorkerRegistration> | undefined;
 
-export type PushStatus =
-    | "unsupported"
-    | "denied"
-    | "disabled"
-    | "enabled";
+function unsupportedReason(): UnsupportedPush | undefined {
+    if (Capacitor.isNativePlatform()) return "native";
 
-
-// ============================================================
-// CONVERTIT LA CLÉ VAPID POUR PUSHMANAGER
-// ============================================================
-
-// Convertit la clé VAPID en ArrayBuffer compatible avec PushManager.
-function urlBase64ToArrayBuffer(
-    base64String: string,
-): ArrayBuffer {
-
-    const padding =
-        "=".repeat(
-            (4 - base64String.length % 4) % 4,
-        );
-
-    const base64 =
-        (base64String + padding)
-            .replace(/-/g, "+")
-            .replace(/_/g, "/");
-
-    const rawData =
-        window.atob(base64);
-
-    const buffer =
-        new ArrayBuffer(rawData.length);
-
-    const bytes =
-        new Uint8Array(buffer);
-
-    for (
-        let index = 0;
-        index < rawData.length;
-        index++
-    ) {
-        bytes[index] =
-            rawData.charCodeAt(index);
-    }
-
-    return buffer;
+    const isIPad = navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+    const isAppleMobile = isIPad || /iPhone|iPad|iPod/.test(navigator.userAgent);
+    const standalone = window.matchMedia("(display-mode: standalone)").matches ||
+        (navigator as Navigator & { standalone?: boolean }).standalone;
+    if (isAppleMobile && !standalone) return "install";
+    if ("serviceWorker" in navigator && "PushManager" in window && "Notification" in window) return;
+    return "unsupported";
 }
 
-
-// ============================================================
-// VÉRIFIE SI LE NAVIGATEUR SUPPORTE WEB PUSH
-// ============================================================
-
-export function supportsPushNotifications():
-    boolean {
-
-    return (
-        !Capacitor.isNativePlatform() &&
-        "serviceWorker" in navigator &&
-        "PushManager" in window &&
-        "Notification" in window
-    );
+export function initialPushStatus(): PushStatus {
+    return unsupportedReason() ?? "checking";
 }
 
-
-// ============================================================
-// ENREGISTRE LE SERVICE WORKER
-// ============================================================
-
-async function getServiceWorkerRegistration():
-    Promise<ServiceWorkerRegistration> {
-
-    if (!supportsPushNotifications()) {
-
-        throw new Error(
-            t("Les notifications push ne sont pas supportées sur cet appareil."),
-        );
-    }
-
-
-    const registration =
-        await navigator.serviceWorker.register(
-            "/sw.js",
-        );
-
-
-    await navigator.serviceWorker.ready;
-
-
-    return registration;
-}
-
-
-// ============================================================
-// ÉTAT ACTUEL DES NOTIFICATIONS
-// ============================================================
-
-export async function getPushStatus():
-    Promise<PushStatus> {
-
-    if (!supportsPushNotifications()) {
-
-        return "unsupported";
-    }
-
-
-    if (
-        Notification.permission ===
-        "denied"
-    ) {
-
-        return "denied";
-    }
-
-
-    const registration =
-        await getServiceWorkerRegistration();
-
-
-    const subscription =
-        await registration.pushManager
-            .getSubscription();
-
-
-    if (!subscription) {
-
-        return "disabled";
-    }
-
-
-    return "enabled";
-}
-
-
-// ============================================================
-// ACTIVE LES NOTIFICATIONS
-// ============================================================
-
-export async function enablePushNotifications():
-    Promise<void> {
-
-    if (!supportsPushNotifications()) {
-
-        throw new Error(
-            t("Les notifications push ne sont pas supportées par ce navigateur."),
-        );
-    }
-
-    console.log("PUSH 1 - start");
-    // Demande l'autorisation système.
-    const permission =
-        await Notification.requestPermission();
-    console.log("PUSH 2 - permission:", permission);
-
-    if (
-        permission !==
-        "granted"
-    ) {
-
-        throw new Error(
-            t("L'autorisation des notifications a été refusée."),
-        );
-    }
-
-
-    const publicKey =
-        import.meta.env
-            .VITE_VAPID_PUBLIC_KEY;
-
-
-    if (!publicKey) {
-
-        throw new Error(
-            "VITE_VAPID_PUBLIC_KEY est manquante.",
-        );
-    }
-    console.log(
-        "VAPID:",
-        `${publicKey.substring(0, 10)}...`,
-        "length:",
-        publicKey.length,
-    );
-
-    const registration =
-        await getServiceWorkerRegistration();
-    console.log("PUSH 3 - service worker ready");
-
-    // Vérifie d'abord s'il existe déjà.
-    let subscription =
-        await registration.pushManager
-            .getSubscription();
-    console.log("PUSH 4 - existing subscription:", subscription);
-
-    if (!subscription) {
-        subscription =
-            await registration.pushManager
-                .subscribe({
-                    userVisibleOnly: true,
-
-                    applicationServerKey:
-                        urlBase64ToArrayBuffer(
-                            publicKey,
-                        ),
-                });
-    }
-    console.log("PUSH 5 - subscription ready");
-
-
-    const subscriptionJson =
-        subscription.toJSON();
-
-
-    const endpoint =
-        subscriptionJson.endpoint;
-
-    const p256dh =
-        subscriptionJson.keys?.p256dh;
-
-    const auth =
-        subscriptionJson.keys?.auth;
-
-
-    if (
-        !endpoint ||
-        !p256dh ||
-        !auth
-    ) {
-
-        throw new Error(
-            t("Abonnement push invalide."),
-        );
-    }
-
-
-    const {
-        data: { user },
-        error: userError,
-    } =
-        await supabase.auth.getUser();
-
-
-    if (userError) {
-        throw userError;
-    }
-
-
-    if (!user) {
-
-        throw new Error(
-            t("Utilisateur introuvable."),
-        );
-    }
-
-    console.log("PUSH 6 - saving in Supabase");
-    // Sauvegarde cet appareil.
-    const {
-        error: subscriptionError,
-    } =
-        await supabase
-            .from("push_subscriptions")
-            .upsert(
-                {
-                    user_id:
-                    user.id,
-
-                    endpoint,
-
-                    p256dh,
-
-                    auth,
-
-                    updated_at:
-                        new Date()
-                            .toISOString(),
-                },
-                {
-                    onConflict:
-                        "endpoint",
-                },
-            );
-
-    console.log(
-        "PUSH 7 - Supabase result:",
-        subscriptionError,
-    );
-
-    if (subscriptionError) {
-        console.error(
-            "Push subscription save error:",
-            subscriptionError,
-        );
-
-        throw subscriptionError;
-    }
-
-
-    // Active les notifications pour le compte.
-    const {
-        error: profileError,
-    } =
-        await supabase
-            .from("profiles")
-            .update({
-                notifications_enabled:
-                    true,
-            })
-            .eq(
-                "id",
-                user.id,
-            );
-
-
-    if (profileError) {
-        throw profileError;
+export function pushDescription(status: PushStatus): string | undefined {
+    switch (status) {
+        case "native": return t("Les notifications ne sont pas encore disponibles sur cette version mobile.");
+        case "install": return t("Sur iPhone ou iPad, ajoute TellMe à l’écran d’accueil depuis Partager, puis ouvre son icône.");
+        case "unsupported": return t("Les notifications ne sont pas prises en charge par ce navigateur.");
+        case "unavailable": return t("Impossible de préparer les notifications. Réessaie.");
+        case "denied": return t("Autorise les notifications pour TellMe dans les réglages de ton appareil ou de ton navigateur.");
     }
 }
 
+function applicationServerKey(): ArrayBuffer {
+    const key = import.meta.env.VITE_VAPID_PUBLIC_KEY?.trim();
+    if (!key) throw new Error(t("Les notifications sont indisponibles pour le moment."));
+    const base64 = key.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(key.length / 4) * 4, "=");
+    return Uint8Array.from(window.atob(base64), character => character.charCodeAt(0)).buffer;
+}
 
-// ============================================================
-// DÉSACTIVE LES NOTIFICATIONS SUR CET APPAREIL
-// ============================================================
-
-export async function disablePushNotifications():
-    Promise<void> {
-
-    const {
-        data: { user },
-        error: userError,
-    } =
-        await supabase.auth.getUser();
-
-
-    if (userError) {
-        throw userError;
+async function registerWorker(): Promise<ServiceWorkerRegistration> {
+    let deadline: number | undefined;
+    const ready = navigator.serviceWorker.register("/sw.js", { scope: "/" })
+        .then(() => navigator.serviceWorker.ready);
+    try {
+        return await Promise.race([
+            ready,
+            new Promise<never>((_, reject) => {
+                deadline = window.setTimeout(() => reject(new Error("Service worker not ready")), 8_000);
+            }),
+        ]);
+    } finally {
+        window.clearTimeout(deadline);
     }
+}
 
-
-    if (!user) {
-
-        throw new Error(
-            t("Utilisateur introuvable."),
-        );
+function prepareWorker(): Promise<ServiceWorkerRegistration> {
+    if (!preparingWorker) {
+        preparingWorker = registerWorker().then(registration => {
+            readyWorker = registration;
+            return registration;
+        }).catch(error => {
+            preparingWorker = undefined;
+            throw error;
+        });
     }
+    return preparingWorker;
+}
 
+export function prepareWebPush(): void {
+    if (!unsupportedReason()) void prepareWorker().catch(() => { /* Le réglage permet de réessayer. */ });
+}
 
-    if (
-        "serviceWorker" in navigator
-    ) {
+async function currentUserId(): Promise<string> {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    if (!session) throw new Error(t("Utilisateur introuvable."));
+    return session.user.id;
+}
 
-        const registration =
-            await navigator.serviceWorker
-                .getRegistration();
+export async function getPushStatus(): Promise<PushStatus> {
+    const unsupported = unsupportedReason();
+    if (unsupported) return unsupported;
+    if (Notification.permission === "denied") return "denied";
+    applicationServerKey();
 
+    const registration = await prepareWorker();
+    const subscription = await registration.pushManager.getSubscription();
+    if (!subscription || Notification.permission !== "granted") return "disabled";
 
-        const subscription =
-            await registration
-                ?.pushManager
-                .getSubscription();
+    const userId = await currentUserId();
+    const [device, profile] = await Promise.all([
+        supabase.from("push_subscriptions").select("endpoint").eq("user_id", userId).eq("endpoint", subscription.endpoint).maybeSingle(),
+        supabase.from("profiles").select("notifications_enabled").eq("id", userId).maybeSingle(),
+    ]);
+    if (device.error) throw device.error;
+    if (profile.error) throw profile.error;
+    return device.data && profile.data?.notifications_enabled !== false ? "enabled" : "disabled";
+}
 
+export async function enablePushNotifications(): Promise<void> {
+    const unsupported = unsupportedReason();
+    if (unsupported) throw new Error(pushDescription(unsupported));
+    if (!readyWorker) throw new Error(pushDescription("unavailable"));
 
-        if (subscription) {
+    // L'inscription doit démarrer dans le même geste que l'appui sur le bouton.
+    const subscription = await readyWorker.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey(),
+    });
+    const { endpoint, keys } = subscription.toJSON();
+    if (!endpoint || !keys?.p256dh || !keys.auth) throw new Error(t("Abonnement push invalide."));
 
-            const endpoint =
-                subscription.endpoint;
+    const userId = await currentUserId();
+    const { error: profileError } = await supabase.from("profiles").update({ notifications_enabled: true }).eq("id", userId);
+    if (profileError) throw profileError;
 
+    const { error: subscriptionError } = await supabase.from("push_subscriptions").upsert({
+        user_id: userId,
+        endpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
+        updated_at: new Date().toISOString(),
+    }, { onConflict: "endpoint" });
+    if (subscriptionError) throw subscriptionError;
+}
 
-            // Supprime l'abonnement Supabase.
-            const {
-                error,
-            } =
-                await supabase
-                    .from(
-                        "push_subscriptions",
-                    )
-                    .delete()
-                    .eq(
-                        "user_id",
-                        user.id,
-                    )
-                    .eq(
-                        "endpoint",
-                        endpoint,
-                    );
+export async function disablePushNotifications(): Promise<void> {
+    const registration = await navigator.serviceWorker.getRegistration("/");
+    const subscription = await registration?.pushManager.getSubscription();
+    if (!subscription) return;
 
+    const userId = await currentUserId();
+    const { error } = await supabase.from("push_subscriptions").delete()
+        .eq("user_id", userId)
+        .eq("endpoint", subscription.endpoint);
+    if (error) throw error;
 
-            if (error) {
-                throw error;
-            }
-
-
-            await subscription.unsubscribe();
-        }
-    }
-
-
-    // Désactive les notifications du compte.
-    const {
-        error: profileError,
-    } =
-        await supabase
-            .from("profiles")
-            .update({
-                notifications_enabled:
-                    false,
-            })
-            .eq(
-                "id",
-                user.id,
-            );
-
-
-    if (profileError) {
-        throw profileError;
-    }
+    // L'abonnement des autres appareils reste valide.
+    await subscription.unsubscribe();
 }

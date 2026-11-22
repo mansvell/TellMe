@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import logo from "../assets/icon.png";
 import LanguageSelector from "../components/LanguageSelector";
 import { t } from "../i18n/runtime";
+import { initialPushStatus } from "../services/pushNotifications";
 
 export default function WelcomePage() {
     return (
@@ -29,6 +30,11 @@ export default function WelcomePage() {
                         py-2.5 text-sm font-bold text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-700">
                         {t("S'enregistrer")}
                     </Link>
+                    {initialPushStatus() === "install" && (
+                        <p className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-300">
+                            {t("Pour recevoir les notifications, ajoute TellMe à l’écran d’accueil avant de t’inscrire.")}
+                        </p>
+                    )}
                 </div>
             </section>
 

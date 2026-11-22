@@ -1,4 +1,3 @@
-import { Capacitor } from "@capacitor/core";
 import { getLocale } from "../i18n/runtime";
 import { t } from "../i18n/runtime";
 import LanguageSelector from "../components/LanguageSelector";
@@ -15,44 +14,17 @@ import {
 } from "lucide-react";
 
 import {useEffect, useMemo, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useOutletContext} from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import type { SettingsTabContext } from "../components/AppTabsLayout";
+import usePushNotifications from "../hooks/usePushNotifications";
 
-import {
-    getInvitationsEnabled,
-    updateInvitationsEnabled,
-} from "../services/invitations";
-
-import {
-    disablePushNotifications,
-    enablePushNotifications,
-    getPushStatus,
-} from "../services/pushNotifications";
+import { updateInvitationsEnabled } from "../services/invitations";
 
 import {
     applyTheme,
     getSavedTheme,
 } from "../services/theme";
-
-type ProfileSettings = {
-    id: string;
-    displayName: string;
-    profileColor: string;
-    createdAt: string;
-    usernameUpdatedAt: string | null;
-    notificationsEnabled: boolean;
-};
-
-
-type ProfileDatabaseRow = {
-    id: string;
-    display_name: string | null;
-    default_color: string | null;
-    created_at: string;
-    username_updated_at: string | null;
-    notifications_enabled: boolean | null;
-};
-
 
 type SwitchProps = {
     icon: React.ReactNode;
@@ -80,6 +52,8 @@ const USERNAME_CHANGE_DELAY_DAYS = 14;
 export default function SettingsPage() {
 
     const navigate = useNavigate();
+    const { profile, updateProfile, retryProfile } = useOutletContext<SettingsTabContext>();
+    const push = usePushNotifications();
 
     const [darkMode, setDarkMode] =
         useState(
@@ -96,35 +70,8 @@ export default function SettingsPage() {
                 : "light",
         );
     }
-    const [profile, setProfile] =
-        useState<ProfileSettings | null>(null);
-
-    // Chargement initial.
-    const [loading, setLoading] =
-        useState(true);
-
-    // Notifications.
-    const [
-        notificationsEnabled,
-        setNotificationsEnabled,
-    ] = useState(true);
-
-    // Invitations.
-    const [
-        invitationsEnabled,
-        setInvitationsEnabled,
-    ] = useState(true);
-
-    // Sauvegarde des switches.
-    const [
-        savingNotifications,
-        setSavingNotifications,
-    ] = useState(false);
-
-    const [
-        savingInvitations,
-        setSavingInvitations,
-    ] = useState(false);
+    const [pendingInvitations, setPendingInvitations] = useState<boolean | null>(null);
+    const invitationsEnabled = pendingInvitations ?? profile?.invitationsEnabled ?? true;
 
     const [
         showUsernameModal,
@@ -148,154 +95,6 @@ export default function SettingsPage() {
     ] = useState("");
 
     const [clock, setClock] = useState<number | null>(null);
-
-    useEffect(() => {
-
-        let active = true;
-
-        async function loadSettings() {
-
-            try {
-
-                const {
-                    data: { user },
-                    error: userError,
-                } =
-                    await supabase.auth.getUser();
-
-
-                if (userError) {
-                    throw userError;
-                }
-
-
-                if (!user) {
-
-                    navigate(
-                        "/welcome",
-                        {
-                            replace: true,
-                        },
-                    );
-
-                    return;
-                }
-
-                const {
-                    data,
-                    error,
-                } =
-                    await supabase
-                        .from("profiles")
-                        .select(`
-                            id,
-                            display_name,
-                            default_color,
-                            created_at,
-                            username_updated_at,
-                            notifications_enabled
-                        `)
-                        .eq(
-                            "id",
-                            user.id,
-                        )
-                        .maybeSingle();
-
-
-                if (error) {
-                    throw error;
-                }
-
-                if (!data) {
-                    console.error(t("Aucun profil trouvé pour cet utilisateur."));
-                    return;
-                }
-
-                const row =
-                    data as ProfileDatabaseRow;
-
-                if (!active) return;
-
-                const loadedProfile:
-                    ProfileSettings = {
-
-                    id:
-                    row.id,
-
-                    displayName:
-                        row.display_name ??
-                        t("Utilisateur"),
-
-                    profileColor:
-                        row.default_color ??
-                        "#0EA5E9",
-
-                    createdAt:
-                    row.created_at,
-
-                    usernameUpdatedAt:
-                    row.username_updated_at,
-
-                    notificationsEnabled:
-                        row.notifications_enabled ??
-                        true,
-                };
-
-
-                setProfile(
-                    loadedProfile,
-                );
-
-                setNewUsername(
-                    loadedProfile.displayName,
-                );
-
-                const pushStatus =
-                    await getPushStatus();
-
-                setNotificationsEnabled(
-                    pushStatus === "enabled",
-                );
-
-                // Charge l'autorisation d'invitation.
-                const allowInvitations =
-                    await getInvitationsEnabled();
-
-                if (!active) return;
-
-                setInvitationsEnabled(
-                    allowInvitations,
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "Settings loading error:",
-                    error,
-                );
-
-                if (!active) return;
-
-                setErrorMessage(
-                    t("Impossible de charger les paramètres."),
-                );
-
-            } finally {
-                if (active) {
-
-                    setLoading(false);
-                }
-            }
-        }
-
-        void loadSettings();
-
-        return () => {
-
-            active = false;
-        };
-
-    }, [navigate]);
 
     // COMPTEUR DU PSEUDO
     // Actualise le compteur toutes les minutes.
@@ -452,122 +251,17 @@ export default function SettingsPage() {
         clock,
     ]);
 
-    // MODIFIE LES NOTIFICATIONS
-    async function handleNotifications(
-        enabled: boolean,
-    ) {
-
-        const previousValue =
-            notificationsEnabled;
-
-
-        setSavingNotifications(
-            true,
-        );
-
+    async function handleInvitations(enabled: boolean) {
+        setPendingInvitations(enabled);
         setErrorMessage("");
-
-
         try {
-
-            if (enabled) {
-
-                // Demande la permission système +
-                // crée l'abonnement Web Push.
-                await enablePushNotifications();
-
-                setNotificationsEnabled(
-                    true,
-                );
-
-            } else {
-
-                // Supprime l'abonnement de cet appareil.
-                await disablePushNotifications();
-
-                setNotificationsEnabled(
-                    false,
-                );
-            }
-
-
+            await updateInvitationsEnabled(enabled);
+            updateProfile({ invitationsEnabled: enabled });
         } catch (error) {
-
-            console.error(
-                "Push notification error:",
-                error,
-            );
-
-
-            setNotificationsEnabled(
-                previousValue,
-            );
-
-
-            setErrorMessage(
-                error instanceof Error
-                    ? error.message
-                    : t("Impossible de modifier les notifications."),
-            );
-
-
+            console.error("Invitation settings error:", error);
+            setErrorMessage(t("Impossible de modifier les invitations."));
         } finally {
-
-            setSavingNotifications(
-                false,
-            );
-        }
-    }
-
-    // MODIFIE LES AUTORISATIONS D'INVITATION
-    async function handleInvitations(
-        enabled: boolean,
-    ) {
-
-        const previousValue =
-            invitationsEnabled;
-
-
-        setInvitationsEnabled(
-            enabled,
-        );
-
-        setSavingInvitations(
-            true,
-        );
-
-        setErrorMessage("");
-
-
-        try {
-
-            await updateInvitationsEnabled(
-                enabled,
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Invitation settings error:",
-                error,
-            );
-
-
-            setInvitationsEnabled(
-                previousValue,
-            );
-
-
-            setErrorMessage(
-                t("Impossible de modifier les invitations."),
-            );
-
-        } finally {
-
-            setSavingInvitations(
-                false,
-            );
+            setPendingInvitations(null);
         }
     }
 
@@ -667,21 +361,7 @@ export default function SettingsPage() {
             const updatedAt =
                 new Date().toISOString();
 
-            setProfile(current => {
-                    if (!current) {
-                        return current;
-                    }
-                    return {
-                        ...current,
-
-                        displayName:
-                        cleanUsername,
-
-                        usernameUpdatedAt:
-                        updatedAt,
-                    };
-                },
-            );
+            updateProfile({ displayName: cleanUsername, usernameUpdatedAt: updatedAt });
             setShowUsernameModal(false);
         } catch (error) {
 
@@ -706,48 +386,6 @@ export default function SettingsPage() {
     }
 
 
-    // CHARGEMENT
-    if (loading) {
-
-        return (
-
-            <main className="flex min-h-full items-center justify-center bg-slate-100 dark:bg-slate-800">
-
-                <LoaderCircle
-                    size={34}
-                    className="animate-spin text-sky-500"
-                />
-
-            </main>
-        );
-    }
-
-    // PROFIL INTROUVABLe
-    if (!profile) {
-
-        return (
-
-            <main className="flex min-h-full items-center justify-center bg-slate-100 dark:bg-slate-800 p-5">
-
-                <div className="max-w-md rounded-3xl bg-white p-8 text-center shadow-sm">
-
-                    <Shield
-                        size={34}
-                        className="mx-auto text-slate-400"
-                    />
-
-                    <h1 className="mt-4 text-xl font-bold text-slate-900">
-                         {t("Profil indisponible")} </h1>
-
-                    <p className="mt-2 text-sm text-slate-500">
-                         {t("Impossible de récupérer tes paramètres.")} </p>
-
-                </div>
-
-            </main>
-        );
-    }
-
     return (
 
         <main className="min-h-full bg-slate-100 pb-8 dark:bg-slate-800">
@@ -763,7 +401,21 @@ export default function SettingsPage() {
 
             </header>
 
-            <section className="mx-auto max-w-4xl space-y-5 p-4 sm:p-5">
+            {profile === undefined && (
+                <div role="status" aria-label={t("Chargement...")} className="mx-auto max-w-4xl space-y-5 p-4 sm:p-5">
+                    <div className="h-36 rounded-[2rem] bg-slate-200 dark:bg-slate-700" />
+                    <div className="h-22 rounded-3xl bg-white dark:bg-slate-700" />
+                </div>
+            )}
+            {profile === null && (
+                <div role="alert" className="mx-auto mt-5 max-w-md px-5 text-center">
+                    <p>{t("Impossible de récupérer tes paramètres.")}</p>
+                    <button type="button" onClick={retryProfile} className="mt-2 font-semibold text-sky-700 dark:text-sky-300">
+                        {t("Réessayer")}
+                    </button>
+                </div>
+            )}
+            {profile && <section className="mx-auto max-w-4xl space-y-5 p-4 sm:p-5">
 
                 <div
                     className="relative overflow-hidden rounded-[2rem] p-7 shadow-lg sm:p-9"
@@ -850,17 +502,23 @@ export default function SettingsPage() {
                     <SwitchRow
                         icon={<Bell size={21}/>}
                         title="Notifications"
-                        disabled={Capacitor.isNativePlatform()}
-                        description={Capacitor.isNativePlatform() ? t("Les notifications ne sont pas encore disponibles sur cette version mobile.") : t("Recevoir les notifications des conversations.")}
-                        checked={notificationsEnabled}
-                        loading={savingNotifications}
-                        onChange={value =>
-                            void handleNotifications(
-                                value,
-                            )
-                        }
+                        disabled={push.status !== "enabled" && push.status !== "disabled"}
+                        description={push.description ?? t("Recevoir les notifications des conversations sur cet appareil.")}
+                        checked={push.status === "enabled"}
+                        loading={push.saving || push.status === "checking"}
+                        onChange={value => void push.change(value)}
                     />
-
+                    {push.error && <p role="alert" className="px-5 pb-3 text-sm text-red-600 dark:text-red-300">{push.error}</p>}
+                    {push.status === "unavailable" && (
+                        <button type="button" onClick={push.retry} className="ml-5 mb-3 text-sm font-semibold text-sky-700 dark:text-sky-300">
+                            {t("Réessayer")}
+                        </button>
+                    )}
+                    {push.status === "install" && (
+                        <p className="px-5 pb-4 text-xs leading-5 text-slate-500 dark:text-slate-300">
+                            {t("Un compte créé dans Safari reste lié à Safari. L’inscription depuis l’icône crée un compte distinct.")}
+                        </p>
+                    )}
 
                     <SwitchRow
                         icon={<Moon size={21}/>}
@@ -876,7 +534,7 @@ export default function SettingsPage() {
                         title={t("Autoriser les invitations")}
                         description={t("Les utilisateurs de TellMe peuvent t’inviter dans une conversation privée.")}
                         checked={invitationsEnabled}
-                        loading={savingInvitations}
+                        loading={pendingInvitations !== null}
                         onChange={
                             value =>
                                 void handleInvitations(
@@ -927,9 +585,9 @@ export default function SettingsPage() {
                 <p className="pb-3 text-center text-xm leading-5 text-slate-400">
                      {t("TellMe, l'App qui révolutionne l'Anonymat et le Fun")} </p>
 
-            </section>
+            </section>}
 
-            {showUsernameModal && (
+            {profile && showUsernameModal && (
 
                 <div
                     className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-5"
@@ -1199,6 +857,7 @@ function SwitchRow({
                 type="button"
 
                 role="switch"
+                aria-label={title}
 
                 aria-checked={
                     checked

@@ -92,7 +92,7 @@ export default function DiscoverPage() {
 
     return (
         <main className="min-h-full bg-white pb-6 text-slate-900 dark:bg-slate-800 dark:text-slate-100">
-            <header className="mx-auto flex h-16 max-w-3xl items-center gap-3 px-4 sm:px-5">
+            <header className="flex h-16 items-center gap-3 px-4 sm:px-5">
                 <Link to="/invit" aria-label={t("Retour")} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
                     <ArrowLeft size={22} />
                 </Link>
