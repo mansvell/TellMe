@@ -572,6 +572,7 @@ export default function SettingsPage() {
                     <Row icon={<Mail size={21}/>}
                          title={t("Aide, Support, Bugs")}
                          description="Contact: mansvellnk@gmail.com"
+                         onClick={() => { window.location.href = "mailto:mansvellnk@gmail.com?subject=TellMe"; }}
                     />
 
                 </div>
