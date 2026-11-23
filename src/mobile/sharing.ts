@@ -5,6 +5,41 @@ import { Share } from "@capacitor/share";
 
 export type ShareOutcome = "image" | "link" | "copied" | "cancelled";
 
+async function imageBase64(blob: Blob): Promise<string> {
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let binary = "";
+    for (let start = 0; start < bytes.length; start += 8192) {
+        binary += String.fromCharCode(...bytes.subarray(start, start + 8192));
+    }
+    return btoa(binary);
+}
+
+export async function saveImage(blob: Blob, filename: string): Promise<"saved" | "download" | "shared" | "cancelled"> {
+    if (Capacitor.isNativePlatform()) {
+        try {
+            await Filesystem.writeFile({
+                directory: Directory.Documents,
+                path: `TellMe/${Date.now()}-${filename.replace(/[^a-zA-Z0-9._-]/g, "_")}`,
+                data: await imageBase64(blob),
+                recursive: true,
+            });
+            return "saved";
+        } catch {
+            const outcome = await shareImage(blob, filename, "TellMe", "");
+            return outcome === "cancelled" ? "cancelled" : "shared";
+        }
+    }
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return "download";
+}
+
 export async function copyText(text: string): Promise<void> {
     if (Capacitor.isNativePlatform()) await Clipboard.write({ string: text });
     else await navigator.clipboard.writeText(text);
@@ -41,13 +76,8 @@ export async function shareImage(blob: Blob, filename: string, title: string, li
         await Promise.all(old.files.filter(file => file.mtime && file.mtime < Date.now() - 86_400_000).map(file =>
             Filesystem.deleteFile({ directory: Directory.Cache, path: `tellme-share/${file.name}` }).catch(() => {}),
         ));
-        const bytes = new Uint8Array(await blob.arrayBuffer());
-        let binary = "";
-        for (let start = 0; start < bytes.length; start += 8192) {
-            binary += String.fromCharCode(...bytes.subarray(start, start + 8192));
-        }
         const path = `tellme-share/${Date.now()}-${filename.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-        const { uri } = await Filesystem.writeFile({ directory: Directory.Cache, path, data: btoa(binary), recursive: true });
+        const { uri } = await Filesystem.writeFile({ directory: Directory.Cache, path, data: await imageBase64(blob), recursive: true });
         try {
             // Le lien est du texte pour servir de légende, avec le fichier PNG.
             await Share.share({ title, text: link, files: [uri] });

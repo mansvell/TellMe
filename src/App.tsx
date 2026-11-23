@@ -1,6 +1,8 @@
 import {Routes, Route, Navigate} from "react-router-dom";
 
 import DiscoverPage from "./pages/DiscoverPage";
+import FunPage from "./pages/FunPage";
+import SecretLandingPage from "./pages/SecretLandingPage";
 import AppTabsLayout from "./components/AppTabsLayout";
 import SplashPage from "./pages/SplashPage.tsx";
 import WelcomePage from "./pages/WelcomePage";
@@ -41,6 +43,7 @@ export default function App() {
               <Route path="/invit" element={<InvitationsPage />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/buzz" element={<BuzzPage />} />
+              <Route path="/fun" element={<FunPage />} />
               <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="/chat/:groupId" element={<ProtectedRoute> <ChatPage/> </ProtectedRoute>} />
@@ -57,6 +60,7 @@ export default function App() {
            <Route path="/terms" element={<TermsPage/>}/>
 
           <Route path="/b/:shareCode" element={<VoteBuzz />}/>
+          <Route path="/s/:token" element={<SecretLandingPage />} />
 
           <Route path="*" element={<Navigate to="/" replace />}/>
 

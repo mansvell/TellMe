@@ -21,7 +21,7 @@ export function appPathFromUrl(input: string): string | null {
         const nativeScheme = url.protocol === "tellme:";
         if (!nativeScheme && (url.protocol !== "https:" || url.origin !== getPublicOrigin())) return null;
         const path = nativeScheme ? `/${url.hostname}${url.pathname}` : url.pathname;
-        if (!/^\/(join|b)\/[a-zA-Z0-9_-]{1,160}$/.test(path)) return null;
+        if (!/^\/(join|b|s)\/[a-zA-Z0-9_-]{1,160}$/.test(path)) return null;
         return path;
     } catch { return null; }
 }

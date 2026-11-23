@@ -14,7 +14,8 @@
     "mobile:run:android": "npm run mobile:sync && cap run android",
     "mobile:run:ios": "npm run mobile:sync && cap run ios",
     "test:mobile": "node --test tests/mobile.test.cjs tests/push.test.cjs",
-    "test:receipts": "node --test tests/receipts.test.cjs"
+    "test:receipts": "node --test tests/receipts.test.cjs",
+    "test:fun": "node --test tests/fun.test.mjs tests/secret-push.test.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.0",
+    "@electric-sql/pglite": "^0.5.14",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.13.2",
     "@types/react": "^19.2.17",

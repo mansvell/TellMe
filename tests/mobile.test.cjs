@@ -143,3 +143,19 @@ test('account navigation keeps its page during verification but blocks a deleted
     assert.equal(states[0], 'missing');
     cleanup();
 });
+
+test('native card export saves its PNG in Documents', async () => {
+    let written;
+    const sharing = load('src/mobile/sharing.ts', {
+        '@capacitor/core': { Capacitor: { isNativePlatform: () => true } },
+        '@capacitor/clipboard': {},
+        '@capacitor/filesystem': { Directory: { Documents: 'DOCUMENTS' }, Filesystem: {
+            writeFile: async args => { written = args; return { uri: 'file:///Documents/card.png' }; },
+        } },
+        '@capacitor/share': {},
+    });
+    assert.equal(await sharing.saveImage(new Blob(['PNG'], { type: 'image/png' }), 'secret.png'), 'saved');
+    assert.equal(written.directory, 'DOCUMENTS');
+    assert.equal(written.data, btoa('PNG'));
+    assert(written.path.endsWith('-secret.png'));
+});

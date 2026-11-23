@@ -2,8 +2,7 @@ import { copyText, shareImage } from "../mobile/sharing";
 import { getPublicOrigin } from "../mobile/links";
 import { t } from "../i18n/runtime";
 import {BarChart3, Check, ChevronRight, CirclePlus, Copy, Flame, Link2, Lock, MessageCircle, MoreHorizontal, Plus,
-    Share2, Trash2, Users, Vote, X ,ChevronDown,
-    ChevronUp, Send} from "lucide-react";
+    Share2, Trash2, Users, Vote, X} from "lucide-react";
 import { sendQuestionToGroup } from "../services/messages";
 import {
     useEffect,
@@ -12,6 +11,7 @@ import {
 import {publishBuzzToGroup } from "../services/buzz";
 import icon from "../assets/icon.png";
 import QuestionShareCard from "../components/QuestionShareCard";
+import QuestionLibrary from "../components/QuestionLibrary";
 import TellMeHeader from "../components/TellMeHeader";
 
 import {
@@ -37,125 +37,6 @@ type Tab =
     | "create"
     | "mine"
     | "results";
-type QuestionCategory = {
-    id: string;
-    name: string;
-    emoji: string;
-    description: string;
-    questions: string[];
-};
-
-const QUESTION_CATEGORIES: QuestionCategory[] = [
-    {
-        id: "fun",
-        name: "Fun",
-        emoji: "😂",
-        description: "Des questions légères pour mettre le groupe en mouvement.",
-        questions: [
-            "premiere impression que tu as eu de moi ?",
-            "Qui est la personne la plus laide du groupe ?",
-            "Qui arriverait en retard à son propre mariage ?",
-            "Qui dépenserait un million d'euros seulement sur les femmes?",
-            "Qui aime le plus les femmes ?",
-            "Qui aime le plus les hommes ?",
-            "Qui survivrait le mieux à une apocalypse ?",
-            "Qui pourrait accidentellement devenir viral sur Internet ?",
-            "Qui serait capable de dormir pendant une urgence ?",
-            "Toi et moi dans une chambre 1h on fait quoi ?",
-        ],
-    },
-    {
-        id: "between-us",
-        name: "Entre nous",
-        emoji: "👀",
-        description: "Des questions parfaites quand tout le groupe se connaît.",
-        questions: [
-            "Quelle est la première impression que vous aviez sur -(MembreDuGroupe)- ?",
-            "Qui a le plus changé depuis que vous vous connaissez ?",
-            "Vous pouvez tout balancer ce que vous avez sur le coeur ",
-            "Quelle histoire du groupe ne vieillira jamais ?",
-            "Que reprochez vous à quelqu'un dans le groupe?",
-            "Quel membre du groupe serait le plus difficile à remplacer ?",
-            "Quel voyage devrait absolument faire le groupe ensemble ?",
-            "Qui est la personne la plus insupportable ?",
-            "Qui pense cacher sa relation pourtant on est tous au courant",
-            "Qui est selon vous les chances que -(MembreDuGroupe)- et -(MembreDuGroupe)- se mette ensemble ?",
-        ],
-    },
-    {
-        id: "hot",
-        name: "Chaud",
-        emoji: "🔥",
-        description: "Les questions qu'il faut mieux laisser",
-        questions: [
-            "Quelle vérité personne ici n'oserait dire à voix haute ?",
-            "Apoutchou ou Skinny ?",
-            "Qui dans le groupe cache probablement le plus de choses ?",
-            "Tu pourrais sortir avec l'ex d'un ami ?",
-            "Quel comportement te fait perdre immédiatement tout intérêt pour quelqu'un ?",
-            "La Position la plus difficile a maintenir lors des bails ?",
-            "Devrait on recommencer avec les marriages arrangé ?",
-            "Qui est le plus attirant du groupe ?",
-            "La taille du robinet compte t'elle ?",
-            "Peut-on vraiment aimer quelqu'un et quand même le tromper ?",
-        ],
-    },
-    {
-        id: "relationships",
-        name: "Relations",
-        emoji: "❤️",
-        description: "Amour, crushs, ex et situations compliquées.",
-        questions: [
-            "Peut-on vraiment rester ami avec son ex ?",
-            "Tu pourrais pardonner une infidélité ?",
-            "L'amour suffit-il pour faire durer une relation ?",
-            "Devoilez un couple qui crois trop se cacher",
-            "Tu pourrais sortir avec quelqu'un que tes amis détestent ?",
-            "Faut-il tout raconter à son partenaire ?",
-            "Une relation à distance peut-elle vraiment fonctionner ?",
-            "Quel est le plus gros red flag dans une relation ?",
-            "Quel est ton fantasme le plus fou?",
-            "Tu pourrais retourner avec quelqu'un qui t'a déjà brisé le cœur ?",
-        ],
-    },
-    {
-        id: "confessions",
-        name: "Confessions",
-        emoji: "🤫",
-        description: "Pour faire sortir les histoires que personne ne raconte.",
-        questions: [
-            "Pourquoi es tu encore célibataire ?",
-            "Quelle chose as-tu faite sans jamais l'avouer ?",
-            "As-tu déjà fait semblant d'aimer quelqu'un ?",
-            "Quelle décision regrettes-tu encore aujourd'hui ?",
-            "As-tu déjà trahi la confiance d'un ami ?",
-            "Quel message regrettes-tu le plus d'avoir envoyé ?",
-            "Qui a quelques choses à dire et veux se lancer ?",
-            "La plus grosse dinguerie que tu ais faite ?",
-            "As-tu déjà ignoré volontairement quelqu'un que tu aimais ?",
-            "Quelle vérité sur toi surprendrait le plus le groupe ?",
-        ],
-    },
-    {
-        id: "debates",
-        name: "Débats",
-        emoji: "🧠",
-        description: "Des sujets palpitants et des opinions qui divisent.",
-        questions: [
-            "20000€/mois a condition de fom 2fois/jour ,tu acceptes?",
-            "L'argent peut-il réellement rendre heureux ?",
-            "Premier Date au mc Donald ,ca passe?",
-            "un homme qui se bat et fort aux fess#s ou un homme riche mais faible aux fess#s ?",
-            "Est-ce que tout le monde mérite une seconde chance ?",
-            "Apoutchou ou Skinny ?",
-            "Le Bodycount est il important ?",
-            "Faire des bails avec un ami(e) ?",
-            "Est-ce pire de mentir ou de cacher volontairement la vérité ?",
-            "Tu choisirais l'amour ou ta carrière si tu devais absolument sacrifier l'un des deux ?",
-        ],
-    },
-
-];
 export default function BuzzPage() {
 
     const [selectedBuzzToShare, setSelectedBuzzToShare] = useState<Buzz | null>(null);
@@ -164,7 +45,6 @@ export default function BuzzPage() {
     const [sharingBuzz, setSharingBuzz] = useState(false);
     const [buzzShareMessage, setBuzzShareMessage] = useState("");
 
-    const [openQuestionCategory, setOpenQuestionCategory] = useState<string | null>(null);
     const [selectedQuestion, setSelectedQuestion] = useState<string | null>(null);
     const [selectedQuestionGroupId, setSelectedQuestionGroupId] = useState<string | null>(null);
 
@@ -718,7 +598,7 @@ export default function BuzzPage() {
                             icon={
                                 <Flame size={17} />
                             }
-                            label={t("Questions")}
+                            label={t("Idées de questions")}
                             onClick={() =>
                                 setTab("results")
                             }
@@ -1290,95 +1170,8 @@ export default function BuzzPage() {
                             {t("Partage les dans tes groupes ou en Statut/Story")}
                         </h2>
 
-                        <div className="mt-7">
-                            <div className="mt-5 space-y-3">
-                                {QUESTION_CATEGORIES.map((category) => {
-                                    const isOpen =
-                                        openQuestionCategory === category.id;
+                        <QuestionLibrary onSelect={setSelectedQuestion} />
 
-                                    return (
-                                        <div
-                                            key={category.id}
-                                            className="overflow-hidden rounded-[1.6rem] border border-slate-200/80 bg-white shadow-sm transition duration-300 dark:border-slate-800 dark:bg-slate-900"
-                                        >
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setOpenQuestionCategory(
-                                                        isOpen
-                                                            ? null
-                                                            : category.id,
-                                                    )
-                                                }
-                                                className="flex w-full items-center gap-4 p-4 text-left transition hover:bg-slate-50 dark:hover:bg-slate-800/60"
-                                            >
-                                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-2xl dark:bg-sky-950/40">
-                                                    {category.emoji}
-                                                </div>
-
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <h4 className="font-bold text-slate-900 dark:text-white">
-                                                            {t(category.name)}
-                                                        </h4>
-
-                                                        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                                            {category.questions.length}
-                                        </span>
-                                                    </div>
-
-                                                    <p className="mt-1 line-clamp-1 text-sm text-slate-500 dark:text-slate-400">
-                                                        {t(category.description)}
-                                                    </p>
-                                                </div>
-
-                                                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition ${isOpen ? "bg-sky-500 text-white" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"}`}>
-                                                    {isOpen ? (
-                                                        <ChevronUp size={18} />
-                                                    ) : (
-                                                        <ChevronDown size={18} />
-                                                    )}
-                                                </div>
-                                            </button>
-
-                                            <div className={`grid transition-all duration-500 ease-in-out ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-                                                <div className="overflow-hidden">
-                                                    <div className="border-t border-slate-100 px-3 pb-3 pt-2 dark:border-slate-800">
-                                                        {category.questions.map(
-                                                            (question, index) => (
-                                                                <div
-                                                                    key={`${category.id}-${index}`}
-                                                                    className="group flex items-center gap-3 rounded-2xl px-3 py-3 transition hover:bg-sky-50 dark:hover:bg-sky-950/20"
-                                                                >
-                                                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-400 dark:bg-slate-800">
-                                                                        {index + 1}
-                                                                    </div>
-
-                                                                    <p className="min-w-0 flex-1 text-sm font-bold leading-5 text-slate-700 dark:text-slate-200">
-                                                                        {t(question)}
-                                                                    </p>
-
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setSelectedQuestion(t(question))}
-                                                                        className="flex h-10 shrink-0 items-center gap-2 rounded-xl bg-sky-500 px-3 font-bold text-white shadow-sm shadow-sky-500/20 transition hover:bg-sky-600 active:scale-95"
-                                                                    >
-                                                                        <Send size={15} />
-
-                                                                        <span className="hidden sm:inline">
-                                                             {t("Partager")} </span>
-                                                                    </button>
-                                                                </div>
-                                                            ),
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
                     </div>
                 )}
 

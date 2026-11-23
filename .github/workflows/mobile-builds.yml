@@ -44,7 +44,7 @@ jobs:
           path: ~/.android/debug.keystore
           key: tellme-android-debug-signing-v1
       - run: npm ci
-      - run: npm run lint && npm run test:mobile && npm run test:receipts
+      - run: npm run lint && npm run test:mobile && npm run test:receipts && npm run test:fun
       - run: npm run build && npx cap sync android
       - run: chmod +x android/gradlew && cd android && ./gradlew --no-daemon assembleDebug
       - uses: actions/upload-artifact@v4

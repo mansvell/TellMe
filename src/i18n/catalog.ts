@@ -2082,5 +2082,349 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Un compte créé dans Safari reste lié à Safari. L’inscription depuis l’icône crée un compte distinct.": {
     "en": "An account created in Safari stays in Safari. Signing up from the Home Screen icon creates a separate account.",
     "de": "Ein in Safari erstelltes Konto bleibt mit Safari verknüpft. Die Registrierung über das Home-Bildschirm-Symbol erstellt ein separates Konto."
+  },
+  "Fun sera disponible après l’activation de la mise à jour sur le serveur.": {
+    "en": "Fun will be available after the server update is activated.",
+    "de": "Fun ist verfügbar, sobald das Server-Update aktiviert wurde."
+  },
+  "La limite d’envoi est atteinte. Réessaie plus tard.": {
+    "en": "You have reached the sending limit. Try again later.",
+    "de": "Das Sendelimit ist erreicht. Versuch es später erneut."
+  },
+  "Ce lien Secrets est indisponible.": {
+    "en": "This Secrets link is unavailable.",
+    "de": "Dieser Secrets-Link ist nicht verfügbar."
+  },
+  "La vérification a expiré. Réessaie l’envoi.": {
+    "en": "Verification expired. Try sending again.",
+    "de": "Die Überprüfung ist abgelaufen. Versuch erneut zu senden."
+  },
+  "L’opération n’a pas abouti. Réessaie.": {
+    "en": "The action could not be completed. Try again.",
+    "de": "Die Aktion konnte nicht abgeschlossen werden. Versuch es erneut."
+  },
+  "À l’instant": {
+    "en": "Just now",
+    "de": "Gerade eben"
+  },
+  "Il y a {count} min": {
+    "en": "{count} min ago",
+    "de": "Vor {count} Min."
+  },
+  "Il y a {count} h": {
+    "en": "{count} h ago",
+    "de": "Vor {count} Std."
+  },
+  "Il y a {count} jour(s)": {
+    "en": "{count} day(s) ago",
+    "de": "Vor {count} Tag(en)"
+  },
+  "Expire dans {time}": {
+    "en": "Expires in {time}",
+    "de": "Läuft in {time} ab"
+  },
+  "Message anonyme": {
+    "en": "Anonymous message",
+    "de": "Anonyme Nachricht"
+  },
+  "Réponds-moi anonymement sur TellMe": {
+    "en": "Reply anonymously on TellMe",
+    "de": "Antworte mir anonym auf TellMe"
+  },
+  "Ma réponse": {
+    "en": "My reply",
+    "de": "Meine Antwort"
+  },
+  "Le lien est en description": {
+    "en": "The link is in the caption",
+    "de": "Der Link steht in der Beschreibung"
+  },
+  "Fond de la carte": {
+    "en": "Card background",
+    "de": "Kartenhintergrund"
+  },
+  "Dis-moi quelque chose anonymement.": {
+    "en": "Tell me something anonymously.",
+    "de": "Sag mir anonym etwas."
+  },
+  "Impossible de préparer l’image.": {
+    "en": "Could not prepare the image.",
+    "de": "Das Bild konnte nicht vorbereitet werden."
+  },
+  "Réponse enregistrée.": {
+    "en": "Reply saved.",
+    "de": "Antwort gespeichert."
+  },
+  "Carte transmise à l’application choisie.": {
+    "en": "Card sent to the selected app.",
+    "de": "Karte an die gewählte App übergeben."
+  },
+  "Le lien est partagé. Enregistre aussi l’image pour ton Statut/Story.": {
+    "en": "The link was shared. Save the image for your status or story too.",
+    "de": "Der Link wurde geteilt. Speichere auch das Bild für deinen Status oder deine Story."
+  },
+  "Le partage a échoué. Tu peux enregistrer l’image.": {
+    "en": "Sharing failed. You can save the image.",
+    "de": "Teilen fehlgeschlagen. Du kannst das Bild speichern."
+  },
+  "Répondre au Secret": {
+    "en": "Reply to the Secret",
+    "de": "Auf das Secret antworten"
+  },
+  "Carte d’invitation": {
+    "en": "Invitation card",
+    "de": "Einladungskarte"
+  },
+  "Aperçu de la carte": {
+    "en": "Card preview",
+    "de": "Kartenvorschau"
+  },
+  "Enregistrer la réponse": {
+    "en": "Save reply",
+    "de": "Antwort speichern"
+  },
+  "Enregistrer l’image": {
+    "en": "Save image",
+    "de": "Bild speichern"
+  },
+  "Choisis WhatsApp, Instagram ou Snapchat dans le partage de ton appareil. Tu peux aussi publier l’image enregistrée manuellement.": {
+    "en": "Choose WhatsApp, Instagram or Snapchat in your device's share menu. You can also post the saved image manually.",
+    "de": "Wähle WhatsApp, Instagram oder Snapchat im Teilen-Menü deines Geräts. Du kannst das gespeicherte Bild auch selbst veröffentlichen."
+  },
+  "Mes Storytimes": {
+    "en": "My Storytimes",
+    "de": "Meine Storytimes"
+  },
+  "Publier une Storytime": {
+    "en": "Publish a Storytime",
+    "de": "Storytime veröffentlichen"
+  },
+  "Publier": {
+    "en": "Publish",
+    "de": "Veröffentlichen"
+  },
+  "Lire la Storytime publiée {time}": {
+    "en": "Read the Storytime posted {time}",
+    "de": "Storytime von {time} lesen"
+  },
+  "Stories précédentes": {
+    "en": "Previous stories",
+    "de": "Vorherige Stories"
+  },
+  "Stories suivantes": {
+    "en": "Next stories",
+    "de": "Nächste Stories"
+  },
+  "Aucune Storytime pour le moment.": {
+    "en": "No Storytimes yet.",
+    "de": "Noch keine Storytimes."
+  },
+  "Ton histoire": {
+    "en": "Your story",
+    "de": "Deine Geschichte"
+  },
+  "Aperçu de ton histoire": {
+    "en": "Preview of your story",
+    "de": "Vorschau deiner Geschichte"
+  },
+  "Visible anonymement pendant 24 h par les utilisateurs de TellMe. Jusqu’à 5 Storytimes actives.": {
+    "en": "Visible anonymously to TellMe users for 24 hours. Up to 5 active Storytimes.",
+    "de": "Für TellMe-Nutzer 24 Stunden anonym sichtbar. Bis zu 5 aktive Storytimes."
+  },
+  "Publication...": {
+    "en": "Publishing...",
+    "de": "Wird veröffentlicht..."
+  },
+  "Cette Storytime a expiré.": {
+    "en": "This Storytime has expired.",
+    "de": "Diese Storytime ist abgelaufen."
+  },
+  "Signalement envoyé.": {
+    "en": "Report sent.",
+    "de": "Meldung gesendet."
+  },
+  "Signaler": {
+    "en": "Report",
+    "de": "Melden"
+  },
+  "Motif du signalement": {
+    "en": "Report reason",
+    "de": "Grund der Meldung"
+  },
+  "Contenu inapproprié": {
+    "en": "Inappropriate content",
+    "de": "Unangemessener Inhalt"
+  },
+  "Spam": {
+    "en": "Spam",
+    "de": "Spam"
+  },
+  "Autre": {
+    "en": "Other",
+    "de": "Sonstiges"
+  },
+  "Envoyer le signalement": {
+    "en": "Send report",
+    "de": "Meldung senden"
+  },
+  "Aucune Storytime active.": {
+    "en": "No active Storytimes.",
+    "de": "Keine aktiven Storytimes."
+  },
+  "Ce Secret est indisponible.": {
+    "en": "This Secret is unavailable.",
+    "de": "Dieses Secret ist nicht verfügbar."
+  },
+  "Lien copié.": {
+    "en": "Link copied.",
+    "de": "Link kopiert."
+  },
+  "Envoie-moi un message anonyme.": {
+    "en": "Send me an anonymous message.",
+    "de": "Schick mir eine anonyme Nachricht."
+  },
+  "Impossible de partager le lien.": {
+    "en": "Could not share the link.",
+    "de": "Der Link konnte nicht geteilt werden."
+  },
+  "Reçois des messages anonymes": {
+    "en": "Receive anonymous messages",
+    "de": "Anonyme Nachrichten empfangen"
+  },
+  "Partage ton lien. Même les personnes sans TellMe peuvent t’écrire.": {
+    "en": "Share your link. People without TellMe can write to you too.",
+    "de": "Teile deinen Link. Auch Personen ohne TellMe können dir schreiben."
+  },
+  "Copier le lien": {
+    "en": "Copy link",
+    "de": "Link kopieren"
+  },
+  "Trouver une question": {
+    "en": "Find a question",
+    "de": "Eine Frage finden"
+  },
+  "Filtrer les Secrets": {
+    "en": "Filter Secrets",
+    "de": "Secrets filtern"
+  },
+  "Lus": {
+    "en": "Read",
+    "de": "Gelesen"
+  },
+  "Aucun Secret à afficher.": {
+    "en": "No Secrets to show.",
+    "de": "Keine Secrets vorhanden."
+  },
+  "Nouveau message anonyme reçu": {
+    "en": "New anonymous message received",
+    "de": "Neue anonyme Nachricht erhalten"
+  },
+  "Réponse préparée": {
+    "en": "Reply prepared",
+    "de": "Antwort vorbereitet"
+  },
+  "Non lu": {
+    "en": "Unread",
+    "de": "Ungelesen"
+  },
+  "Lu": {
+    "en": "Read",
+    "de": "Gelesen"
+  },
+  "Supprimer ce Secret et sa réponse ?": {
+    "en": "Delete this Secret and its reply?",
+    "de": "Dieses Secret und seine Antwort löschen?"
+  },
+  "Confirmer la suppression": {
+    "en": "Confirm deletion",
+    "de": "Löschen bestätigen"
+  },
+  "{count} Secrets non lus": {
+    "en": "{count} unread Secrets",
+    "de": "{count} ungelesene Secrets"
+  },
+  "Découvre des histoires et reçois des messages anonymes.": {
+    "en": "Discover stories and receive anonymous messages.",
+    "de": "Entdecke Geschichten und erhalte anonyme Nachrichten."
+  },
+  "Ton message a été envoyé.": {
+    "en": "Your message was sent.",
+    "de": "Deine Nachricht wurde gesendet."
+  },
+  "Tu peux retrouver une éventuelle réponse dans le Statut/Story de la personne qui a partagé ce lien.": {
+    "en": "You may find a reply in the status or story of the person who shared this link.",
+    "de": "Eine mögliche Antwort findest du im Status oder in der Story der Person, die diesen Link geteilt hat."
+  },
+  "Un Secret pour {name}": {
+    "en": "A Secret for {name}",
+    "de": "Ein Secret für {name}"
+  },
+  "Écris librement. Ton nom ne sera pas affiché.": {
+    "en": "Write freely. Your name will not be shown.",
+    "de": "Schreib frei. Dein Name wird nicht angezeigt."
+  },
+  "Ton message": {
+    "en": "Your message",
+    "de": "Deine Nachricht"
+  },
+  "Envoi en cours...": {
+    "en": "Sending...",
+    "de": "Wird gesendet..."
+  },
+  "Envoyer anonymement": {
+    "en": "Send anonymously",
+    "de": "Anonym senden"
+  },
+  "Idées de questions": {
+    "en": "Question ideas",
+    "de": "Fragenideen"
+  },
+  "Bleu clair": {
+    "en": "Light blue",
+    "de": "Hellblau"
+  },
+  "Violet doux": {
+    "en": "Soft purple",
+    "de": "Sanftes Violett"
+  },
+  "Rose pastel": {
+    "en": "Pastel pink",
+    "de": "Pastellrosa"
+  },
+  "Bleu nuit": {
+    "en": "Midnight blue",
+    "de": "Nachtblau"
+  },
+  "Bleu-violet": {
+    "en": "Blue-purple",
+    "de": "Blau-Violett"
+  },
+  "Gris foncé": {
+    "en": "Dark grey",
+    "de": "Dunkelgrau"
+  },
+  "Image enregistrée dans Documents.": {
+    "en": "Image saved in Documents.",
+    "de": "Bild in Dokumente gespeichert."
+  },
+  "Téléchargement de l’image lancé.": {
+    "en": "Image download started.",
+    "de": "Bilddownload gestartet."
+  },
+  "Choisis Enregistrer dans les options de ton appareil.": {
+    "en": "Choose Save in your device options.",
+    "de": "Wähle Speichern in den Optionen deines Geräts."
+  },
+  "Impossible d’enregistrer l’image.": {
+    "en": "Could not save the image.",
+    "de": "Das Bild konnte nicht gespeichert werden."
+  },
+  "Il y a 1 jour": {
+    "en": "1 day ago",
+    "de": "Vor 1 Tag"
+  },
+  "Il y a {count} jours": {
+    "en": "{count} days ago",
+    "de": "Vor {count} Tagen"
   }
 };

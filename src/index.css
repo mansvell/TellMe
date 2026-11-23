@@ -80,6 +80,14 @@ button {
   background-image: linear-gradient(color-mix(in oklab, var(--color-sky-950) 55%, transparent), transparent 11rem);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .fun-dialog[open] { animation: fun-dialog-open 150ms ease-out; }
+  @keyframes fun-dialog-open {
+    from { opacity: 0; transform: scale(.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+}
+
 /* Le document reste fixe dans le chat : seul le fil de messages défile. */
 html.chat-open, html.chat-open body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 html.chat-open #root { height: 100%; min-height: 0; }

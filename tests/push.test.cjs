@@ -166,4 +166,14 @@ test("the service worker displays a received push and opens its group", async ()
     callbacks.get("notificationclick")({ notification: { close() {}, data: { groupId: "https://outside.example" } }, waitUntil: promise => { completion = promise; } });
     await completion;
     assert.equal(destination, "https://tellme.example/home");
+    const secretId = "00000000-0000-4000-8000-000000000002";
+    callbacks.get("push")({ data: { json: () => ({ title: "TellMe", body: "Tu as reçu un nouveau Secret.", type: "secret", secretId }) }, waitUntil: promise => { completion = promise; } });
+    await completion;
+    assert.equal(shown[1][1].tag, "tellme-secret");
+    callbacks.get("notificationclick")({ notification: { close() {}, data: shown[1][1].data }, waitUntil: promise => { completion = promise; } });
+    await completion;
+    assert.equal(destination, "https://tellme.example/fun?secret=" + secretId);
+    callbacks.get("notificationclick")({ notification: { close() {}, data: { type: "secret", secretId: "https://outside.example" } }, waitUntil: promise => { completion = promise; } });
+    await completion;
+    assert.equal(destination, "https://tellme.example/home");
 });

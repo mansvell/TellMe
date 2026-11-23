@@ -6,7 +6,11 @@ self.addEventListener("activate", event => {
     event.waitUntil(self.clients.claim());
 });
 
-function chatPath(groupId) {
+function notificationPath(data) {
+    if (data?.type === "secret" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.secretId ?? "")) {
+        return `/fun?secret=${data.secretId}`;
+    }
+    const groupId = data?.groupId;
     return typeof groupId === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(groupId)
         ? `/chat/${groupId}`
         : "/home";
@@ -21,24 +25,24 @@ self.addEventListener("push", event => {
     }
 
     const { title, body, groupId } = payload;
-    const url = chatPath(groupId);
+    const url = notificationPath(payload);
     event.waitUntil(self.registration.showNotification(
         typeof title === "string" && title.trim() ? title : "TellMe",
         {
             body: typeof body === "string" && body.trim() ? body : "Tu as reçu un nouveau message.",
             icon: "/tellme-icon-192.png",
             badge: "/tellme-icon-192.png",
-            tag: url === "/home" ? "tellme-message" : `tellme-chat-${groupId}`,
+            tag: payload.type === "secret" ? "tellme-secret" : url === "/home" ? "tellme-message" : `tellme-chat-${groupId}`,
             renotify: true,
             vibrate: [150, 80, 150],
-            data: { groupId },
+            data: { groupId, type: payload.type, secretId: payload.secretId },
         },
     ));
 });
 
 self.addEventListener("notificationclick", event => {
     event.notification.close();
-    const destination = new URL(chatPath(event.notification.data?.groupId), self.location.origin).href;
+    const destination = new URL(notificationPath(event.notification.data), self.location.origin).href;
     event.waitUntil((async () => {
         const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
         const match = windows.find(client => client.url === destination);
