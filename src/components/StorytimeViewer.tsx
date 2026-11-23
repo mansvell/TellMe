@@ -2,8 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight, Flag, Pause, Play, X } from "lucide-react";
 import { t } from "../i18n/runtime";
 import { elapsedTime, funError, readStorytime, reportStorytime, type Storytime } from "../services/fun";
-import { FUN_BACKGROUNDS } from "../services/funCards";
-import { STORY_TOPICS } from "../data/storytimes";
+import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
 
 export default function StorytimeViewer({ stories, initialId, onRead, onMore, onClose }: {
     stories: Storytime[]; initialId: string; onRead: (id: string) => void;
@@ -94,7 +93,7 @@ function StoryScene({ story, position, total, loading, error, onRead, onNext, on
         catch (error) { setFailure(funError(error)); }
         finally { setSending(false); }
     }
-    const palette = FUN_BACKGROUNDS[story.theme];
+    const palette = STORY_BACKGROUNDS[story.theme];
     return <div style={{ background: palette.background, color: palette.color }} className="mx-auto flex h-full w-full max-w-3xl flex-col"
         onKeyDown={event => {
             if (event.target instanceof HTMLElement && ["SELECT", "OPTION"].includes(event.target.tagName)) return;

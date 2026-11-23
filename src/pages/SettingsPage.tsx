@@ -574,16 +574,11 @@ export default function SettingsPage() {
                          description="Contact: mansvellnk@gmail.com"
                     />
 
-                    <Row
-                        title="Version"
-                        value="1.0.0"
-                        disabled
-                    />
-
                 </div>
 
                 <p className="pb-3 text-center text-xm leading-5 text-slate-400">
                      {t("TellMe, l'App qui révolutionne l'Anonymat et le Fun")} </p>
+                <p className="pt-8 pb-3 text-center text-xs text-slate-500 dark:text-slate-400">Version 1.0.2</p>
 
             </section>}
 

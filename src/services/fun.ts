@@ -5,6 +5,7 @@ import { getLocale, t } from "../i18n/runtime";
 export const CARD_THEMES = ["blue", "violet", "pink", "night", "gradient", "slate"] as const;
 export type CardTheme = typeof CARD_THEMES[number];
 export type Storytime = { id: string; content: string; theme: CardTheme; created_at: string; expires_at: string; seen: boolean };
+export type StorytimeViewer = { display_name: string; color: string; viewed_at: string };
 export type Secret = { id: string; content: string; created_at: string; read_at: string | null; reply: string | null; card_theme: CardTheme; replied_at: string | null };
 export type Cursor = { created_at: string; id: string };
 type RpcArgs = Record<string, string | null>;
@@ -48,6 +49,13 @@ export async function getStorytimes(cursor?: Cursor) {
     return { rows: rows.slice(0, 10), hasMore: rows.length > 10 };
 }
 export const getMyStorytimes = () => rpc<Storytime[]>("get_my_storytimes");
+export const getMyStorytimeViewCounts = () => rpc<{ story_id: string; view_count: number }[]>("get_my_storytime_view_counts");
+export async function getStorytimeViewers(id: string, offset = 0) {
+    const { data, error } = await supabase.rpc("get_storytime_viewers", { target_id: id, page_offset: offset });
+    if (error) throw error;
+    const rows = data as StorytimeViewer[];
+    return { rows: rows.slice(0, 50), hasMore: rows.length > 50 };
+}
 export const createStorytime = (content: string, theme: CardTheme) => rpc<string>("create_storytime", { story_text: content.trim(), target_theme: theme });
 export const readStorytime = (id: string) => rpc<void>("read_storytime", { target_id: id });
 export const deleteStorytime = (id: string) => rpc<void>("delete_storytime", { target_id: id });

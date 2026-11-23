@@ -172,3 +172,64 @@ test("only the group creator can rename an active group, with a valid name", asy
         await assert.rejects(db.query("select rename_group($1,'Supprimé')", [uuid(100)]), /ACCOUNT_NOT_FOUND/);
     } finally { await db.close(); }
 });
+
+test("Storytime views are unique, exclude the author and are private to the author", async () => {
+    const db = new PGlite();
+    try {
+        await db.exec(`
+            create schema auth; create role anon; create role authenticated;
+            grant usage on schema public,auth to anon,authenticated;
+            create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('test.user',true),'')::uuid$$;
+            create table public.profiles(id uuid primary key,display_name text,default_color text);
+            grant select on public.profiles to authenticated;
+        `);
+        for (let i=1;i<=3;i++) await db.query("insert into profiles values($1,$2,$3)",[uuid(i),"Profil "+i,i===2?"#22C55E":null]);
+        await db.exec(migration);
+        const viewsMigration=fs.readFileSync("supabase/migrations/20261123_storytime_views.sql","utf8");
+        await db.exec(viewsMigration); await db.exec(viewsMigration);
+        async function login(index) {
+            await db.exec("reset role");
+            await db.query("select set_config('test.user',$1,false)",[index?uuid(index):""]);
+            await db.exec(index?"set role authenticated":"set role anon");
+        }
+        const rows=async(text,args=[]) => (await db.query(text,args)).rows;
+        await login(1);
+        const storyId=(await rows("select create_storytime('Mon histoire','blue') as id"))[0].id;
+        await db.query("select read_storytime($1)",[storyId]);
+        assert.equal(Number((await rows("select * from get_my_storytime_view_counts()"))[0].view_count),0);
+        assert.equal((await rows("select * from get_storytime_viewers($1)",[storyId])).length,0);
+        for (const viewer of [2,2,3]) { await login(viewer); await db.query("select read_storytime($1)",[storyId]); }
+        await assert.rejects(db.query("select * from get_storytime_viewers($1)",[storyId]),/STORY_ACCESS_DENIED/);
+        assert.equal((await rows("select * from get_my_storytime_view_counts()")).length,0);
+        await assert.rejects(db.query("select * from tellme_private.storytime_views"),/permission denied/);
+        await login(0);
+        await assert.rejects(db.query("select * from get_storytime_viewers($1)",[storyId]),/permission denied/);
+        await assert.rejects(db.query("select * from get_my_storytime_view_counts()"),/permission denied/);
+        await login(1);
+        assert.equal(Number((await rows("select * from get_my_storytime_view_counts()"))[0].view_count),2);
+        const viewed=await rows("select * from get_storytime_viewers($1)",[storyId]);
+        assert.equal(viewed.length,2);
+        assert.deepEqual(Object.keys(viewed[0]).sort(),["color","display_name","viewed_at"]);
+        assert.equal(viewed.find(row=>row.display_name==="Profil 2").color,"#22C55E");
+        assert.equal(viewed.find(row=>row.display_name==="Profil 3").color,"#0EA5E9");
+        await assert.rejects(db.query("select * from get_storytime_viewers($1,-1)",[storyId]),/INVALID_OFFSET/);
+        await assert.rejects(db.query("select * from get_storytime_viewers($1)",[uuid(900)]),/STORY_ACCESS_DENIED/);
+        await db.exec("reset role");
+        for(let i=10;i<65;i++) {
+            await db.query("insert into profiles(id,display_name) values($1,$2)",[uuid(i),"Spectateur "+i]);
+            await db.query("insert into tellme_private.storytime_views(story_id,user_id) values($1,$2)",[storyId,uuid(i)]);
+        }
+        await login(1);
+        assert.equal(Number((await rows("select * from get_my_storytime_view_counts()"))[0].view_count),57);
+        assert.equal((await rows("select * from get_storytime_viewers($1)",[storyId])).length,51);
+        assert.equal((await rows("select * from get_storytime_viewers($1,50)",[storyId])).length,7);
+        await db.exec("reset role");
+        await db.query("delete from profiles where id=$1",[uuid(2)]);
+        await login(1);
+        assert.equal(Number((await rows("select * from get_my_storytime_view_counts()"))[0].view_count),56);
+        await db.exec("reset role");
+        await db.query("delete from profiles where id=$1",[uuid(1)]);
+        await login(1);
+        await assert.rejects(db.query("select * from get_storytime_viewers($1)",[storyId]),/ACCOUNT_NOT_FOUND/);
+    } finally { await db.close(); }
+});

@@ -4,6 +4,8 @@ Appliquer supabase/migrations/20261123_fun_secrets_storytimes.sql dans le SQL Ed
 
 Pour renommer un groupe depuis ses informations, appliquer aussi supabase/migrations/20261123_group_name.sql. Seul son créateur peut modifier le nom d'un groupe encore actif, entre 2 et 40 caractères.
 
+Appliquer supabase/migrations/20261123_storytime_views.sql pour les compteurs et spectateurs de Storytimes. La liste et le nombre sont réservés à l'auteur, dans Mes Storytimes. Chaque compte ne compte qu'une fois ; les lectures de l'auteur sont exclues. Les vues déjà enregistrées restent prises en compte. Les comptes supprimés disparaissent du compteur et de la liste. La liste charge 50 personnes à la fois.
+
 Les Storytimes sont visibles pendant 24 heures aux utilisateurs inscrits. La liste publique ne renvoie aucun identifiant d'auteur. Chaque auteur peut avoir cinq histoires actives et dix publications par jour. Seul l'auteur peut supprimer son histoire. Les signalements se consultent avec les droits administrateur dans tellme_private.storytime_reports.
 
 Chaque boîte possède un identifiant public aléatoire stable. Le lien utilise le domaine du site sur le web et le domaine public configuré sur l'application native. L'envoi public ne crée pas de compte. Il utilise une vérification cryptographique légère dans un worker, un champ anti-robot et des limites côté serveur. Les adresses IP sont utilisées sous forme d'empreintes salées dans les tables privées. Les limites sont de dix messages par tranche de dix minutes par empreinte et cinquante messages par heure par boîte. Les répétitions d'une même requête ne créent pas de doublon.
@@ -11,6 +13,8 @@ Chaque boîte possède un identifiant public aléatoire stable. Le lien utilise 
 Le contenu d'un Secret est accessible à son seul destinataire. Les actions de lecture, réponse et suppression vérifient le propriétaire côté serveur. Une réponse est enregistrée uniquement avec « Enregistrer la réponse ». La carte peut être transmise à la feuille de partage du système ou enregistrée en PNG 1080 × 1920. La publication dans le Statut/Story de l'application choisie reste à effectuer par l'utilisateur.
 
 Les cartes Secrets ne contiennent ni l'URL ni la mention « lien en description » dans l'image. Le lien reste transmis en légende au partage. La couleur d'une Storytime indique son thème ; le bouton d'information détaille les couleurs et les limites. La lecture occupe tout l'écran et avance après cinq secondes, avec pause lors d'un appui prolongé, du signalement ou du passage en arrière-plan.
+
+Palette Storytimes : vert/Quotidien, violet doux/Confidences, rose pastel/Amour et relations, bleu/Mystère, rouge/Drôle, jaune/Privé. Le jaune indique un secret personnel révélé anonymement ; la visibilité reste commune à tous les utilisateurs. Les clés enregistrées des couleurs sont conservées pour les histoires existantes. La palette des cartes Secrets reste indépendante. Les paramètres affichent Version 1.0.2 en bas de page.
 
 ## Notifications système des Secrets
 

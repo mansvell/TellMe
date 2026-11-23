@@ -2530,5 +2530,69 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Le renommage sera disponible après la mise à jour du serveur.": {
     "en": "Renaming will be available after the server update.",
     "de": "Das Umbenennen ist nach der Serveraktualisierung verfügbar."
+  },
+  "Vert": {
+    "en": "Green",
+    "de": "Grün"
+  },
+  "Bleu": {
+    "en": "Blue",
+    "de": "Blau"
+  },
+  "Rouge": {
+    "en": "Red",
+    "de": "Rot"
+  },
+  "Jaune": {
+    "en": "Yellow",
+    "de": "Gelb"
+  },
+  "Drôle": {
+    "en": "Funny",
+    "de": "Lustig"
+  },
+  "Privé": {
+    "en": "Private",
+    "de": "Privat"
+  },
+  "Seul l’auteur peut consulter le nombre de vues et la liste des personnes qui ont vu son histoire.": {
+    "en": "Only the author can see the view count and the list of people who viewed their story.",
+    "de": "Nur der Autor kann die Anzahl der Aufrufe und die Personen sehen, die seine Geschichte angesehen haben."
+  },
+  "Vues de la Storytime": {
+    "en": "Storytime views",
+    "de": "Storytime-Aufrufe"
+  },
+  "Une seule vue par personne. Tes propres lectures ne sont pas comptées.": {
+    "en": "One view per person. Your own views are not counted.",
+    "de": "Ein Aufruf pro Person. Deine eigenen Aufrufe zählen nicht."
+  },
+  "Personne n’a encore vu cette Storytime.": {
+    "en": "No one has viewed this Storytime yet.",
+    "de": "Diese Storytime hat noch niemand angesehen."
+  },
+  "Impossible de charger les vues. Réessaie.": {
+    "en": "Could not load views. Try again.",
+    "de": "Die Aufrufe konnten nicht geladen werden. Versuche es erneut."
+  },
+  "Vues": {
+    "en": "Views",
+    "de": "Aufrufe"
+  },
+  "1 vue": {
+    "en": "1 view",
+    "de": "1 Aufruf"
+  },
+  "{count} vues": {
+    "en": "{count} views",
+    "de": "{count} Aufrufe"
+  },
+  "Le jaune « Privé » annonce un secret personnel révélé anonymement.": {
+    "en": "Yellow “Private” signals a personal secret shared anonymously.",
+    "de": "Gelb „Privat“ steht für ein persönliches Geheimnis, das anonym erzählt wird."
+  },
+  "Un secret personnel, raconté anonymement.": {
+    "en": "A personal secret, shared anonymously.",
+    "de": "Ein persönliches Geheimnis, anonym erzählt."
   }
 };

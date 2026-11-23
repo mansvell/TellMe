@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import { BookOpen, ChevronLeft, ChevronRight, Info, MoreHorizontal, Plus } from "lucide-react";
 import { t } from "../i18n/runtime";
 import { elapsedTime, funError, getStorytimes, type Storytime } from "../services/fun";
-import { FUN_BACKGROUNDS } from "../services/funCards";
-import { STORY_TOPICS } from "../data/storytimes";
+import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
 import FunDialog from "./FunDialog";
 import StorytimeInfo from "./StorytimeInfo";
 import StorytimeViewer from "./StorytimeViewer";
@@ -68,7 +67,7 @@ export default function StorytimesSection() {
                     <button type="button" aria-label={t("Lire la Storytime publiée {time}", { time: elapsedTime(story.created_at, now) })} onClick={() => setSelected(story.id)}
                         style={story.seen ? undefined : { borderColor: STORY_TOPICS[story.theme].ring }}
                         className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full border-[3px] p-1 ${story.seen ? "border-slate-300 dark:border-slate-600" : ""}`}>
-                        <span style={{ background: FUN_BACKGROUNDS[story.theme].background, color: FUN_BACKGROUNDS[story.theme].color }} className="flex h-full w-full items-center justify-center rounded-full"><BookOpen size={22} /></span>
+                        <span style={{ background: STORY_BACKGROUNDS[story.theme].background, color: STORY_BACKGROUNDS[story.theme].color }} className="flex h-full w-full items-center justify-center rounded-full"><BookOpen size={22} /></span>
                     </button>
                     <p className="mt-2 whitespace-nowrap text-[11px] text-slate-500 dark:text-slate-300">{elapsedTime(story.created_at, now)}</p>
                 </li>)}
