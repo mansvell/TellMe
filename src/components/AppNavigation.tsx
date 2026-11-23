@@ -6,10 +6,10 @@ export default function AppNavigation({ secretsUnread = 0 }: { secretsUnread?: n
     const { pathname } = useLocation();
     const current = pathname.toLowerCase().replace(/\/$/, "");
     const items = [
-        { to: "/home", title: t("Accueil"), icon: House },
-        { to: "/buzz", title: "Buzz", icon: Flame },
         { to: "/fun", title: "Fun", icon: Drama },
         { to: "/invit", title: t("Invitations"), icon: MailPlus },
+        { to: "/home", title: t("Accueil"), icon: House },
+        { to: "/buzz", title: "Buzz", icon: Flame },
         { to: "/settings", title: t("Paramètres"), icon: Settings },
     ];
 

@@ -322,7 +322,7 @@ export default function InvitationsPage() {
 
             <section className="mx-auto max-w-5xl p-4 sm:p-5">
                 <button type="button" onClick={() => navigate("/discover")}
-                    className="mb-6 flex w-full items-center justify-between gap-3 rounded-2xl border border-sky-200 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">
+                    className="mb-6 flex w-70 items-center justify-between gap-3 rounded-2xl border border-sky-400 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">
                     {t("Trouver d’autres utilisateurs")}
                     <UserRoundPlus size={22} className="shrink-0" aria-hidden="true" />
                 </button>

@@ -1,0 +1,123 @@
+Les avantages
+✅ Pas de profils.
+✅ Pas de recherche d'utilisateurs.
+✅ Pas de copie de lien.
+✅ Très simple à comprendre.
+✅ On garde l'idée que toute relation commence dans un groupe.
+
+Je trouve même que cette fonctionnalité peut devenir une signature de TellMe : au lieu d'ouvrir une "conversation privée" classique, on crée un mini-groupe privé de deux personnes, qui bénéficie exactement des mêmes fonctionnalités (personnalisation, médias, durée de vie, etc.) que les autres groupes. Cela reste cohérent avec toute l'architecture de l'application.
+
+Splash
+      │
+      ▼
+Welcome
+      │
+ ┌────┴────────────┐
+ │                 │
+Commencer     J'ai un lien
+ │                 │
+ ▼                 ▼
+Register     JoinByLink
+ │                 │
+ ▼                 ▼
+Home        JoinPreview
+                 │
+      ┌──────────┴─────────┐TellMeApp0726
+      │                    │
+Compte existant     Nouveau
+      │                    │
+      ▼                    ▼
+   Rejoindre          Register
+      │                    │
+      └──────────┬─────────┘
+                 ▼
+               Chat
+
+-- Utilisateurs TellMe
+create table public.profiles (
+    id uuid primary key references auth.users(id) on delete cascade,
+    display_name text not null check (char_length(display_name) between 3 and 24),
+    default_color text not null default '#0EA5E9',
+    receive_invitations boolean not null default true,
+    last_pseudo_change timestamptz not null default now(),
+    created_at timestamptz not null default now()
+);
+
+-- Groupes
+create table public.groups (
+    id uuid primary key default gen_random_uuid(),
+    name text not null check (char_length(name) between 2 and 40),
+    color text not null default '#0EA5E9',
+    dominus_id uuid not null references public.profiles(id) on delete cascade,
+    invite_code text not null unique,
+    lifetime_minutes integer,
+    expires_at timestamptz,
+    created_at timestamptz not null default now()
+);
+
+-- Membres des groupes
+create table public.group_members (
+    id uuid primary key default gen_random_uuid(),
+    group_id uuid not null references public.groups(id) on delete cascade,
+    user_id uuid not null references public.profiles(id) on delete cascade,
+    local_pseudo text not null,
+    local_color text not null default '#0EA5E9',
+    chat_background text,
+    role text not null default 'member'
+        check (role in ('dominus', 'member')),
+    status text not null default 'active'
+        check (status in ('active', 'left', 'banned')),
+    joined_at timestamptz not null default now(),
+    last_seen_at timestamptz not null default now(),
+
+    unique(group_id, user_id)
+);
+
+-- Messages
+create table public.messages (
+    id uuid primary key default gen_random_uuid(),
+    group_id uuid not null references public.groups(id) on delete cascade,
+    sender_membership_id uuid not null
+        references public.group_members(id) on delete cascade,
+    content text not null check (char_length(content) between 1 and 2000),
+    reply_to_id uuid references public.messages(id) on delete set null,
+    created_at timestamptz not null default now(),
+    edited_at timestamptz,
+    deleted_at timestamptz
+);
+
+-- Lectures des messages
+create table public.message_reads (
+    message_id uuid not null references public.messages(id) on delete cascade,
+    membership_id uuid not null
+        references public.group_members(id) on delete cascade,
+    read_at timestamptz not null default now(),
+
+    primary key (message_id, membership_id)
+);
+
+-- Invitations internes à deux personnes
+create table public.invitations (
+    id uuid primary key default gen_random_uuid(),
+    sender_membership_id uuid not null
+        references public.group_members(id) on delete cascade,
+    receiver_membership_id uuid not null
+        references public.group_members(id) on delete cascade,
+    conversation_name text not null
+        check (char_length(conversation_name) between 2 and 40),
+    status text not null default 'pending'
+        check (status in ('pending', 'accepted', 'declined')),
+    created_at timestamptz not null default now(),
+    responded_at timestamptz
+);
+
+-- Médias attachés aux messages
+create table public.attachments (
+    id uuid primary key default gen_random_uuid(),
+    message_id uuid not null references public.messages(id) on delete cascade,
+    storage_path text not null,
+    file_name text not null,
+    file_type text not null,
+    file_size bigint,
+    created_at timestamptz not null default now()
+);

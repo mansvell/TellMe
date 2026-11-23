@@ -1,0 +1,67 @@
+Nouvel utilisateur
+Welcome → Commencer → Register → Home
+
+Utilisateur qui ne se déconnecte pas
+Splash → session Supabase trouvée → Home
+
+Utilisateur déconnecté
+Welcome → Mon compte → pseudo + code → Home
+
+Utilisateur supprimé/banni
+Mon compte → compte introuvable/refusé → reste sur Welcome
+
+Invitation
+lien /join/:inviteCode → JoinPreviewPage → nouvel utilisateur s'inscrit si nécessaire → rejoint le groupe
+
+
+Public Key:
+BH760RcZkY29Ma9apbpjsekoFWBnw6NoU1aaRN5AK_ZSq9b5PLeWvoYLNMPP5tWeXlw5Fc4A6IC65Vx2ClAtMB0
+
+Private Key:
+C-6D46BBR10-68UiPFC7HCDwg2GuVlgft43M-RGuFx0
+
+Public Key:
+BGT7wLM7vW6ju7rysBDfmD0qlmEUov_R0Fa2-naQe4FsWazJZY8x-O4tA23mv5fRqdC6wTTm9wAoEL6mhByRXqA
+
+Private Key:
+l1AQn8n0-5KFTMsRCgw0jcJeli9pQ29NISo1pjzx6WA
+
+Ouverture TellMe
+        │
+        ▼
+        /
+        │
+        ▼
+     Splash
+        │
+   vérifie session
+        │
+   ┌────┴────┐
+   │         │
+ session   aucune
+   │        session
+   ▼         │
+ /home       ▼
+          /welcome
+             │
+             ▼
+          register
+             │
+             ▼
+           /home	Lien TellMe reçu
+        │
+        ▼
+/join/B30D464F3B
+        │
+        ▼
+ JoinPreviewPage
+        │
+   ┌────┴─────┐
+existant    nouveau
+   │           │
+   ▼           ▼
+rejoindre   inscription
+   │           │
+   └─────┬─────┘
+         ▼
+       /chat
