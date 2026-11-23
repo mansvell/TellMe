@@ -1,5 +1,5 @@
 import { t } from "../i18n/runtime";
-import { MessageCircle, Sparkles } from "lucide-react";
+import { MessageCircle, CircleHelp } from "lucide-react";
 //carte de Question envoyé dans les groupes
 
 type Props = {
@@ -18,18 +18,14 @@ export default function QuestionMessageCard({
                     <div className="relative">
 
                         <div className="mt-1 flex items-center justify-center gap-1.5">
-                            <Sparkles
-                                size={13}
+                            <CircleHelp
+                                size={16}
                                 className="text-sky-500"
                             />
 
                             <p className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-500">
                                  {t("Nouvelle Question")} </p>
 
-                            <Sparkles
-                                size={13}
-                                className="text-sky-500"
-                            />
                         </div>
 
                         <p className="mx-auto mt-3 max-w-sm text-lg font-black leading-7 text-slate-900 dark:text-white">
@@ -43,7 +39,7 @@ export default function QuestionMessageCard({
                                 size={16}
                                 className="text-sky-500"
                             />
-                             {t("Exprimez vous sans crainte")} </div>
+                             {t("Dis moi tout")} </div>
                     </div>
                 </div>
             </div>

@@ -16,7 +16,7 @@ const QuestionShareCard = forwardRef<HTMLDivElement>(
                         <img src={icon} alt="TellMe" className="h-24 w-24 object-contain drop-shadow-xl" />
 
                         <span className="mt-1 text-4xl font-black tracking-tight">
-                            ✦ TellMe ✦
+                            TellMe
                         </span>
                     </div>
 

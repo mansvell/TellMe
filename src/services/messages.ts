@@ -58,6 +58,10 @@ export type ChatMessage = {
     question: string | null;
 };
 
+export function isAnonymousGroupPrompt(message: Pick<ChatMessage, "message_type" | "buzz_id">): boolean {
+    return message.message_type === "question" || message.message_type === "buzz" || !!message.buzz_id;
+}
+
 type MessageDatabaseRow = {
     id: string;
     group_id: string;
@@ -632,12 +636,12 @@ async function hydrateMessages(
             question: row.message_type === "question" ? row.content : null,
             me: membership?.user_id === currentUserId,
 
-            name:
+            name: isAnonymousGroupPrompt(row) ? "TellMe" :
                 profile?.display_name ??
                 row.sender_name ??
                 t("Utilisateur"),
 
-            color:
+            color: isAnonymousGroupPrompt(row) ? "#0EA5E9" :
                 membership?.local_color ??
                 row.sender_color ??
                 "#0EA5E9",
@@ -662,14 +666,14 @@ async function hydrateMessages(
                     ? {
                         id: replyRow.id,
 
-                        name: replyProfile?.display_name ??
+                        name: isAnonymousGroupPrompt(replyRow) ? t(replyRow.message_type === "question" ? "Question anonyme" : "Sondage anonyme") : replyProfile?.display_name ??
                             replyRow.sender_name ??
                             t("Utilisateur"),
 
                         text:
                         replyRow.content,
 
-                        color: replyMembership?.local_color ??
+                        color: isAnonymousGroupPrompt(replyRow) ? "#0EA5E9" : replyMembership?.local_color ??
                             replyRow.sender_color ??
                             "#0EA5E9",
                     }

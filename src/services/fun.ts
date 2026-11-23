@@ -77,7 +77,7 @@ export const readSecret = (id: string) => rpc<string>("read_secret", { target_id
 export const deleteSecret = (id: string) => rpc<void>("delete_secret", { target_id: id });
 export const saveSecretReply = (id: string, reply: string, theme: CardTheme) => rpc<void>("save_secret_reply", { target_id: id, reply_text: reply.trim(), target_theme: theme });
 export const getSecretUnreadCount = () => rpc<number>("get_secrets_unread_count");
-export const getSecretRecipient = (token: string) => rpc<{ display_name: string }[]>("get_secret_recipient", { target_token: token });
+export const isSecretLinkAvailable = async (token: string) => (await rpc<unknown[]>("get_secret_recipient", { target_token: token })).length > 0;
 
 export async function sendPublicSecret(token: string, content: string, requestId: string, website: string, signal: AbortSignal): Promise<void> {
     const rows = await rpc<{ challenge_id: string; salt: string }[]>("create_secret_challenge", { target_token: token, target_request_id: requestId });

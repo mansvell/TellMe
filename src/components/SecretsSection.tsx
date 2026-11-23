@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-import { Copy, Mail, Share2, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Mail, Share2, Trash2 } from "lucide-react";
+import { toBlob } from "html-to-image";
 import { useOutletContext, useSearchParams } from "react-router-dom";
 import type { SettingsTabContext } from "./AppTabsLayout";
-import { t } from "../i18n/runtime";
-import { copyText, shareLink } from "../mobile/sharing";
+import { getLanguage, t } from "../i18n/runtime";
+import { saveImage, shareImage } from "../mobile/sharing";
 import {
     deleteSecret, elapsedTime, funError, getSecret, getSecretLink, getSecrets, readSecret, type Secret,
 } from "../services/fun";
 import FunDialog from "./FunDialog";
-import QuestionLibrary from "./QuestionLibrary";
 import SecretCardEditor from "./SecretCardEditor";
+import SecretShareCard from "./SecretShareCard";
 
 export default function SecretsSection() {
     const { secretsUnread } = useOutletContext<SettingsTabContext>();
@@ -21,8 +22,6 @@ export default function SecretsSection() {
     const [attempt, setAttempt] = useState(0);
     const [selected, setSelected] = useState<Secret | null>(null);
     const [replying, setReplying] = useState(false);
-    const [questions, setQuestions] = useState(false);
-    const [question, setQuestion] = useState<string | null>(null);
     const [notice, setNotice] = useState("");
     const [busy, setBusy] = useState(false);
     const [dialogError, setDialogError] = useState("");
@@ -30,6 +29,26 @@ export default function SecretsSection() {
     const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
     const [params, setParams] = useSearchParams();
     const target = params.get("secret");
+    const posterRef = useRef<HTMLDivElement>(null);
+    const locale = getLanguage();
+    const [poster, setPoster] = useState<{ blob: Blob; locale: string } | null>(null);
+    const [posterError, setPosterError] = useState("");
+    const [posterAttempt, setPosterAttempt] = useState(0);
+    const [sharing, setSharing] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+        const node = posterRef.current;
+        if (!node) return;
+        void (async () => {
+            await document.fonts.ready;
+            await Promise.all(Array.from(node.querySelectorAll("img")).map(image => image.decode()));
+            const blob = await toBlob(node, { pixelRatio: 3, cacheBust: true });
+            if (!blob) throw Error("POSTER_UNAVAILABLE");
+            if (active) { setPoster({ blob, locale }); setPosterError(""); }
+        })().catch(() => { if (active) setPosterError(t("Impossible de préparer l’image.")); });
+        return () => { active = false; };
+    }, [locale, posterAttempt]);
 
     useEffect(() => {
         let active = true;
@@ -100,21 +119,24 @@ export default function SecretsSection() {
         finally { setBusy(false); }
     }
 
-    async function copy() {
-        try { await copyText(link); setNotice(t("Lien copié.")); }
-        catch { setError(t("Impossible de copier le lien.")); }
-    }
-
     async function share() {
+        if (!poster || poster.locale !== locale || !link || sharing) return;
+        setSharing(true); setNotice("");
         try {
-            const result = await shareLink("TellMe", t("Envoie-moi un message anonyme."), link);
-            if (result === "copied") setNotice(t("Lien copié."));
+            const result = await shareImage(poster.blob, "tellme-anonyme.png", "TellMe", link);
+            if (result === "image") setNotice(t("Carte transmise à l’application choisie."));
+            else if (result !== "cancelled") {
+                await saveImage(poster.blob, "tellme-anonyme.png");
+                setNotice(t(result === "copied" ? "Image téléchargée et lien copié." : "Image téléchargée et lien partagé."));
+            }
         } catch { setError(t("Impossible de partager le lien.")); }
+        finally { setSharing(false); }
     }
 
     const visible = secrets.filter(secret => filter === "all" || (filter === "unread" ? !secret.read_at : secret.read_at));
     return (
         <section aria-labelledby="secrets-heading" className="mt-9">
+            <div aria-hidden="true" className="pointer-events-none fixed -left-[10000px] top-0"><SecretShareCard ref={posterRef} /></div>
             <h2 id="secrets-heading" className="flex items-center gap-2 text-lg font-bold">Secrets
                 {secretsUnread > 0 && <span className="rounded-full bg-sky-700 px-2 py-0.5 text-xs text-white">{secretsUnread}</span>}
             </h2>
@@ -122,13 +144,11 @@ export default function SecretsSection() {
                 <h3 className="text-balance font-semibold">{t("Prêt à recevoir des messages anonymes ?")}</h3>
                 {link && <p className="mt-3 select-all break-all rounded-lg bg-white/70 px-3 py-2 text-xs text-sky-800 dark:bg-slate-900 dark:text-sky-200">{link}</p>}
                 <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" disabled={!link} onClick={() => void copy()} className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Copy size={17} />{t("Copier le lien")}</button>
-                    <button type="button" disabled={!link} onClick={() => void share()} className="inline-flex items-center gap-2 rounded-lg bg-violet-100 px-3 py-2.5 text-sm font-semibold text-violet-800 dark:bg-slate-700 dark:text-violet-200 disabled:opacity-50"><Share2 size={17} />{t("Partager")}</button>
+                    <button type="button" disabled={!link || poster?.locale !== locale || sharing} onClick={() => void share()} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Share2 size={17} />{sharing ? t("Préparation…") : t("Partager le lien")}</button>
                 </div>
+                {posterError && <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-300">{posterError}<button type="button" onClick={() => setPosterAttempt(value => value + 1)} className="ml-2 underline">{t("Réessayer")}</button></p>}
                 {notice && <p role="status" className="mt-3 text-sm text-sky-700 dark:text-sky-300">{notice}</p>}
             </div>
-            <button type="button" disabled={!link} onClick={() => setQuestions(true)}
-                className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-violet-700 dark:text-violet-300 disabled:opacity-50">{t("Trouver une question")}</button>
 
             <div className="mt-5 flex gap-2" role="group" aria-label={t("Filtrer les Secrets")}>
                 {(["all", "unread", "read"] as const).map(value => (
@@ -176,10 +196,6 @@ export default function SecretsSection() {
                 setSelected(updated);
                 setSecrets(current => current.map(secret => secret.id === updated.id ? updated : secret));
             }} />}
-            {questions && <FunDialog title={t("Trouver une question")} onClose={() => setQuestions(false)}>
-                <QuestionLibrary onSelect={value => { setQuestion(value); setQuestions(false); }} />
-            </FunDialog>}
-            {question && <SecretCardEditor question={question} link={link} onClose={() => setQuestion(null)} />}
         </section>
     );
 }

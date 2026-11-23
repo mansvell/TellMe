@@ -76,7 +76,7 @@ test("Fun SQL protects anonymous Storytimes, private Secrets, public sending and
         await assert.rejects(db.query("select * from get_my_secrets()"), /permission denied/);
         const target = await rows("select * from get_secret_recipient($1)", [token]);
         assert.deepEqual(Object.keys(target[0]), ["display_name"]);
-        assert.equal(target[0].display_name, "Alice");
+        assert.equal(target[0].display_name, "TellMe");
         await assert.rejects(db.query("select * from secret_boxes"), /permission denied/);
         const challenge = (await rows("select * from create_secret_challenge($1,$2)", [token,uuid(900)]))[0];
         assert(challenge);
@@ -231,5 +231,34 @@ test("Storytime views are unique, exclude the author and are private to the auth
         await db.query("delete from profiles where id=$1",[uuid(1)]);
         await login(1);
         await assert.rejects(db.query("select * from get_storytime_viewers($1)",[storyId]),/ACCOUNT_NOT_FOUND/);
+    } finally { await db.close(); }
+});
+
+test("public Secret links validate availability without revealing the recipient name", async () => {
+    const db = new PGlite();
+    try {
+        await db.exec(`
+            create schema auth;create role anon;create role authenticated;
+            grant usage on schema public,auth to anon,authenticated;
+            create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('test.user',true),'')::uuid$$;
+            create table profiles(id uuid primary key,display_name text);
+            grant select on profiles to authenticated;
+        `);
+        await db.query("insert into profiles values($1,'Pseudo confidentiel')",[uuid(1)]);
+        await db.exec(migration);
+        // Simulate the old RPC before applying the upgrade to an existing project.
+        await db.exec(`create or replace function public.get_secret_recipient(target_token uuid)
+          returns table(display_name text) language sql stable security definer set search_path=public,pg_temp as $$
+          select p.display_name::text from public.secret_boxes b join public.profiles p on p.id=b.owner_id where b.public_token=target_token; $$;`);
+        const privacy=fs.readFileSync("supabase/migrations/20261123_secrets_public_anonymity.sql","utf8");
+        await db.exec(privacy);await db.exec(privacy);
+        await db.query("select set_config('test.user',$1,false)",[uuid(1)]);
+        await db.exec("set role authenticated");
+        const token=(await db.query("select * from get_secret_box()")).rows[0].public_token;
+        await db.exec("reset role;set role anon");
+        assert.deepEqual((await db.query("select * from get_secret_recipient($1)",[token])).rows,[{display_name:"TellMe"}]);
+        assert.equal((await db.query("select * from get_secret_recipient($1)",[uuid(999)])).rows.length,0);
+        await db.exec("reset role");await db.query("delete from profiles where id=$1",[uuid(1)]);await db.exec("set role anon");
+        assert.equal((await db.query("select * from get_secret_recipient($1)",[token])).rows.length,0);
     } finally { await db.close(); }
 });

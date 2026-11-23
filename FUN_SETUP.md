@@ -6,6 +6,8 @@ Pour renommer un groupe depuis ses informations, appliquer aussi supabase/migrat
 
 Appliquer supabase/migrations/20261123_storytime_views.sql pour les compteurs et spectateurs de Storytimes. La liste et le nombre sont réservés à l'auteur, dans Mes Storytimes. Chaque compte ne compte qu'une fois ; les lectures de l'auteur sont exclues. Les vues déjà enregistrées restent prises en compte. Les comptes supprimés disparaissent du compteur et de la liste. La liste charge 50 personnes à la fois.
 
+Pour un projet déjà activé, appliquer supabase/migrations/20261123_secrets_public_anonymity.sql. La validation du lien Secrets ne renvoie plus le pseudo du destinataire. La page publique conserve uniquement le titre d'envoi anonyme, le champ et la langue, avec la palette bleu/cyan de la page publique des sondages.
+
 Les Storytimes sont visibles pendant 24 heures aux utilisateurs inscrits. La liste publique ne renvoie aucun identifiant d'auteur. Chaque auteur peut avoir cinq histoires actives et dix publications par jour. Seul l'auteur peut supprimer son histoire. Les signalements se consultent avec les droits administrateur dans tellme_private.storytime_reports.
 
 Chaque boîte possède un identifiant public aléatoire stable. Le lien utilise le domaine du site sur le web et le domaine public configuré sur l'application native. L'envoi public ne crée pas de compte. Il utilise une vérification cryptographique légère dans un worker, un champ anti-robot et des limites côté serveur. Les adresses IP sont utilisées sous forme d'empreintes salées dans les tables privées. Les limites sont de dix messages par tranche de dix minutes par empreinte et cinquante messages par heure par boîte. Les répétitions d'une même requête ne créent pas de doublon.
@@ -13,6 +15,10 @@ Chaque boîte possède un identifiant public aléatoire stable. Le lien utilise 
 Le contenu d'un Secret est accessible à son seul destinataire. Les actions de lecture, réponse et suppression vérifient le propriétaire côté serveur. Une réponse est enregistrée uniquement avec « Enregistrer la réponse ». La carte peut être transmise à la feuille de partage du système ou enregistrée en PNG 1080 × 1920. La publication dans le Statut/Story de l'application choisie reste à effectuer par l'utilisateur.
 
 Les cartes Secrets ne contiennent ni l'URL ni la mention « lien en description » dans l'image. Le lien reste transmis en légende au partage. La couleur d'une Storytime indique son thème ; le bouton d'information détaille les couleurs et les limites. La lecture occupe tout l'écran et avance après cinq secondes, avec pause lors d'un appui prolongé, du signalement ou du passage en arrière-plan.
+
+Le bouton Partager le lien dans Fun transmet une affiche PNG 1080 × 1920 avec « Dis moi tout en anonyme », le logo, TellMe, un appel à cliquer et deux flèches. Le PNG est préparé avant l'appui pour préserver le geste requis par le partage système. Sur un navigateur sans partage de fichiers, l'image est téléchargée et le lien est partagé ou copié. Les accès Copier le lien et Trouver une question ne sont plus affichés dans Fun ; les questions restent dans Buzz. Les affiches Buzz et Questions affichent TellMe sans étoiles ; l'affiche des sondages n'affiche plus de feu.
+
+Les questions et sondages du chat sont affichés au centre, sans bulle personnelle, pseudo, actions d'expéditeur ni coches personnelles. Les citations utilisent un intitulé neutre. Les messages ordinaires gardent leurs bulles et accusés de réception.
 
 Palette Storytimes : vert/Quotidien, violet doux/Confidences, rose pastel/Amour et relations, bleu/Mystère, rouge/Drôle, jaune/Privé. Le jaune indique un secret personnel révélé anonymement ; la visibilité reste commune à tous les utilisateurs. Les clés enregistrées des couleurs sont conservées pour les histoires existantes. La palette des cartes Secrets reste indépendante. Les paramètres affichent Version 1.0.2 en bas de page.
 

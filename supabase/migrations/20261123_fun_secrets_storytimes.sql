@@ -118,7 +118,7 @@ end $$;
 
 create or replace function public.get_secret_recipient(target_token uuid)
 returns table(display_name text) language sql stable security definer set search_path=public,pg_temp as $$
- select p.display_name::text from public.secret_boxes b join public.profiles p on p.id=b.owner_id
+ select 'TellMe'::text from public.secret_boxes b join public.profiles p on p.id=b.owner_id
  where b.public_token=target_token;
 $$;
 

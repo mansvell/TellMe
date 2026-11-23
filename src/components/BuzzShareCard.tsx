@@ -1,16 +1,19 @@
 import { t } from "../i18n/runtime";
 import { forwardRef } from "react";
-import { Flame } from "lucide-react";
 import icon from "../assets/icon.png";
 
 type Props = {
     message?: string;
+    footerMessage?: string;
+    arrows?: 2 | 3;
 };
 
 const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
     (
         {
             message = t("Donne moi ton avis en anonyme sur ce sondage"),
+            footerMessage,
+            arrows = 3,
         },
         ref,
     ) => {
@@ -29,29 +32,23 @@ const BuzzShareCard = forwardRef<HTMLDivElement, Props>(
                     />
 
                     <span className="mt-1 text-4xl font-black tracking-tight">
-                        ✦TellMe✦
+                        TellMe
                     </span>
                 </div>
 
                 <div className="flex flex-1 flex-col items-center justify-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/15 backdrop-blur-md">
-                        <Flame size={27} />
-                    </div>
-
                     <h2 className="mt-6 text-4xl font-black leading-[1.05] tracking-tight">
                         {message}
-                        <span className="ml-2">🔥</span>
                     </h2>
 
-                    <p className="mt-8 text-xl font-bold text-sky-50">
-                         {t("Clique et découvre")} </p>
+                    {!footerMessage && <p className="mt-8 text-xl font-bold text-sky-50">
+                         {t("Clique et découvre")} </p>}
                 </div>
 
                 <div className="flex flex-col items-center">
+                    {footerMessage && <p className="mb-3 text-lg font-bold text-sky-50">{footerMessage}</p>}
                     <div className="flex items-end gap-6 text-5xl font-light text-white/90">
-                        <span >↓</span>
-                        <span >↓</span>
-                        <span>↓</span>
+                        {Array.from({ length: arrows }, (_, index) => <span key={index}>↓</span>)}
                     </div>
 
                 </div>

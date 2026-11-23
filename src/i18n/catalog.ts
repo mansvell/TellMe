@@ -2594,5 +2594,45 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Un secret personnel, raconté anonymement.": {
     "en": "A personal secret, shared anonymously.",
     "de": "Ein persönliches Geheimnis, anonym erzählt."
+  },
+  "Dis moi tout en anonyme": {
+    "en": "Tell me everything anonymously",
+    "de": "Sag mir alles anonym"
+  },
+  "Clique sur le lien": {
+    "en": "Tap the link",
+    "de": "Tippe auf den Link"
+  },
+  "Partager le lien": {
+    "en": "Share the link",
+    "de": "Link teilen"
+  },
+  "Envoyez votre message en anonyme": {
+    "en": "Send your anonymous message",
+    "de": "Sende deine anonyme Nachricht"
+  },
+  "Dis moi tout": {
+    "en": "Tell me everything",
+    "de": "Sag mir alles"
+  },
+  "Question anonyme": {
+    "en": "Anonymous question",
+    "de": "Anonyme Frage"
+  },
+  "Sondage anonyme": {
+    "en": "Anonymous poll",
+    "de": "Anonyme Umfrage"
+  },
+  "Ce sondage n’est plus disponible.": {
+    "en": "This poll is no longer available.",
+    "de": "Diese Umfrage ist nicht mehr verfügbar."
+  },
+  "Image téléchargée et lien copié.": {
+    "en": "Image downloaded and link copied.",
+    "de": "Bild heruntergeladen und Link kopiert."
+  },
+  "Image téléchargée et lien partagé.": {
+    "en": "Image downloaded and link shared.",
+    "de": "Bild heruntergeladen und Link geteilt."
   }
 };

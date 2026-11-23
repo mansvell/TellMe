@@ -9,7 +9,7 @@ import BuzzMessageCard from "../components/BuzzMessageCard";
 import QuestionMessageCard from "../components/QuestionMessageCard";
 import MessageStatus from "../components/MessageStatus";
 import MessageReadersDialog from "../components/MessageReadersDialog";
-import { formatMessageDate, getMessageById, getMessages, getUnreadMessageIds, markMessageAsRead, sendMessage, type ChatMessage } from "../services/messages";
+import { formatMessageDate, getMessageById, getMessages, getUnreadMessageIds, isAnonymousGroupPrompt, markMessageAsRead, sendMessage, type ChatMessage } from "../services/messages";
 import { acknowledgeDelivery, getReceiptSummaries, type ReceiptSummary } from "../services/receipts";
 import { getMyMessageColor } from "../services/group";
 import { sendChatInvitation } from "../services/invitations";
@@ -295,7 +295,11 @@ function ChatConversation({ groupId }: { groupId: string | undefined }) {
                         return <div key={message.id} data-message-id={message.id}>
                             {showDate && <div className="my-5 flex justify-center"><span className="rounded-md border border-slate-200/70 bg-white/90 px-3 py-1 text-[11px] font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">{formatMessageDate(new Date(message.created_at))}</span></div>}
                             {message.id === firstUnread && <div className="my-4 flex items-center gap-3"><span className="h-px flex-1 bg-sky-200 dark:bg-sky-900"/><span className="text-xs font-medium text-sky-600 dark:text-sky-400">{t("Non lus")}</span><span className="h-px flex-1 bg-sky-200 dark:bg-sky-900"/></div>}
-                            <div className={`group flex items-end gap-1 ${message.me ? "justify-end" : "justify-start"}`}>
+                            {isAnonymousGroupPrompt(message) ? <article data-message-id={message.id} data-incoming={!message.me ? "true" : undefined}
+                                aria-label={t(message.message_type === "question" ? "Question anonyme" : "Sondage anonyme")}
+                                className="mx-auto w-full max-w-xl">
+                                {message.buzz ? <BuzzMessageCard buzz={message.buzz} /> : message.message_type === "question" ? <QuestionMessageCard question={message.question ?? message.content} /> : <p className="my-5 rounded-xl bg-white px-5 py-4 text-center text-sm text-slate-500 dark:bg-slate-900 dark:text-slate-400">{t("Ce sondage n’est plus disponible.")}</p>}
+                            </article> : <div className={`group flex items-end gap-1 ${message.me ? "justify-end" : "justify-start"}`}>
                                 <article data-message-id={message.id} data-incoming={!message.me ? "true" : undefined} onContextMenu={event => { event.preventDefault(); openMenu(event.clientX, event.clientY, message); }}
                                     onTouchStart={event => {
                                         if ((event.target as HTMLElement).closest("button,a")) return;
@@ -313,7 +317,7 @@ function ChatConversation({ groupId }: { groupId: string | undefined }) {
                                     <div className="mt-1 flex min-h-5 items-center justify-end gap-1.5 text-[10px]"><time className="opacity-75">{message.time}</time>{message.me && <MessageStatus onDark={whiteText} pending={message.pending} receipt={receipts.get(message.id)} onClick={() => setReaderMessageId(message.id)}/>}</div>
                                 </article>
                                 {!message.pending && <button type="button" aria-label={t("Actions du message")} onClick={event => { const bounds = event.currentTarget.getBoundingClientRect(); openMenu(bounds.left - 170, bounds.top, message); }} className="mb-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 opacity-60 hover:bg-slate-200 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 dark:hover:bg-slate-800"><MoreHorizontal size={17}/></button>}
-                            </div>
+                            </div>}
                         </div>;
                     })}
                 </div>
