@@ -2,6 +2,8 @@
 
 Le même projet React produit le site Vercel et les applications Capacitor. Le code de l'interface est embarqué dans l'application ; la base Supabase existante reste commune.
 
+Pour publier la version 1.0.2 dans les stores, lire [STORE_PUBLICATION.md](STORE_PUBLICATION.md) : état de préparation, comptes, signature Android, parcours iOS et fonctions encore nécessaires avant soumission. Les descriptions FR/EN/DE sont dans `store/listings/`. Le workflow de bundle Android signé est distinct des constructions debug et simulateur ci-dessous.
+
 ## Ce qui est intégré
 
 - Projets Android et iOS, nom TellMe, identifiant `com.mansvell.tellme`, icônes et écran de lancement avec le logo existant.

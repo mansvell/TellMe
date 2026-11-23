@@ -1,0 +1,83 @@
+name: TellMe Android store bundle
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-store-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  android-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TELLME_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/tellme-upload.jks
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check signing configuration
+        shell: bash
+        env:
+          TELLME_ANDROID_KEYSTORE_BASE64: ${{ secrets.TELLME_ANDROID_KEYSTORE_BASE64 }}
+          TELLME_ANDROID_STORE_PASSWORD: ${{ secrets.TELLME_ANDROID_STORE_PASSWORD }}
+          TELLME_ANDROID_KEY_ALIAS: ${{ secrets.TELLME_ANDROID_KEY_ALIAS }}
+          TELLME_ANDROID_KEY_PASSWORD: ${{ secrets.TELLME_ANDROID_KEY_PASSWORD }}
+        run: |
+          python - <<'PY'
+          import os
+          names = ['TELLME_ANDROID_KEYSTORE_BASE64', 'TELLME_ANDROID_STORE_PASSWORD', 'TELLME_ANDROID_KEY_ALIAS', 'TELLME_ANDROID_KEY_PASSWORD']
+          missing = [name for name in names if not os.environ.get(name)]
+          if missing:
+              raise SystemExit('Configure GitHub Actions secrets: ' + ', '.join(missing))
+          PY
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+      - run: npm ci
+      - run: npm run lint && npm run test:mobile && npm run test:receipts && npm run test:fun
+      - run: npm run build && npx cap sync android
+      - name: Prepare private upload key
+        shell: bash
+        env:
+          TELLME_ANDROID_KEYSTORE_BASE64: ${{ secrets.TELLME_ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          python - <<'PY'
+          import base64, os
+          from pathlib import Path
+          path = Path(os.environ['TELLME_ANDROID_KEYSTORE_PATH'])
+          path.write_bytes(base64.b64decode(os.environ['TELLME_ANDROID_KEYSTORE_BASE64'], validate=True))
+          path.chmod(0o600)
+          PY
+      - name: Build signed release bundle
+        env:
+          TELLME_ANDROID_STORE_PASSWORD: ${{ secrets.TELLME_ANDROID_STORE_PASSWORD }}
+          TELLME_ANDROID_KEY_ALIAS: ${{ secrets.TELLME_ANDROID_KEY_ALIAS }}
+          TELLME_ANDROID_KEY_PASSWORD: ${{ secrets.TELLME_ANDROID_KEY_PASSWORD }}
+        run: chmod +x android/gradlew && cd android && ./gradlew --no-daemon bundleRelease
+      - name: Verify bundle signature
+        run: |
+          jarsigner -verify android/app/build/outputs/bundle/release/app-release.aab
+          python - <<'PY'
+          import zipfile
+          with zipfile.ZipFile('android/app/build/outputs/bundle/release/app-release.aab') as bundle:
+              names = [name.upper() for name in bundle.namelist() if name.startswith('META-INF/')]
+              if not any(name.endswith('.SF') for name in names) or not any(name.endswith(('.RSA', '.EC', '.DSA')) for name in names):
+                  raise SystemExit('The bundle is not signed.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TellMe-1.0.2-Android-AAB
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+          retention-days: 14
+      - name: Remove private key
+        if: always()
+        shell: bash
+        run: rm -f -- "$TELLME_ANDROID_KEYSTORE_PATH"
