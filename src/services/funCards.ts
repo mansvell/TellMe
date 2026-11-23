@@ -49,7 +49,7 @@ function logoImage() {
     return imagePromise;
 }
 
-export async function createFunCard(message: string, reply: string, theme: CardTheme, link: string, fromSecret = false): Promise<Blob> {
+export async function createFunCard(message: string, reply: string, theme: CardTheme, fromSecret = false): Promise<Blob> {
     const image = await logoImage();
     await document.fonts.ready;
     const canvas = document.createElement("canvas");
@@ -93,10 +93,5 @@ export async function createFunCard(message: string, reply: string, theme: CardT
         context.font = `600 ${size}px system-ui, sans-serif`;
         for (const line of replyLines) { context.fillText(line, 540, y); y += size * 1.35; }
     }
-    context.font = "500 26px system-ui, sans-serif";
-    context.fillText(t("Le lien est en description"), 540, 1740);
-    context.font = "400 22px system-ui, sans-serif";
-    const linkLines = wrap(context, link, 910).slice(0, 3);
-    linkLines.forEach((line, index) => context.fillText(line, 540, 1790 + index * 30));
     return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(Error("Export unavailable")), "image/png"));
 }

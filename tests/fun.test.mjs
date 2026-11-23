@@ -133,3 +133,42 @@ test("Fun SQL protects anonymous Storytimes, private Secrets, public sending and
         await db.close();
     }
 });
+
+test("only the group creator can rename an active group, with a valid name", async () => {
+    const db = new PGlite();
+    try {
+        await db.exec(`
+            create schema auth; create role anon; create role authenticated;
+            grant usage on schema public,auth to anon,authenticated;
+            create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('test.user',true),'')::uuid$$;
+            create table public.profiles(id uuid primary key);
+            create table public.groups(id uuid primary key,name text,dominus_id uuid,expires_at timestamptz);
+        `);
+        await db.query("insert into profiles values($1),($2)", [uuid(1), uuid(2)]);
+        await db.query("insert into groups values($1,'Avant',$2,null)", [uuid(100),uuid(1)]);
+        const sql = fs.readFileSync("supabase/migrations/20261123_group_name.sql", "utf8");
+        await db.exec(sql); await db.exec(sql);
+        async function login(index) {
+            await db.exec("reset role");
+            await db.query("select set_config('test.user',$1,false)", [index ? uuid(index) : ""]);
+            await db.exec(index ? "set role authenticated" : "set role anon");
+        }
+        await login(0);
+        await assert.rejects(db.query("select rename_group($1,'Interdit')", [uuid(100)]), /permission denied/);
+        await login(2);
+        await assert.rejects(db.query("select rename_group($1,'Interdit')", [uuid(100)]), /GROUP_ACCESS_DENIED/);
+        await login(1);
+        await assert.rejects(db.query("select rename_group($1,' ')", [uuid(100)]), /INVALID_GROUP_NAME/);
+        await assert.rejects(db.query("select rename_group($1,$2)", [uuid(100),"x".repeat(41)]), /INVALID_GROUP_NAME/);
+        assert.equal((await db.query("select rename_group($1,' Nouveau nom ') as name",[uuid(100)])).rows[0].name,"Nouveau nom");
+        await db.exec("reset role");
+        assert.equal((await db.query("select name from groups where id=$1",[uuid(100)])).rows[0].name,"Nouveau nom");
+        await db.query("update groups set expires_at=now()-interval '1 minute' where id=$1",[uuid(100)]);
+        await login(1);
+        await assert.rejects(db.query("select rename_group($1,'Expiré')", [uuid(100)]), /GROUP_ACCESS_DENIED/);
+        await db.exec("reset role");
+        await db.query("delete from profiles where id=$1",[uuid(1)]);
+        await login(1);
+        await assert.rejects(db.query("select rename_group($1,'Supprimé')", [uuid(100)]), /ACCOUNT_NOT_FOUND/);
+    } finally { await db.close(); }
+});

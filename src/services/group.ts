@@ -292,6 +292,15 @@ export async function getGroupDetails(
 }
 
 // MODIFIE LA DURÉE DU GROUPE
+export async function updateGroupName(groupId: string, name: string): Promise<string> {
+    const { data, error } = await supabase.rpc("rename_group", {
+        target_group_id: groupId,
+        new_name: name.trim(),
+    });
+    if (error) throw error;
+    return data as string;
+}
+
 export async function updateGroupLifetime(
     groupId: string,
     lifetime: GroupLifetime,

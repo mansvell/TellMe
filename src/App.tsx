@@ -2,6 +2,8 @@ import {Routes, Route, Navigate} from "react-router-dom";
 
 import DiscoverPage from "./pages/DiscoverPage";
 import FunPage from "./pages/FunPage";
+import CreateStorytimePage from "./pages/CreateStorytimePage";
+import MyStorytimesPage from "./pages/MyStorytimesPage";
 import SecretLandingPage from "./pages/SecretLandingPage";
 import AppTabsLayout from "./components/AppTabsLayout";
 import SplashPage from "./pages/SplashPage.tsx";
@@ -46,6 +48,8 @@ export default function App() {
               <Route path="/fun" element={<FunPage />} />
               <Route path="/settings" element={<SettingsPage />} />
           </Route>
+          <Route path="/fun/story/new" element={<ProtectedRoute><CreateStorytimePage /></ProtectedRoute>} />
+          <Route path="/fun/stories" element={<ProtectedRoute><MyStorytimesPage /></ProtectedRoute>} />
           <Route path="/chat/:groupId" element={<ProtectedRoute> <ChatPage/> </ProtectedRoute>} />
           <Route path="/gdetailp/:groupId" element={<ProtectedRoute> <GroupDetailsPage /> </ProtectedRoute>} />
 

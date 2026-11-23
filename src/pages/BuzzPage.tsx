@@ -598,7 +598,7 @@ export default function BuzzPage() {
                             icon={
                                 <Flame size={17} />
                             }
-                            label={t("Idées de questions")}
+                            label={t("Questions")}
                             onClick={() =>
                                 setTab("results")
                             }

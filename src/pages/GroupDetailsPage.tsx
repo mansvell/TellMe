@@ -9,6 +9,7 @@ import {
     LoaderCircle,
     LogOut,
     Palette,
+    Pencil,
     Share2,
     Trash2,
     Users,
@@ -32,6 +33,7 @@ import {
     getGroupDetails,
     leaveGroup,
     updateGroupLifetime,
+    updateGroupName,
     type GroupDetails,
     type GroupLifetime,
 } from "../services/group";
@@ -101,6 +103,26 @@ export default function GroupDetailsPage() {
 
     const [errorMessage, setErrorMessage] =
         useState("");
+
+    const [editingName, setEditingName] = useState(false);
+    const [name, setName] = useState("");
+    const [savingName, setSavingName] = useState(false);
+
+    async function saveName(event: React.FormEvent) {
+        event.preventDefault();
+        if (!groupId || !group?.isDominus || savingName || name.trim().length < 2 || name.trim().length > 40) return;
+        setSavingName(true); setErrorMessage("");
+        try {
+            const updatedName = await updateGroupName(groupId, name);
+            setGroup(current => current ? { ...current, name: updatedName } : current);
+            setEditingName(false);
+        } catch (error) {
+            const message = error && typeof error === "object" && "message" in error ? String(error.message) : "";
+            setErrorMessage(/PGRST202|could not find|does not exist/i.test(message)
+                ? t("Le renommage sera disponible après la mise à jour du serveur.")
+                : t("Impossible de modifier le nom du groupe."));
+        } finally { setSavingName(false); }
+    }
 
 
     // Charge les informations du groupe.
@@ -363,16 +385,16 @@ export default function GroupDetailsPage() {
             </header>
 
 
-            <section className="mx-auto max-w-3xl p-5">
+            <section className="mx-auto max-w-3xl p-4 sm:p-5">
 
                 {/* Identité du groupe */}
 
-                <div className="rounded-3xl bg-white dark:bg-slate-600 p-8 shadow-sm">
+                <div className="bg-transparent px-3 py-4">
 
                     <div className="flex flex-col items-center text-center">
 
                         <div
-                            className="flex h-28 w-28 items-center justify-center rounded-3xl shadow-sm"
+                            className="flex h-20 w-20 items-center justify-center rounded-3xl shadow-sm"
                             style={{
                                 backgroundColor:
                                 group.color,
@@ -381,14 +403,26 @@ export default function GroupDetailsPage() {
                             <img
                                 src={icon}
                                 alt=""
-                                className="h-16 w-16 object-contain"
+                                className="h-12 w-12 object-contain"
                                 draggable={false}
                             />
                         </div>
 
-                        <h2 className="mt-5 text-3xl font-bold text-slate-900 dark:text-white">
-                            {group.name}
-                        </h2>
+                        {editingName ? <form onSubmit={event => void saveName(event)} className="mt-3 w-full max-w-sm text-left">
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-200">{t("Nom du groupe")}
+                                <input autoFocus value={name} onChange={event => setName(event.target.value)} maxLength={40} disabled={savingName}
+                                    className="mt-2 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2.5 text-slate-900 outline-sky-500 dark:border-slate-600 dark:text-white" />
+                            </label>
+                            <p className="mt-1 text-right text-xs text-slate-500 dark:text-slate-400">{name.length}/40</p>
+                            <div className="mt-2 flex justify-end gap-2">
+                                <button type="button" disabled={savingName} onClick={() => setEditingName(false)} className="rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-slate-300">{t("Annuler")}</button>
+                                <button type="submit" disabled={savingName || name.trim().length < 2 || name.trim().length > 40} className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-3 py-2 text-sm text-white disabled:opacity-50">{savingName && <LoaderCircle size={16} className="animate-spin" />}{t("Enregistrer")}</button>
+                            </div>
+                        </form> : <div className="mt-3 flex max-w-full items-center justify-center gap-2">
+                            <h2 className="min-w-0 break-words text-2xl font-bold text-slate-900 dark:text-white">{group.name}</h2>
+                            {group.isDominus && <button type="button" aria-label={t("Modifier le nom du groupe")} onClick={() => { setName(group.name); setEditingName(true); setErrorMessage(""); }}
+                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sky-700 hover:bg-slate-200 dark:text-sky-300 dark:hover:bg-slate-700"><Pencil size={18} /></button>}
+                        </div>}
 
                         <p className="mt-2 text-slate-500">
                             {group.membersCount}{" "}
@@ -410,7 +444,7 @@ export default function GroupDetailsPage() {
 
                 </div>
 
-                <div className="mt-6 overflow-hidden rounded-3xl bg-white dark:bg-slate-600 shadow-sm">
+                <div className="mt-3 overflow-hidden rounded-2xl bg-white dark:bg-slate-600 shadow-sm">
 
                     <Item
                         to={`/members/${group.id}`}
@@ -441,7 +475,7 @@ export default function GroupDetailsPage() {
 
                 </div>
 
-                <div className="mt-6 rounded-3xl bg-white dark:bg-slate-600 p-6 shadow-sm">
+                <div className="mt-3 rounded-2xl bg-white dark:bg-slate-600 p-4 shadow-sm">
 
                     <h3 className="text-lg dark:text-white font-bold">
                          {t("Invite tes ami(e)s")} </h3>
@@ -449,9 +483,9 @@ export default function GroupDetailsPage() {
                     <p className="mt-1 text-sm text-sky-400">
                          {t("Seules les personnes possédant ce lien pourront rejoindre le groupe.")} </p>
 
-                    <div className="mt-5 rounded-2xl bg-slate-100 p-4">
+                    <div className="mt-3 rounded-xl bg-slate-100 p-3 dark:bg-slate-700">
 
-                        <p className="truncate text-sm text-slate-700">
+                        <p className="truncate text-sm text-slate-700 dark:text-slate-200">
                             {group.inviteLink}
                         </p>
 
@@ -489,7 +523,7 @@ export default function GroupDetailsPage() {
                 {/* Durée : uniquement visible par le Dominus */}
                 {group.isDominus && (
 
-                    <div className="mt-6 rounded-3xl bg-white dark:bg-slate-600 p-5 shadow-sm sm:p-6">
+                    <div className="mt-3 rounded-2xl bg-white dark:bg-slate-600 p-4 shadow-sm">
 
                         <div className="flex items-start gap-3">
 
@@ -541,7 +575,7 @@ export default function GroupDetailsPage() {
                                     parsed,
                                 );
                             }}
-                            className="mt-5 h-14 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 outline-none focus:border-sky-500 disabled:opacity-60"
+                            className="mt-3 h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-slate-900 dark:bg-slate-700 dark:text-white outline-none focus:border-sky-500 disabled:opacity-60"
                         >
 
                             {durations.map(
@@ -565,7 +599,7 @@ export default function GroupDetailsPage() {
                         </select>
 
 
-                        <div className="mt-4 flex items-center gap-2">
+                        <div className="mt-3 flex items-center gap-2">
                             {savingDuration && (
                                 <LoaderCircle
                                     size={16}
@@ -598,7 +632,7 @@ export default function GroupDetailsPage() {
                         onClick={() =>
                             void handleDeleteGroup()
                         }
-                        className="mt-8 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-500 font-bold text-white transition hover:bg-red-600"
+                        className="mt-4 flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-red-500 font-bold text-white transition hover:bg-red-600"
                     >
                         <Trash2 size={20} />
                          {t("Supprimer le groupe")} </button>
@@ -610,7 +644,7 @@ export default function GroupDetailsPage() {
                         onClick={() =>
                             void handleLeaveGroup()
                         }
-                        className="mt-8 flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-red-500 font-bold text-white transition hover:bg-red-600"
+                        className="mt-4 flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-red-500 font-bold text-white transition hover:bg-red-600"
                     >
                         <LogOut size={20} />
                          {t("Quitter le groupe")} </button>
@@ -643,10 +677,10 @@ function Item({
 
         <Link
             to={to}
-            className="flex w-full items-center justify-between border-b px-6 py-5 transition last:border-0"
+            className="flex w-full items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-500 transition last:border-0"
         >
 
-            <div className="flex min-w-0 items-center gap-4">
+            <div className="flex min-w-0 items-center gap-3">
 
                 <div className="text-sky-500">
                     {icon}

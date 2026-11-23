@@ -119,8 +119,7 @@ export default function SecretsSection() {
                 {secretsUnread > 0 && <span className="rounded-full bg-sky-700 px-2 py-0.5 text-xs text-white">{secretsUnread}</span>}
             </h2>
             <div className="mt-4 rounded-2xl bg-blue-50 px-5 py-5 dark:bg-slate-800">
-                <h3 className="font-semibold">{t("Reçois des messages anonymes")}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{t("Partage ton lien. Même les personnes sans TellMe peuvent t’écrire.")}</p>
+                <h3 className="text-balance font-semibold">{t("Prêt à recevoir des messages anonymes ?")}</h3>
                 {link && <p className="mt-3 select-all break-all rounded-lg bg-white/70 px-3 py-2 text-xs text-sky-800 dark:bg-slate-900 dark:text-sky-200">{link}</p>}
                 <div className="mt-4 flex flex-wrap gap-3">
                     <button type="button" disabled={!link} onClick={() => void copy()} className="inline-flex items-center gap-2 rounded-lg bg-sky-700 px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Copy size={17} />{t("Copier le lien")}</button>

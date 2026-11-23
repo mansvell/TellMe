@@ -1,4 +1,4 @@
-import { Flame, House, MailPlus, Settings, Sparkles } from "lucide-react";
+import { Flame, House, MailPlus, Settings, Drama } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { t } from "../i18n/runtime";
 
@@ -8,7 +8,7 @@ export default function AppNavigation({ secretsUnread = 0 }: { secretsUnread?: n
     const items = [
         { to: "/home", title: t("Accueil"), icon: House },
         { to: "/buzz", title: "Buzz", icon: Flame },
-        { to: "/fun", title: "Fun", icon: Sparkles },
+        { to: "/fun", title: "Fun", icon: Drama },
         { to: "/invit", title: t("Invitations"), icon: MailPlus },
         { to: "/settings", title: t("Paramètres"), icon: Settings },
     ];

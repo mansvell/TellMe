@@ -2426,5 +2426,109 @@ export const catalog: Record<string, { en: string; de: string }> = {
   "Il y a {count} jours": {
     "en": "{count} days ago",
     "de": "Vor {count} Tagen"
+  },
+  "Prêt à recevoir des messages anonymes ?": {
+    "en": "Ready to receive anonymous messages?",
+    "de": "Bereit für anonyme Nachrichten?"
+  },
+  "Choisir : {question}": {
+    "en": "Choose: {question}",
+    "de": "Auswählen: {question}"
+  },
+  "Quotidien": {
+    "en": "Everyday life",
+    "de": "Alltag"
+  },
+  "Confidences": {
+    "en": "Confessions",
+    "de": "Geständnisse"
+  },
+  "Amour et relations": {
+    "en": "Love and relationships",
+    "de": "Liebe und Beziehungen"
+  },
+  "Mystère": {
+    "en": "Mystery",
+    "de": "Geheimnis"
+  },
+  "Surprise": {
+    "en": "Surprise",
+    "de": "Überraschung"
+  },
+  "Réflexion": {
+    "en": "Reflection",
+    "de": "Gedanken"
+  },
+  "À propos des Storytimes": {
+    "en": "About Storytimes",
+    "de": "Über Storytimes"
+  },
+  "Informations sur les Storytimes": {
+    "en": "Storytime information",
+    "de": "Informationen zu Storytimes"
+  },
+  "Les Storytimes sont anonymes et visibles par tous les utilisateurs de TellMe. Elles disparaissent du fil après 24 heures.": {
+    "en": "Storytimes are anonymous and visible to all TellMe users. They disappear from the feed after 24 hours.",
+    "de": "Storytimes sind anonym und für alle TellMe-Nutzer sichtbar. Sie verschwinden nach 24 Stunden aus dem Feed."
+  },
+  "Tu peux avoir 5 Storytimes actives et en publier 10 par jour. Une histoire peut contenir jusqu’à 2 000 caractères.": {
+    "en": "You can have 5 active Storytimes and publish 10 per day. Each story can contain up to 2,000 characters.",
+    "de": "Du kannst 5 aktive Storytimes haben und 10 pro Tag veröffentlichen. Jede Geschichte kann bis zu 2.000 Zeichen enthalten."
+  },
+  "Chaque histoire passe à la suivante après 5 secondes. Maintiens le texte appuyé ou utilise Pause pour prendre le temps de lire.": {
+    "en": "Each story advances after 5 seconds. Hold the text or use Pause to take your time reading.",
+    "de": "Nach 5 Sekunden erscheint die nächste Geschichte. Halte den Text gedrückt oder nutze Pause, um in Ruhe zu lesen."
+  },
+  "Une couleur, un thème": {
+    "en": "A colour, a topic",
+    "de": "Eine Farbe, ein Thema"
+  },
+  "Le contour coloré indique une histoire non lue. Un contour gris indique une histoire déjà consultée.": {
+    "en": "A coloured ring means an unread story. A grey ring means a story you have already viewed.",
+    "de": "Ein farbiger Rand zeigt eine ungelesene Geschichte. Ein grauer Rand zeigt eine bereits gelesene Geschichte."
+  },
+  "Couleur de ton histoire": {
+    "en": "Story colour",
+    "de": "Farbe deiner Geschichte"
+  },
+  "Lecture des Storytimes": {
+    "en": "Storytime viewer",
+    "de": "Storytimes ansehen"
+  },
+  "Histoire {current} sur {total}": {
+    "en": "Story {current} of {total}",
+    "de": "Geschichte {current} von {total}"
+  },
+  "Reprendre la lecture": {
+    "en": "Resume playback",
+    "de": "Wiedergabe fortsetzen"
+  },
+  "Mettre en pause": {
+    "en": "Pause",
+    "de": "Pausieren"
+  },
+  "Histoire précédente": {
+    "en": "Previous story",
+    "de": "Vorherige Geschichte"
+  },
+  "Histoire suivante": {
+    "en": "Next story",
+    "de": "Nächste Geschichte"
+  },
+  "Nom du groupe": {
+    "en": "Group name",
+    "de": "Gruppenname"
+  },
+  "Modifier le nom du groupe": {
+    "en": "Edit group name",
+    "de": "Gruppennamen ändern"
+  },
+  "Impossible de modifier le nom du groupe.": {
+    "en": "Could not change the group name.",
+    "de": "Der Gruppenname konnte nicht geändert werden."
+  },
+  "Le renommage sera disponible après la mise à jour du serveur.": {
+    "en": "Renaming will be available after the server update.",
+    "de": "Das Umbenennen ist nach der Serveraktualisierung verfügbar."
   }
 };

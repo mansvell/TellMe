@@ -26,7 +26,7 @@ export default function SecretCardEditor({ secret, question, link, onClose, onSa
         let active = true;
         let url: string | undefined;
         const timer = window.setTimeout(() => {
-            void createFunCard(message, answer, theme, link, fromSecret).then(blob => {
+            void createFunCard(message, answer, theme, fromSecret).then(blob => {
                 if (!active) return;
                 url = URL.createObjectURL(blob);
                 setPreview({ blob, url, version });
