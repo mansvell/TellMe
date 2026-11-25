@@ -100,7 +100,7 @@ export const reportStorytime = (id: string, reason: string) => rpc<void>("report
 export type StoryNotification = { id: string; story_id: string; comment_id: string; kind: "comment" | "reply" | "story_reply"; created_at: string; read_at: string | null; actor_name?: string | null };
 export const getStoryNotifications = () => rpc<StoryNotification[]>("get_story_notifications");
 export const readStoryNotification = (id: string) => rpc<void>("read_story_notification", { target_id: id });
-export type Standing = { position: number; points: number; is_me: boolean };
+export type Standing = { position: number; points: number; is_me: boolean; display_name: string };
 export type MonthlyStandings = {
     month: string; ends_at: string; leaders: Standing[]; mine: { position: number | null; points: number };
     previous_reward: { month: string; position: number; points: number; reward_eur: number; payment_status: "pending" | "paid" | "not_applicable" } | null;

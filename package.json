@@ -15,7 +15,7 @@
     "mobile:run:ios": "npm run mobile:sync && cap run ios",
     "test:mobile": "node --test tests/mobile.test.cjs tests/push.test.cjs",
     "test:receipts": "node --test tests/receipts.test.cjs",
-    "test:fun": "node --test tests/fun.test.mjs tests/story-comments.test.mjs tests/secret-push.test.cjs tests/story-upgrade.test.mjs tests/story-notifications.test.cjs tests/story-thread-layout.test.mjs"
+    "test:fun": "node --test tests/fun.test.mjs tests/story-comments.test.mjs tests/secret-push.test.cjs tests/story-upgrade.test.mjs tests/story-notifications.test.cjs tests/story-thread-layout.test.mjs tests/monthly-ranking.test.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

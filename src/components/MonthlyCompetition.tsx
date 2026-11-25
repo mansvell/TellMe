@@ -4,9 +4,9 @@ import { getLocale, t } from "../i18n/runtime";
 import { funError, getMonthlyStandings, type MonthlyStandings } from "../services/fun";
 
 const places = [
-    { title: "Gold", reward: 30, style: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200" },
-    { title: "Silver", reward: 20, style: "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-100" },
-    { title: "Bronze", reward: 15, style: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200" },
+    { title: "Gold", reward: 30, badge: "bg-gradient-to-br from-amber-200 to-amber-50 text-amber-900 ring-1 ring-amber-300 dark:from-amber-800 dark:to-amber-950 dark:text-amber-100 dark:ring-amber-700", style: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200" },
+    { title: "Silver", reward: 20, badge: "bg-gradient-to-br from-slate-300 to-slate-50 text-slate-800 ring-1 ring-slate-300 dark:from-slate-500 dark:to-slate-800 dark:text-white dark:ring-slate-500", style: "bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-100" },
+    { title: "Bronze", reward: 15, badge: "bg-gradient-to-br from-orange-200 to-orange-50 text-orange-900 ring-1 ring-orange-300 dark:from-orange-800 dark:to-orange-950 dark:text-orange-100 dark:ring-orange-700", style: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-200" },
 ];
 export function CompetitionRules() {
     return <section className="mt-6 border-t border-sky-200 pt-4 dark:border-sky-900">
@@ -14,11 +14,11 @@ export function CompetitionRules() {
         <ul className="mt-3 grid grid-cols-3 gap-2">
             {places.map((place, i) => <li key={place.title} className={`rounded-xl px-2 py-3 text-center ${place.style}`}><Award size={20} className="mx-auto mb-1" /><strong className="block">{i + 1} · {place.title}</strong><span className="text-base font-bold">{place.reward} €</span></li>)}
         </ul>
-        <p className="mt-3 font-semibold text-slate-700 dark:text-slate-200">{t("Minimum 200 points pour être éligible à un gain.")}</p>
+        <p className="mt-3 font-semibold text-slate-700 dark:text-slate-200">{t("Minimum 800 points pour être éligible à un gain.")}</p>
         <p className="mt-2">{t("1 point par Story, commentaire, réponse ou réaction au commentaire d’autrui. Limites par jour UTC : 10 Storys, 20 commentaires/réponses et 10 réactions.")}</p>
         <p className="mt-2">{t("Doublons et réactions à soi-même : 0 point. Supprimer son action retire son point ; l’expiration automatique le conserve.")}</p>
         <p className="mt-2">{t("Les Storytimes doivent respecter le thème de TellMe et les règles de la communauté.")}</p>
-        <p className="mt-2">{t("Classement renouvelé chaque mois UTC. Égalités : score atteint en premier. Top 5 anonyme et position personnelle réelle. Versement manuel après clôture.")}</p>
+        <p className="mt-2">{t("Classement renouvelé chaque mois UTC. Égalités : score atteint en premier. Top 5 visible par tous les utilisateurs, avec les pseudos et la position personnelle réelle. Versement manuel après clôture.")}</p>
     </section>;
 }
 
@@ -48,7 +48,10 @@ export default function MonthlyCompetition() {
                     const row = data.leaders.find(leader => leader.position === index + 1), place = places[index];
                     return <li key={index} className={`flex items-center gap-3 rounded-2xl border p-3.5 ${row?.is_me ? "border-sky-400 bg-sky-50 dark:border-sky-700 dark:bg-sky-950/50" : index === 0 ? "border-amber-200 bg-amber-50/60 dark:border-amber-900 dark:bg-amber-950/15" : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/50"}`}>
                         <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-bold ${place?.style ?? "bg-sky-50 text-sky-800 dark:bg-sky-950 dark:text-sky-200"}`}>{index + 1}</span>
-                        <div className="min-w-0 flex-1"><p className="font-semibold">{place?.title ?? t("Top 5")}{row?.is_me && <span className="ml-2 text-sky-700 dark:text-sky-300">· {t("Toi")}</span>}</p><p className="text-xs text-slate-500 dark:text-slate-400">{place ? `${place.reward} €` : t("Finaliste")}</p></div>
+                        <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2"><span className={`inline-flex rounded-md px-2.5 py-1 text-xs font-bold ${place?.badge ?? "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200"}`}>{place?.title ?? t("Finaliste")}</span>{place && <span className="text-xs font-semibold text-slate-500 dark:text-slate-300">{place.reward} €</span>}</div>
+                            {row && <p title={row.display_name} className="mt-2 break-words text-sm font-semibold leading-5 text-slate-900 [overflow-wrap:anywhere] dark:text-slate-100">{row.display_name ?? t("Pseudo indisponible")}{row.is_me && <span className="ml-1 text-xs font-medium text-sky-700 dark:text-sky-300">· {t("Toi")}</span>}</p>}
+                        </div>
                         <span className="text-right text-base font-bold tabular-nums">{row ? t("{count} points", { count: row.points }) : t("Place libre")}</span>
                     </li>;
                 })}
