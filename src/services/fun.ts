@@ -4,7 +4,7 @@ import { getLocale, t } from "../i18n/runtime";
 
 export const CARD_THEMES = ["blue", "violet", "pink", "night", "gradient", "slate"] as const;
 export type CardTheme = typeof CARD_THEMES[number];
-export type Storytime = { id: string; content: string; theme: CardTheme; created_at: string; expires_at: string; seen: boolean };
+export type Storytime = { id: string; content: string; theme: CardTheme; created_at: string; expires_at: string; seen: boolean; group_key?: string };
 export type StorytimeViewer = { display_name: string; color: string; viewed_at: string };
 export type Secret = { id: string; content: string; created_at: string; read_at: string | null; reply: string | null; card_theme: CardTheme; replied_at: string | null };
 export type Cursor = { created_at: string; id: string };
@@ -20,6 +20,7 @@ export function funError(error: unknown): string {
     const message = error && typeof error === "object" && "message" in error ? String(error.message) : "";
     if (/PGRST202|could not find|does not exist/i.test(message)) return t("Fun sera disponible après l’activation de la mise à jour sur le serveur.");
     if (/FUN_RATE_LIMIT|STORY_LIMIT/.test(message)) return t("La limite d’envoi est atteinte. Réessaie plus tard.");
+    if (/STORY_EXPIRED/.test(message)) return t("Cette Storytime a expiré.");
     if (/SECRET_LINK_UNAVAILABLE/.test(message)) return t("Ce lien Secrets est indisponible.");
     if (/EXPIRED_CHALLENGE|INVALID_PROOF/.test(message)) return t("La vérification a expiré. Réessaie l’envoi.");
     return t("L’opération n’a pas abouti. Réessaie.");
@@ -48,6 +49,23 @@ export async function getStorytimes(cursor?: Cursor) {
     const rows = await rpc<Storytime[]>("get_storytimes", cursorArgs(cursor));
     return { rows: rows.slice(0, 10), hasMore: rows.length > 10 };
 }
+export type StoryGroup = { author_key: string; created_at: string; stories: Storytime[] };
+export type StoryComment = {
+    id: string; content: string; created_at: string; display_prefix: string; color: string; own: boolean;
+    like_count: number; dislike_count: number; laugh_count: number; my_reaction: StoryReaction | null;
+};
+export type StoryReaction = "like" | "dislike" | "laugh";
+export async function getStorytimeGroups(cursor?: StoryGroup) {
+    const rows = await rpc<StoryGroup[]>("get_storytime_groups", { before_time: cursor?.created_at ?? null, before_key: cursor?.author_key ?? null });
+    return { rows: rows.slice(0, 10).map(group => ({ ...group, stories: group.stories.map(story => ({ ...story, group_key: group.author_key })) })), hasMore: rows.length > 10 };
+}
+export async function getStoryComments(id: string, cursor?: Cursor) {
+    const rows = await rpc<StoryComment[]>("get_storytime_comments", { target_id: id, ...cursorArgs(cursor) });
+    return { rows: rows.slice(0, 20).reverse(), hasMore: rows.length > 20 };
+}
+export const addStoryComment = (id: string, content: string, requestId: string) => rpc<string>("add_storytime_comment", { target_id: id, comment_text: content.trim(), request_id: requestId });
+export const reactToStoryComment = (id: string, reaction: StoryReaction | null) => rpc<void>("set_storytime_comment_reaction", { target_comment_id: id, target_reaction: reaction });
+export const deleteStoryComment = (id: string) => rpc<void>("delete_storytime_comment", { target_comment_id: id });
 export const getMyStorytimes = () => rpc<Storytime[]>("get_my_storytimes");
 export const getMyStorytimeViewCounts = () => rpc<{ story_id: string; view_count: number }[]>("get_my_storytime_view_counts");
 export async function getStorytimeViewers(id: string, offset = 0) {

@@ -103,25 +103,23 @@ export default function HomePage() {
                                 </button>
                             )}
                         </div>
-                        <Link to="/discover" aria-label={t("Trouver d’autres utilisateurs")} title={t("Trouver d’autres utilisateurs")}
-                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-green-200 px-3 font-semibold text-black hover:bg-green-300 dark:bg-green-300 dark:hover:bg-green-200">
-                            <span className="hidden text-sm md:inline">{t("Autres utilisateurs")}</span>
-                            <UserRoundPlus size={22} aria-hidden="true" />
-                        </Link>
-                    </div>
-                    <div className="mt-1 flex justify-end">
                         <Link to="/invit" aria-label={t("Invitations")} title={t("Invitations")}
-                            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
-                            <span className="hidden md:inline">{t("Invitations")}</span>
+                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-300 px-3 text-sm font-semibold text-black transition-colors hover:bg-sky-400 dark:bg-sky-300 dark:hover:bg-sky-200">
                             <MailPlus size={21} aria-hidden="true" />
+                            <span className="hidden md:inline">{t("Invitations")}</span>
+                        </Link>
+                        <Link to="/discover" aria-label={t("Trouver d’autres utilisateurs")} title={t("Trouver d’autres utilisateurs")}
+                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-green-300 px-3 font-semibold text-black transition-colors hover:bg-green-400 dark:bg-green-300 dark:hover:bg-green-200">
+                            <UserRoundPlus size={22} aria-hidden="true" />
+                            <span className="hidden text-sm md:inline">{t("Autres utilisateurs")}</span>
                         </Link>
                     </div>
-                    <div className="flex items-center justify-between gap-3 pb-2 pt-1">
+                    <div className="flex items-center justify-between gap-3 pb-2 pt-4">
                         <h2 id="discussions-title" className="text-lg font-bold">{t("Discussions")}</h2>
                         <button type="button" onClick={() => setShowNewGroup(true)} aria-label={t("Créer un groupe")} title={t("Créer un groupe")}
                             className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-700 px-3 font-semibold text-white hover:bg-sky-800">
                             <Plus size={21} aria-hidden="true" />
-                            <span className="text-sm">{t("Créer un groupe")}</span>
+                            <span className="hidden text-sm md:inline">{t("Créer un groupe")}</span>
                         </button>
                     </div>
                 </div>

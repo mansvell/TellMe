@@ -139,7 +139,7 @@ export default function SecretsSection() {
     return (
         <section aria-labelledby="secrets-heading">
             <div aria-hidden="true" className="pointer-events-none fixed -left-[10000px] top-0"><SecretShareCard ref={posterRef} /></div>
-            <h2 id="secrets-heading" className="flex items-center gap-2 text-lg font-bold">Secrets
+            <h2 id="secrets-heading" className="tellme-section-title flex items-center gap-2">{t("Messages Anonymes")}
                 {secretsUnread > 0 && <span className="rounded-full bg-sky-700 px-2 py-0.5 text-xs text-white">{secretsUnread}</span>}
             </h2>
             <div className="mt-4 rounded-2xl bg-blue-50 px-5 py-5 dark:bg-slate-800">

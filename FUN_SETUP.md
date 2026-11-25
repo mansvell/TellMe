@@ -20,7 +20,7 @@ Le bouton Partager le lien dans Fun transmet une affiche PNG 1080 × 1920 avec �
 
 Les questions et sondages du chat sont affichés au centre, sans bulle personnelle, pseudo, actions d'expéditeur ni coches personnelles. Les citations utilisent un intitulé neutre. Les messages ordinaires gardent leurs bulles et accusés de réception.
 
-Palette Storytimes : vert/Quotidien, violet doux/Confidences, rose pastel/Amour et relations, bleu/Mystère, rouge/Drôle, jaune/Privé. Le jaune indique un secret personnel révélé anonymement ; la visibilité reste commune à tous les utilisateurs. Les clés enregistrées des couleurs sont conservées pour les histoires existantes. La palette des cartes Secrets reste indépendante. Les paramètres affichent Version 1.0.2 en bas de page.
+Palette Storytimes : vert/Quotidien, violet doux/Confidences, rose pastel/Amour et relations, bleu/Mystère, rouge/Drôle, jaune/Privé. Le jaune indique un secret personnel révélé anonymement ; la visibilité reste commune à tous les utilisateurs. Les clés enregistrées des couleurs sont conservées pour les histoires existantes. La palette des cartes Secrets reste indépendante. Les paramètres affichent Version 1.0.3 en bas de page.
 
 ## Notifications système des Secrets
 
@@ -44,3 +44,17 @@ Sur iPhone et iPad, ouvrir le site depuis l'icône d'écran d'accueil et autoris
 ## Vérification
 
 npm run test:fun exécute la migration dans PostgreSQL/PGlite sur un schéma de test et vérifie les droits d'accès, l'expiration, les limites et les envois sans compte. npm run test:mobile, npm run test:receipts, npm run build et npm run lint complètent les vérifications.
+
+## Version 1.0.3 : Storys regroupées et commentaires
+
+Appliquer `supabase/migrations/20261125_story_groups_comments.sql` dans le SQL Editor du même projet Supabase, après la migration Fun initiale. Ce script est réexécutable. Aucun secret ni nouvelle variable d’environnement n’est nécessaire. Sans lui, les nouveaux regroupements et commentaires ne peuvent pas se charger.
+
+Chaque auteur occupe un seul cercle, avec toutes ses histoires actives classées par publication. Le fil se charge par dix auteurs et affiche quatre cercles par rangée. La clé publique de regroupement est une empreinte salée ; le pseudo et l’UUID du profil de l’auteur ne sont pas renvoyés. Les publications personnelles gardent leur cercle à droite de Publier.
+
+En lecture : appui à gauche/précédente, à droite/suivante, au centre/pause. Un appui prolongé suspend aussi la lecture. Tirer vers le bas ferme la Story avec une animation ; les textes longs restent défilables. Signaler est placé à gauche de Pause, avec une icône seule sur téléphone. Le bouton Commentaires ouvre la Story concernée sous la grille.
+
+Les commentaires sont accessibles aux utilisateurs inscrits uniquement tant que la Story est active. Ils affichent les deux premiers caractères alphanumériques du pseudo, avec normalisation des accents et sa couleur, sans pseudo complet ni identifiant de profil. Ils sont ordonnés du plus ancien au plus récent, avec vingt commentaires par page, chargement des précédents et raccourci haut/bas. Les nouvelles contributions sont rechargées toutes les quinze secondes lorsque l’onglet est visible.
+
+Un commentaire contient au maximum 600 caractères ; un compte peut en envoyer vingt par tranche de cinq minutes. Les envois répétés après une erreur réseau utilisent un identifiant stable pour éviter les doublons. Chaque compte dispose d’une réaction par commentaire : aimer, ne pas aimer ou rire. Cliquer à nouveau la retire ; en choisir une autre la remplace. Un utilisateur peut supprimer ses propres commentaires. La suppression d’une Story ou d’un profil supprime les données associées par cascade. Les tables sont privées ; toutes les opérations passent par des fonctions qui contrôlent le compte et l’expiration.
+
+`npm run test:fun` vérifie également le regroupement, la pagination, les préfixes de pseudos, l’idempotence, les réactions, les autorisations, les limites et l’expiration.
