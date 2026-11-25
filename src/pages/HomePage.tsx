@@ -1,4 +1,4 @@
-import { ChevronRight, Plus, Search, X } from "lucide-react";
+import { ChevronRight, MailPlus, Plus, Search, UserRoundPlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import icon from "../assets/icon.png";
@@ -103,14 +103,27 @@ export default function HomePage() {
                                 </button>
                             )}
                         </div>
+                        <Link to="/discover" aria-label={t("Trouver d’autres utilisateurs")} title={t("Trouver d’autres utilisateurs")}
+                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-green-200 px-3 font-semibold text-black hover:bg-green-300 dark:bg-green-300 dark:hover:bg-green-200">
+                            <span className="hidden text-sm md:inline">{t("Autres utilisateurs")}</span>
+                            <UserRoundPlus size={22} aria-hidden="true" />
+                        </Link>
+                    </div>
+                    <div className="mt-1 flex justify-end">
+                        <Link to="/invit" aria-label={t("Invitations")} title={t("Invitations")}
+                            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700">
+                            <span className="hidden md:inline">{t("Invitations")}</span>
+                            <MailPlus size={21} aria-hidden="true" />
+                        </Link>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 pb-2 pt-1">
+                        <h2 id="discussions-title" className="text-lg font-bold">{t("Discussions")}</h2>
                         <button type="button" onClick={() => setShowNewGroup(true)} aria-label={t("Créer un groupe")} title={t("Créer un groupe")}
-                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-700 px-3 font-semibold text-white hover:bg-sky-800">
+                            className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-700 px-3 font-semibold text-white hover:bg-sky-800">
                             <Plus size={21} aria-hidden="true" />
-                            <span className="hidden text-sm sm:inline">{t("Créer un groupe")}</span>
+                            <span className="text-sm">{t("Créer un groupe")}</span>
                         </button>
                     </div>
-
-                    <h2 id="discussions-title" className="pb-2 pt-5 text-lg font-bold">{t("Discussions")}</h2>
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 sm:px-5" aria-busy={loading}>

@@ -1,10 +1,13 @@
 import { ArrowLeft, Check, Search, UserPlus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
+import type { SettingsTabContext } from "../components/AppTabsLayout";
+import { profileAvatarStyle } from "../utils/profileColors";
 import { t } from "../i18n/runtime";
 import { findUsers, inviteUser, type DiscoveredUser } from "../services/discovery";
 
 export default function DiscoverPage() {
+    const { profile } = useOutletContext<SettingsTabContext>();
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState<DiscoveredUser[]>([]);
     const [page, setPage] = useState(0);
@@ -93,7 +96,7 @@ export default function DiscoverPage() {
     return (
         <main className="min-h-full bg-white pb-6 text-slate-900 dark:bg-slate-800 dark:text-slate-100">
             <header className="flex h-16 items-center gap-3 px-4 sm:px-5">
-                <Link to="/invit" aria-label={t("Retour")} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
+                <Link to="/home" aria-label={t("Retour")} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
                     <ArrowLeft size={22} />
                 </Link>
                 <h1 className="text-xl font-bold">{t("Découvrir")}</h1>
@@ -112,8 +115,7 @@ export default function DiscoverPage() {
                 <ul aria-busy={loading} className="mt-3 divide-y divide-slate-200 dark:divide-slate-700">
                     {users.map(user => (
                         <li key={user.id} className="flex min-h-16 items-center gap-3 py-2.5">
-                            <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full
-                                bg-sky-50 font-semibold text-sky-700 dark:bg-sky-950 dark:text-sky-300">
+                            <span aria-hidden="true" style={profileAvatarStyle(user.color)} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-semibold">
                                 {Array.from(user.display_name)[0]?.toUpperCase()}
                             </span>
                             <h2 className="min-w-0 flex-1 truncate font-semibold">{user.display_name}</h2>
@@ -150,8 +152,8 @@ export default function DiscoverPage() {
                 )}
                 {hasMore && !error && (
                     <button type="button" disabled={loading} onClick={() => { setLoading(true); setPage(value => value + 1); }}
-                        className="mx-auto mt-4 block min-h-11 rounded-lg bg-slate-100 px-5 text-sm font-semibold text-sky-700
-                            hover:bg-sky-50 disabled:opacity-60 dark:bg-slate-700 dark:text-sky-300 dark:hover:bg-slate-600">
+                        className="mx-auto mt-4 block min-h-11 rounded-xl bg-sky-700 px-6 text-sm font-semibold text-white shadow-sm
+                            transition-colors hover:bg-sky-800 disabled:opacity-60 dark:bg-sky-600 dark:hover:bg-sky-500">
                         {loading ? t("Chargement...") : t("Voir plus")}
                     </button>
                 )}
@@ -173,6 +175,7 @@ export default function DiscoverPage() {
                     <label htmlFor="discovery-name" className="mt-6 block text-sm font-semibold">{t("Nom de la conversation")}</label>
                     <input autoFocus id="discovery-name" required minLength={2} maxLength={80}
                         value={name} onChange={event => setName(event.target.value)}
+                        placeholder={`${profile?.displayName ?? t("Ton pseudo")} & ${selected?.display_name ?? t("Son pseudo")}`}
                         className="mt-2 h-12 w-full rounded-lg border border-slate-200 bg-transparent px-3 dark:border-slate-700" />
                     <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
                         {t("Une nouvelle conversation n’est créée que lorsque l’invitation est acceptée.")}

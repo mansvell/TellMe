@@ -54,6 +54,7 @@ function ChatConversation({ groupId }: { groupId: string | undefined }) {
     const [menu, setMenu] = useState<Menu | null>(null);
     const [invitation, setInvitation] = useState<ChatItem | null>(null);
     const [conversationName, setConversationName] = useState("");
+    const [ownName, setOwnName] = useState("");
     const [inviting, setInviting] = useState(false);
     const [notice, setNotice] = useState("");
     const [firstUnread, setFirstUnread] = useState<string | null>(null);
@@ -75,6 +76,18 @@ function ChatConversation({ groupId }: { groupId: string | undefined }) {
     useLayoutEffect(() => { messagesRef.current = messages; }, [messages]);
     const messageKey = messages.filter(message => !message.pending).map(message => message.id).join(",");
     const ownMessageKey = messages.filter(message => message.me && !message.pending).map(message => message.id).join(",");
+
+    useEffect(() => {
+        if (!invitation) return;
+        let active = true;
+        void (async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+            const { data } = await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
+            if (active && data?.display_name) setOwnName(data.display_name);
+        })().catch(() => {});
+        return () => { active = false; };
+    }, [invitation]);
 
     // La fenêtre du chat suit aussi le clavier iOS ; seul le fil possède un défilement.
     useEffect(() => {
@@ -358,7 +371,7 @@ function ChatConversation({ groupId }: { groupId: string | undefined }) {
                 <div className="flex items-center justify-between"><h2 id="invite-title" className="text-lg font-semibold">{t("Nouvelle conversation")}</h2><button type="button" disabled={inviting} onClick={() => setInvitation(null)} aria-label={t("Fermer")} className="p-2 text-slate-400"><X size={19}/></button></div>
                 <p className="mt-2 text-sm text-slate-500">{t("Invitation destinée à")} {invitation.name}</p>
                 <label htmlFor="conversation-name" className="mb-2 mt-5 block text-sm font-medium">{t("Nom de la conversation")}</label>
-                <input id="conversation-name" autoFocus required maxLength={40} value={conversationName} onChange={event => setConversationName(event.target.value)} className="h-11 w-full rounded-lg border border-slate-200 bg-transparent px-3 outline-none focus:border-sky-500 dark:border-slate-700"/>
+                <input id="conversation-name" autoFocus required maxLength={40} value={conversationName} placeholder={`${ownName || t("Ton pseudo")} & ${invitation.name}`} onChange={event => setConversationName(event.target.value)} className="h-11 w-full rounded-lg border border-slate-200 bg-transparent px-3 outline-none focus:border-sky-500 dark:border-slate-700"/>
                 <button type="submit" disabled={inviting || !conversationName.trim()} className="mt-5 w-full rounded-lg bg-sky-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{inviting ? t("Envoi...") : t("Envoyer l’invitation")}</button>
             </form>
         </div>}

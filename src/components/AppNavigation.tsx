@@ -1,4 +1,4 @@
-import { Flame, House, MailPlus, Settings, Drama } from "lucide-react";
+import { Flame, House, BookOpen, Settings, Drama } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { t } from "../i18n/runtime";
 
@@ -6,8 +6,8 @@ export default function AppNavigation({ secretsUnread = 0 }: { secretsUnread?: n
     const { pathname } = useLocation();
     const current = pathname.toLowerCase().replace(/\/$/, "");
     const items = [
+        { to: "/storys", title: "Storys", icon: BookOpen },
         { to: "/fun", title: "Fun", icon: Drama },
-        { to: "/invit", title: t("Invitations"), icon: MailPlus },
         { to: "/home", title: t("Accueil"), icon: House },
         { to: "/buzz", title: "Buzz", icon: Flame },
         { to: "/settings", title: t("Paramètres"), icon: Settings },
@@ -19,7 +19,7 @@ export default function AppNavigation({ secretsUnread = 0 }: { secretsUnread?: n
                 md:order-none md:w-26 md:bg-slate-100 md:pb-3 md:pt-3 md:dark:bg-slate-900">
             <ul className="mx-auto grid min-h-17 max-w-2xl grid-cols-5 items-center gap-1 px-1 py-2 md:grid-cols-1 md:gap-2 md:px-2">
                 {items.map(({ to, title, icon: Icon }) => {
-                    const active = current === to || (to === "/invit" && current === "/discover");
+                    const active = current === to || (to === "/home" && ["/invit", "/discover"].includes(current));
                     return (
                         <li key={to} className="min-w-0">
                             <Link to={to} aria-current={active ? (current === to ? "page" : "location") : undefined}

@@ -16,7 +16,7 @@ export default function CreateStorytimePage() {
         event.preventDefault();
         if (busy || !text.trim()) return;
         setBusy(true); setError("");
-        try { await createStorytime(text, theme); navigate("/fun", { replace: true }); }
+        try { await createStorytime(text, theme); navigate("/storys", { replace: true }); }
         catch (failure) { setError(funError(failure)); setBusy(false); }
     }
     return <StorytimePageLayout title={t("Publier une Storytime")} busy={busy}>

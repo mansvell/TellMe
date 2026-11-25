@@ -1,7 +1,7 @@
 import { t } from "../i18n/runtime";
-import { Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, UserRoundPlus, X, XCircle} from "lucide-react";
+import { ArrowLeft, Check, CheckCircle2, Clock3, LoaderCircle, MessageCircle, ShieldOff, X, XCircle} from "lucide-react";
 
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
 import { supabase } from "../lib/supabase";
 
@@ -307,7 +307,8 @@ export default function InvitationsPage() {
 
             <header className="sticky top-0 z-20 bg-white dark:bg-slate-800">
 
-                    <div className="flex items-center justify-center gap-3 p-2">
+                    <div className="flex min-h-16 items-center gap-3 px-4 sm:px-5">
+                        <Link to="/home" aria-label={t("Retour")} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"><ArrowLeft size={22} /></Link>
 
                         <img
                             src={icon}
@@ -321,34 +322,7 @@ export default function InvitationsPage() {
             </header>
 
             <section className="mx-auto max-w-5xl p-4 sm:p-5">
-                <button type="button" onClick={() => navigate("/discover")}
-                    className="mb-6 flex w-70 items-center justify-between gap-3 rounded-2xl border border-sky-400 bg-white px-5 py-4 text-left font-bold text-sky-600 shadow-sm transition hover:bg-sky-50 dark:border-sky-900 dark:bg-slate-900 dark:text-sky-300">
-                    {t("Trouver d’autres utilisateurs")}
-                    <UserRoundPlus size={22} className="shrink-0" aria-hidden="true" />
-                </button>
-                <div
-                    className="rounded-3xl bg-linear-to-br from-sky-600 to-blue-700 p-5 text-white sm:p-7 dark:bg-none dark:bg-slate-700">
-
-                <div className="flex items-start gap-4">
-
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15">
-                            <MessageCircle size={24} />
-                        </div>
-
-                        <div>
-                            <h2 className="text-xl font-bold sm:text-2xl">
-                                 {t("Conversations privées")} </h2>
-
-                            <p className="mt-2 max-w-xl text-sm leading-6 text-sky-100 dark:text-slate-200">
-                                 {t("Une nouvelle conversation n’est créée que lorsque l’invitation est acceptée.")} </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div className="mt-6 grid grid-cols-3 gap-2 rounded-2xl bg-white p-1.5 shadow-sm">
+                <div className="grid grid-cols-3 gap-2 rounded-2xl bg-white p-1.5 shadow-sm">
 
                     <TabButton
                         active={

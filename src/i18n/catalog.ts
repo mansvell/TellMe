@@ -1,4 +1,8 @@
 export const catalog: Record<string, { en: string; de: string }> = {
+  "Autres utilisateurs": { "en": "Other users", "de": "Andere Nutzer" },
+  "Son pseudo": { "en": "Their nickname", "de": "Sein Pseudonym" },
+  "Les Storys des autres utilisateurs": { "en": "Other users’ stories", "de": "Storys anderer Nutzer" },
+  "Tes Storys": { "en": "Your stories", "de": "Deine Storys" },
   "Les notifications ne sont pas encore disponibles sur cette version mobile.": {
     "en": "Notifications are not available in this mobile version yet.",
     "de": "Benachrichtigungen sind in dieser mobilen Version noch nicht verfügbar."

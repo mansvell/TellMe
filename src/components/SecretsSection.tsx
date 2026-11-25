@@ -31,13 +31,15 @@ export default function SecretsSection() {
     const target = params.get("secret");
     const posterRef = useRef<HTMLDivElement>(null);
     const locale = getLanguage();
-    const [poster, setPoster] = useState<{ blob: Blob; locale: string } | null>(null);
+    const [poster, setPoster] = useState<{ blob: Blob; url: string; locale: string } | null>(null);
+    const [showSharePreview, setShowSharePreview] = useState(false);
     const [posterError, setPosterError] = useState("");
     const [posterAttempt, setPosterAttempt] = useState(0);
     const [sharing, setSharing] = useState(false);
 
     useEffect(() => {
         let active = true;
+        let url: string | undefined;
         const node = posterRef.current;
         if (!node) return;
         void (async () => {
@@ -45,9 +47,9 @@ export default function SecretsSection() {
             await Promise.all(Array.from(node.querySelectorAll("img")).map(image => image.decode()));
             const blob = await toBlob(node, { pixelRatio: 3, cacheBust: true });
             if (!blob) throw Error("POSTER_UNAVAILABLE");
-            if (active) { setPoster({ blob, locale }); setPosterError(""); }
+            if (active) { url = URL.createObjectURL(blob); setPoster({ blob, url, locale }); setPosterError(""); }
         })().catch(() => { if (active) setPosterError(t("Impossible de préparer l’image.")); });
-        return () => { active = false; };
+        return () => { active = false; if (url) URL.revokeObjectURL(url); };
     }, [locale, posterAttempt]);
 
     useEffect(() => {
@@ -135,7 +137,7 @@ export default function SecretsSection() {
 
     const visible = secrets.filter(secret => filter === "all" || (filter === "unread" ? !secret.read_at : secret.read_at));
     return (
-        <section aria-labelledby="secrets-heading" className="mt-9">
+        <section aria-labelledby="secrets-heading">
             <div aria-hidden="true" className="pointer-events-none fixed -left-[10000px] top-0"><SecretShareCard ref={posterRef} /></div>
             <h2 id="secrets-heading" className="flex items-center gap-2 text-lg font-bold">Secrets
                 {secretsUnread > 0 && <span className="rounded-full bg-sky-700 px-2 py-0.5 text-xs text-white">{secretsUnread}</span>}
@@ -144,7 +146,7 @@ export default function SecretsSection() {
                 <h3 className="text-balance font-semibold">{t("Prêt à recevoir des messages anonymes ?")}</h3>
                 {link && <p className="mt-3 select-all break-all rounded-lg bg-white/70 px-3 py-2 text-xs text-sky-800 dark:bg-slate-900 dark:text-sky-200">{link}</p>}
                 <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" disabled={!link || poster?.locale !== locale || sharing} onClick={() => void share()} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Share2 size={17} />{sharing ? t("Préparation…") : t("Partager le lien")}</button>
+                    <button type="button" disabled={!link || poster?.locale !== locale || sharing} onClick={() => { setNotice(""); setShowSharePreview(true); }} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Share2 size={17} />{sharing ? t("Préparation…") : t("Partager le lien")}</button>
                 </div>
                 {posterError && <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-300">{posterError}<button type="button" onClick={() => setPosterAttempt(value => value + 1)} className="ml-2 underline">{t("Réessayer")}</button></p>}
                 {notice && <p role="status" className="mt-3 text-sm text-sky-700 dark:text-sky-300">{notice}</p>}
@@ -176,6 +178,20 @@ export default function SecretsSection() {
                 </li>)}
             </ul>
             {hasMore && <button type="button" disabled={loading} onClick={() => void more()} className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-sky-700 dark:text-sky-300 disabled:opacity-50">{t("Voir plus")}</button>}
+
+            {showSharePreview && <FunDialog title={t("Partager le lien")} onClose={() => setShowSharePreview(false)} busy={sharing}>
+                <div className="mx-auto aspect-[9/16] w-full max-w-64 overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800">
+                    {poster?.locale === locale && <img src={poster.url} alt={t("Aperçu de la carte")} className="h-full w-full object-contain" />}
+                </div>
+                {error && <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-300">{error}</p>}
+                {notice && <p role="status" className="mt-3 text-sm text-sky-700 dark:text-sky-300">{notice}</p>}
+                <div className="mt-5 flex justify-center">
+                    <button type="button" disabled={!link || poster?.locale !== locale || sharing} onClick={() => void share()}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">
+                        <Share2 size={17} />{sharing ? t("Préparation…") : t("Partager")}
+                    </button>
+                </div>
+            </FunDialog>}
 
             {selected && !replying && <FunDialog title={t("Message anonyme")} onClose={close} busy={busy}>
                 <p className="text-xs text-slate-500 dark:text-slate-300">{elapsedTime(selected.created_at)} · {t(selected.read_at ? "Lu" : "Non lu")}</p>

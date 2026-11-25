@@ -2,6 +2,7 @@ import {Routes, Route, Navigate} from "react-router-dom";
 
 import DiscoverPage from "./pages/DiscoverPage";
 import FunPage from "./pages/FunPage";
+import StorysPage from "./pages/StorysPage";
 import CreateStorytimePage from "./pages/CreateStorytimePage";
 import MyStorytimesPage from "./pages/MyStorytimesPage";
 import SecretLandingPage from "./pages/SecretLandingPage";
@@ -46,6 +47,7 @@ export default function App() {
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/buzz" element={<BuzzPage />} />
               <Route path="/fun" element={<FunPage />} />
+              <Route path="/storys" element={<StorysPage />} />
               <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="/fun/story/new" element={<ProtectedRoute><CreateStorytimePage /></ProtectedRoute>} />
