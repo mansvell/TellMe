@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Check } from "lucide-react";
 import { t } from "../i18n/runtime";
-import { CARD_THEMES, createStorytime, funError, type CardTheme } from "../services/fun";
+import { CARD_THEMES, createStorytime, funError, getStoryCommentQuote, type CommentQuote, type CardTheme } from "../services/fun";
 import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
 import StorytimePageLayout from "../components/StorytimePageLayout";
+import StoryCommentQuote from "../components/StoryCommentQuote";
 
 export default function CreateStorytimePage() {
     const [text, setText] = useState("");
@@ -12,14 +13,23 @@ export default function CreateStorytimePage() {
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const [params] = useSearchParams();
+    const commentId = params.get("comment");
+    const [quote, setQuote] = useState<CommentQuote | null>(null);
+    useEffect(() => {
+        if (!commentId) return;
+        let active = true;
+        void getStoryCommentQuote(commentId).then(value => { if (active) setQuote(value); }).catch(failure => { if (active) setError(funError(failure)); });
+        return () => { active = false; };
+    }, [commentId]);
     async function publish(event: React.FormEvent) {
         event.preventDefault();
-        if (busy || !text.trim()) return;
+        if (busy || !text.trim() || (commentId && !quote)) return;
         setBusy(true); setError("");
-        try { await createStorytime(text, theme); navigate("/storys", { replace: true }); }
+        try { await createStorytime(text, theme, commentId); navigate("/storys", { replace: true }); }
         catch (failure) { setError(funError(failure)); setBusy(false); }
     }
-    return <StorytimePageLayout title={t("Publier une Storytime")} busy={busy}>
+    return <StorytimePageLayout title={t(commentId ? "Répondre en Story" : "Publier une Storytime")} busy={busy}>
         <form onSubmit={event => void publish(event)}>
             <fieldset disabled={busy}>
                 <legend className="mb-4 text-sm font-medium">{t("Couleur de ton histoire")}</legend>
@@ -36,13 +46,15 @@ export default function CreateStorytimePage() {
                 </div>
             </fieldset>
             {theme === "slate" && <p className="mt-3 text-xs leading-5 text-slate-500 dark:text-slate-400">{t("Un secret personnel, raconté anonymement.")}</p>}
+            {quote && <div className="mt-6"><StoryCommentQuote quote={quote} /></div>}
+            {commentId && !quote && !error && <p role="status" className="mt-4 text-sm">{t("Chargement...")}</p>}
             <label className="mt-7 block text-sm font-medium">{t("Ton histoire")}
                 <textarea value={text} onChange={event => setText(event.target.value)} maxLength={2000} rows={9} disabled={busy}
                     className="mt-3 min-h-64 w-full resize-y rounded-xl border border-slate-300 bg-transparent p-4 text-base font-normal leading-7 outline-sky-500 dark:border-slate-700" />
             </label>
             <p className="mt-1 text-right text-xs text-slate-500 dark:text-slate-400">{text.length}/2000</p>
             {error && <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-300">{error}</p>}
-            <button type="submit" disabled={busy || !text.trim()} className="mt-4 w-full rounded-xl bg-sky-700 px-4 py-3 font-semibold text-white disabled:opacity-50">{busy ? t("Publication...") : t("Publier")}</button>
+            <button type="submit" disabled={busy || !text.trim() || !!(commentId && !quote)} className="mt-4 w-full rounded-xl bg-sky-700 px-4 py-3 font-semibold text-white disabled:opacity-50">{busy ? t("Publication...") : t("Publier")}</button>
         </form>
     </StorytimePageLayout>;
 }

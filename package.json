@@ -1,7 +1,7 @@
 {
   "name": "app",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,7 @@
     "mobile:run:ios": "npm run mobile:sync && cap run ios",
     "test:mobile": "node --test tests/mobile.test.cjs tests/push.test.cjs",
     "test:receipts": "node --test tests/receipts.test.cjs",
-    "test:fun": "node --test tests/fun.test.mjs tests/story-comments.test.mjs tests/secret-push.test.cjs"
+    "test:fun": "node --test tests/fun.test.mjs tests/story-comments.test.mjs tests/secret-push.test.cjs tests/story-upgrade.test.mjs tests/story-notifications.test.cjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.0",

@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Link } from "react-router-dom";
-import { BookOpen, Info, MoreHorizontal, Plus } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { BookOpen, Info, MoreHorizontal, Plus, Trophy } from "lucide-react";
 import { t } from "../i18n/runtime";
-import { elapsedTime, funError, getMyStorytimes, getStorytimeGroups, type StoryGroup, type Storytime } from "../services/fun";
+import { elapsedTime, funError, getMyStorytimes, getStorytime, getStorytimeGroups, type StoryGroup, type Storytime } from "../services/fun";
 import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
 import FunDialog from "./FunDialog";
 import StorytimeInfo from "./StorytimeInfo";
 import StorytimeViewer from "./StorytimeViewer";
 import StoryComments from "./StoryComments";
+import MonthlyCompetition from "./MonthlyCompetition";
+import StoryNotificationInbox from "./StoryNotificationInbox";
 
 const noMore = async () => [];
 const firstUnread = (stories: Storytime[]) => stories.find(story => !story.seen) ?? stories[0];
@@ -49,6 +51,15 @@ export default function StorytimesSection() {
     const [now, setNow] = useState(() => Date.now());
     const [active, setActive] = useState<ActiveStory | null>(null);
     const [info, setInfo] = useState(false);
+    const [competition, setCompetition] = useState(false);
+    const [params, setParams] = useSearchParams();
+    const targetStory = params.get("story");
+    useEffect(() => {
+        if (!targetStory) return;
+        let current = true;
+        void getStorytime(targetStory).then(story => { if (current) { setActive({ mode: "comments", story }); setError(""); } }).catch(failure => { if (current) setError(funError(failure)); });
+        return () => { current = false; };
+    }, [targetStory]);
     const mounted = useRef(true);
     const fetching = useRef(false);
     useEffect(() => {
@@ -87,8 +98,13 @@ export default function StorytimesSection() {
         }) }));
         return changed ? next : current;
     }), []);
-    const close = useCallback(() => setActive(null), []);
+    const close = useCallback(() => { setActive(null); if (targetStory) setParams({}, { replace: true }); }, [targetStory, setParams]);
     const comment = useCallback((story: Storytime) => setActive({ mode: "comments", story: { ...story } }), []);
+    const countChanged = useCallback((id: string, count: number) => {
+        const update = (story: Storytime) => story.id === id ? { ...story, comment_count: count } : story;
+        setGroups(rows => rows.map(group => ({ ...group, stories: group.stories.map(update) })));
+        setOwnStories(rows => rows.map(update));
+    }, []);
     const mine = ownStories.filter(story => Date.parse(story.expires_at) > now);
     const allGroups = groups.map(group => ({ ...group, stories: group.stories.filter(story => Date.parse(story.expires_at) > now) })).filter(group => group.stories.length);
     const visibleGroups = allGroups.slice(0, pages * pageSize);
@@ -101,6 +117,8 @@ export default function StorytimesSection() {
         <div className="flex items-center justify-between gap-3">
             <h1 id="storytimes-heading" className="tellme-section-title">Storytimes</h1>
             <div className="flex items-center gap-1">
+                <StoryNotificationInbox />
+                <button type="button" onClick={() => setCompetition(true)} aria-label={t("Classement du mois")} className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"><Trophy size={20} /></button>
                 <button type="button" onClick={() => setInfo(true)} aria-label={t("Informations sur les Storytimes")} className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"><Info size={20} /></button>
                 <Link to="/fun/stories" aria-label={t("Mes Storytimes")} className="flex h-11 w-11 items-center justify-center rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"><MoreHorizontal size={23} /></Link>
             </div>
@@ -121,8 +139,9 @@ export default function StorytimesSection() {
         {loading && <p role="status" className="mt-3 text-sm text-slate-500 dark:text-slate-400">{t("Chargement...")}</p>}
         {error && <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-300">{error}<button type="button" onClick={() => { setLoading(true); setAttempt(value => value + 1); }} className="ml-2 underline">{t("Réessayer")}</button></p>}
         {(hasMore || allGroups.length > visibleGroups.length) && <button type="button" disabled={loading} onClick={() => void more()} className="mx-auto mt-4 block rounded-xl bg-sky-100 px-5 py-2.5 text-sm font-semibold text-sky-800 dark:bg-sky-950 dark:text-sky-200 disabled:opacity-50">{t("Voir plus")}</button>}
-        {active?.mode === "comments" && <StoryComments key={active.story.id} story={active.story} onClose={close} onRead={read} />}
+        {active?.mode === "comments" && <StoryComments key={active.story.id} story={active.story} onClose={close} onRead={read} onCount={countChanged} />}
         {info && <FunDialog title={t("Informations sur les Storytimes")} onClose={() => setInfo(false)}><StorytimeInfo /></FunDialog>}
+        {competition && <FunDialog title={t("Classement du mois")} onClose={() => setCompetition(false)}><MonthlyCompetition /></FunDialog>}
         {active?.mode === "viewer" && <StorytimeViewer key={active.initialId} stories={active.stories} initialId={active.initialId} onRead={read} onMore={noMore} onClose={close} onComment={comment} />}
     </section>;
 }

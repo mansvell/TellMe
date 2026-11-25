@@ -13,6 +13,7 @@ import { formatMessageDate, getMessageById, getMessages, getUnreadMessageIds, is
 import { acknowledgeDelivery, getReceiptSummaries, type ReceiptSummary } from "../services/receipts";
 import { getMyMessageColor } from "../services/group";
 import { sendChatInvitation } from "../services/invitations";
+import { playNotificationSound } from "../services/notificationSound";
 
 type ChatItem = ChatMessage & { pending?: boolean };
 type ChatGroup = { id: string; name: string; color: string; members: number };
@@ -120,6 +121,7 @@ function ChatConversation({ groupId }: { groupId: string | undefined }) {
                 if (!active || message.group_id !== groupId) return;
                 setMessages(current => mergeMessages(current, [message]));
                 if (!message.me) {
+                    if (!messagesRef.current.some(known => known.id === id)) playNotificationSound();
                     if (!nearBottom.current) setHasNewMessages(true);
                     await acknowledgeDelivery(groupId, [id]);
                 }

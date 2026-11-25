@@ -1,2 +1,5 @@
 [functions.notify-secret]
 verify_jwt = false
+
+[functions.notify-story]
+verify_jwt = false

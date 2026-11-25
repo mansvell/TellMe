@@ -8,7 +8,7 @@ Appliquer supabase/migrations/20261123_storytime_views.sql pour les compteurs et
 
 Pour un projet déjà activé, appliquer supabase/migrations/20261123_secrets_public_anonymity.sql. La validation du lien Secrets ne renvoie plus le pseudo du destinataire. La page publique conserve uniquement le titre d'envoi anonyme, le champ et la langue, avec la palette bleu/cyan de la page publique des sondages.
 
-Les Storytimes sont visibles pendant 24 heures aux utilisateurs inscrits. La liste publique ne renvoie aucun identifiant d'auteur. Chaque auteur peut avoir cinq histoires actives et dix publications par jour. Seul l'auteur peut supprimer son histoire. Les signalements se consultent avec les droits administrateur dans tellme_private.storytime_reports.
+Les Storytimes sont visibles pendant 4 jours aux utilisateurs inscrits. La liste publique ne renvoie aucun identifiant d'auteur. Chaque auteur peut avoir cinq histoires actives et dix publications par jour. Seul l'auteur peut supprimer son histoire. Les signalements se consultent avec les droits administrateur dans tellme_private.storytime_reports.
 
 Chaque boîte possède un identifiant public aléatoire stable. Le lien utilise le domaine du site sur le web et le domaine public configuré sur l'application native. L'envoi public ne crée pas de compte. Il utilise une vérification cryptographique légère dans un worker, un champ anti-robot et des limites côté serveur. Les adresses IP sont utilisées sous forme d'empreintes salées dans les tables privées. Les limites sont de dix messages par tranche de dix minutes par empreinte et cinquante messages par heure par boîte. Les répétitions d'une même requête ne créent pas de doublon.
 
@@ -20,7 +20,7 @@ Le bouton Partager le lien dans Fun transmet une affiche PNG 1080 × 1920 avec �
 
 Les questions et sondages du chat sont affichés au centre, sans bulle personnelle, pseudo, actions d'expéditeur ni coches personnelles. Les citations utilisent un intitulé neutre. Les messages ordinaires gardent leurs bulles et accusés de réception.
 
-Palette Storytimes : vert/Quotidien, violet doux/Confidences, rose pastel/Amour et relations, bleu/Mystère, rouge/Drôle, jaune/Privé. Le jaune indique un secret personnel révélé anonymement ; la visibilité reste commune à tous les utilisateurs. Les clés enregistrées des couleurs sont conservées pour les histoires existantes. La palette des cartes Secrets reste indépendante. Les paramètres affichent Version 1.0.3 en bas de page.
+Palette Storytimes : vert/Quotidien, violet doux/Confidences, rose pastel/Amour et relations, bleu/Mystère, rouge/Drôle, jaune/Privé. Le jaune indique un secret personnel révélé anonymement ; la visibilité reste commune à tous les utilisateurs. Les clés enregistrées des couleurs sont conservées pour les histoires existantes. La palette des cartes Secrets reste indépendante. Les paramètres affichent Version 1.0.4 en bas de page.
 
 ## Notifications système des Secrets
 
@@ -60,3 +60,43 @@ Un commentaire contient au maximum 600 caractères ; un compte peut en envoyer v
 `npm run test:fun` vérifie également le regroupement, la pagination, les préfixes de pseudos, l’idempotence, les réactions, les autorisations, les limites et l’expiration.
 
 L’ouverture des commentaires ferme explicitement le lecteur et garde un seul écran actif avec l’histoire sélectionnée. Le champ de saisie est placé juste sous la carte, avant la liste défilante. La section des autres auteurs porte le titre TellMe-Storys. Dans Fun, les bulles décoratives sont discrètes, adaptées au thème et arrêtées si le système demande de réduire les animations. Ces ajustements ne demandent pas de nouvelle migration SQL.
+
+## Version 1.0.4 : réponses, notifications et défi mensuel
+
+### Activation sur le projet Supabase existant
+
+1. Appliquer `supabase/migrations/20261125_story_threads_rewards.sql` après les migrations précédentes. Le script est réexécutable. Les Storys encore actives passent à quatre jours à compter de leur publication ; les Storys expirées ne réapparaissent pas.
+2. Déployer `supabase/functions/notify-story/index.ts` sur le même projet : `supabase functions deploy notify-story`. Cette fonction réutilise les mêmes secrets VAPID et `FUN_WEBHOOK_SECRET` que `notify-secret` ; ne jamais les mettre dans le code client.
+3. Créer un Database Webhook sur `public.story_notifications`, événement **INSERT**, vers `notify-story`, avec l’en-tête `x-tellme-hook` égal à `FUN_WEBHOOK_SECRET`. La vérification JWT est désactivée pour cette fonction, mais son secret partagé reste obligatoire et vérifié côté serveur.
+4. Si `pg_cron` est actif, la migration programme le nettoyage des Storys expirées toutes les heures et la clôture mensuelle à 00 h UTC le premier. Sinon, activer cette extension dans Supabase puis relancer la migration. Les RPC bloquent immédiatement l’accès aux Storys expirées, même avant le nettoyage physique.
+5. Fusionner `version-1.0.4` vers la branche de production après activation du SQL. Vercel déploie ensuite la version habituelle du site.
+
+Les commentaires et réponses restent dans la même liste chronologique ; une réponse cite son parent, même si celui-ci n’est pas dans la page de vingt commentaires chargée. Supprimer un parent conserve les réponses, sans continuer d’afficher son texte. Le compteur inclut toutes les réponses. Le champ reste au-dessus de la liste défilante. « En Story » ouvre la page de publication avec le commentaire accroché ; seul son préfixe de pseudo et sa couleur apparaissent. Le serveur valide le commentaire source, son accès et l’expiration. La citation disparaît si son commentaire est supprimé ou expire avec sa Story source.
+
+La cloche dans Storys affiche les notifications et ouvre la Story concernée. L’auteur est informé des nouveaux commentaires ; l’auteur d’un commentaire est informé d’une réponse ou d’une citation en Story. Une personne ne reçoit pas de notification pour sa propre action et un même destinataire ne reçoit pas deux notifications pour une réponse qui concerne à la fois sa Story et son commentaire. Les commentaires ne sont jamais exposés dans les push système. Les envois répétés avec le même identifiant ne créent ni commentaire, ni notification, ni point supplémentaires.
+
+Un son discret est disponible au premier plan, après une interaction avec l’app, pour les notifications des Storys, les Secrets et les nouveaux messages du chat ouvert. Le réglage **Sons des notifications** permet de le couper. En arrière-plan, le son est celui du système et dépend des autorisations, du mode silencieux et de Concentration ; un son personnalisé sur iPhone n’est pas garanti. Le service worker évite la double alerte système/son interne quand TellMe est déjà visible. Les notifications push nécessitent le webhook ci-dessus et les abonnements existants ; le fonctionnement de l’app ouverte ne dépend pas de ce webhook.
+
+### Points et récompenses
+
+Le trophée dans Storys ouvre le classement réel. Les règles figurent aussi dans Infos, en français, anglais et allemand. Une Story publiée, un commentaire/réponse et une réaction au commentaire d’autrui valent chacun **1 point**. Il n’y a ni multiplicateur ni concurrent fictif. Les plafonds journaliers UTC sont 10 publications, 20 commentaires/réponses cumulés et 10 réactions. Une réaction modifiée ou retirée puis remise ne peut jamais cumuler plusieurs points. Un texte de Story identique dans le mois ou un commentaire identique sous la même Story ne rapporte pas de point supplémentaire. Les réactions à son propre commentaire ne rapportent rien.
+
+Supprimer volontairement sa Story ou son commentaire annule son point du mois courant. Supprimer sa Story annule aussi ses propres points de commentaires/réactions supprimés avec elle ; les autres personnes ne sont pas pénalisées. Retirer sa réaction annule le point de cette réaction ; la remettre peut seulement restaurer le même point. Les quotas consommés ne sont pas libérés par une suppression. L’expiration automatique et ses suppressions par cascade ne retirent pas les points acquis. Les mois déjà clôturés restent fixes.
+
+Les points sont calculés uniquement par des fonctions privées côté serveur. Le client ne peut pas écrire dans le registre. Chaque mois UTC commence avec un nouveau score. Les égalités sont départagées par la première attribution du score, puis par un ordre stable. Seules les cinq premières positions sont montrées, avec des scores réels et sans identités ; chaque personne voit aussi sa propre position réelle, même hors top 5. Une place sans participant reste libre.
+
+Les trois premières positions sont fixes : **Gold / 20 €**, **Silver / 15 €**, **Bronze / 10 €**. Les quatrième et cinquième positions sont finalistes sans récompense en argent. Le budget est donc **45 € par mois complet avec trois gagnants**. Les versements ne sont pas automatisés : l’organisateur doit réellement les effectuer. Aucun paiement n’est simulé ou marqué versé par l’app.
+
+Les résultats des mois terminés sont archivés dans `tellme_private.monthly_results`, inaccessible aux utilisateurs. L’administration peut les consulter depuis SQL Editor et organiser les versements :
+
+```sql
+select month, position, user_id, points, reward_eur, payment_status
+from tellme_private.monthly_results
+order by month desc, position;
+```
+
+Après un versement réel uniquement, l’administration peut changer `payment_status` de `pending` à `paid` pour le mois et la position concernés. Le gagnant voit le statut de son dernier résultat ; l’app ne collecte ni coordonnées bancaires ni données de paiement. Les récompenses et les règles de participation doivent être assumées par l’organisateur avant la mise en production.
+
+### Vérifications de la version
+
+`npm run test:fun` couvre les fils de réponses, les citations, les compteurs, les destinataires et droits des notifications, le retrait des points, les anti-doublons, les quotas, le vrai top 5, les archives mensuelles, les push et le son. Les vérifications mobiles, des accusés de lecture et le build restent inclus dans les contrôles habituels.

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Laugh, Send, ThumbsDown, ThumbsUp, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, BookOpen, Laugh, Reply, Send, ThumbsDown, ThumbsUp, Trash2, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { t } from "../i18n/runtime";
 import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
 import { addStoryComment, deleteStoryComment, elapsedTime, funError, getStoryComments, reactToStoryComment, readStorytime, type StoryComment, type StoryReaction, type Storytime } from "../services/fun";
 import { profileAvatarStyle } from "../utils/profileColors";
+import StoryCommentQuote from "./StoryCommentQuote";
 
 function ordered(rows: StoryComment[]) {
     return rows.sort((a, b) => a.created_at.localeCompare(b.created_at) || a.id.localeCompare(b.id));
@@ -14,7 +16,7 @@ const reactions = [
     { key: "laugh", icon: Laugh, label: "Ça me fait rire" },
 ] as const;
 
-export default function StoryComments({ story, onClose, onRead }: { story: Storytime; onClose: () => void; onRead: (id: string) => void }) {
+export default function StoryComments({ story, onClose, onRead, onCount }: { story: Storytime; onClose: () => void; onRead: (id: string) => void; onCount: (id: string, count: number) => void }) {
     const section = useRef<HTMLElement>(null);
     const list = useRef<HTMLDivElement>(null);
     const [comments, setComments] = useState<StoryComment[]>([]);
@@ -23,13 +25,17 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState("");
     const [text, setText] = useState("");
+    const [reply, setReply] = useState<StoryComment | null>(null);
+    const [total, setTotal] = useState<number | undefined>(story.comment_count);
+    const [quote, setQuote] = useState(story.comment_quote ?? null);
+    const composer = useRef<HTMLTextAreaElement>(null);
     const [expired, setExpired] = useState(() => Date.parse(story.expires_at) <= Date.now());
     const [scrollState, setScrollState] = useState({ overflow: false, bottom: true });
     const mounted = useRef(false);
     const mutation = useRef(false);
     const revision = useRef(0);
     const olderLoaded = useRef(false);
-    const draftRequest = useRef<{ text: string; id: string } | null>(null);
+    const draftRequest = useRef<{ text: string; parent: string | null; id: string } | null>(null);
     const scrollIntent = useRef<"bottom" | { height: number; top: number } | null>("bottom");
     const atBottom = useRef(true);
     const palette = STORY_BACKGROUNDS[story.theme];
@@ -46,6 +52,8 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
         try {
             const result = await getStoryComments(story.id);
             if (!mounted.current || current !== revision.current) return;
+            setTotal(result.total); onCount(story.id, result.total);
+            setQuote(result.quote);
             if (atBottom.current) scrollIntent.current = "bottom";
             setComments(previous => {
                 const latest = new Map(result.rows.map(row => [row.id, row]));
@@ -58,7 +66,7 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
             setError("");
         } catch (failure) { if (mounted.current && current === revision.current) setError(funError(failure)); }
         finally { if (mounted.current && current === revision.current) setLoading(false); }
-    }, [story.id]);
+    }, [story.id, onCount]);
 
     useEffect(() => {
         mounted.current = true;
@@ -102,11 +110,12 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
         const content = text.trim();
         if (!content || mutation.current || expired) return;
         mutation.current = true; revision.current++; setLoading(false); setBusy(true); setError("");
-        if (draftRequest.current?.text !== content) draftRequest.current = { text: content, id: crypto.randomUUID() };
+        const parent = reply?.id ?? null;
+        if (draftRequest.current?.text !== content || draftRequest.current.parent !== parent) draftRequest.current = { text: content, parent, id: crypto.randomUUID() };
         try {
-            await addStoryComment(story.id, content, draftRequest.current.id);
+            await addStoryComment(story.id, content, draftRequest.current.id, parent);
             if (!mounted.current) return;
-            setText(""); draftRequest.current = null;
+            setText(""); setReply(null); draftRequest.current = null;
             scrollIntent.current = "bottom"; atBottom.current = true;
             await refresh();
         } catch (failure) { if (mounted.current) setError(funError(failure)); }
@@ -133,7 +142,11 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
         mutation.current = true; revision.current++; setLoading(false); setBusy(true); setError("");
         try {
             await deleteStoryComment(id);
-            if (mounted.current) setComments(rows => rows.filter(row => row.id !== id));
+            if (mounted.current) {
+                setComments(rows => rows.filter(row => row.id !== id).map(row => row.parent_id === id ? { ...row, parent_id: null, reply_to: null } : row));
+                if (reply?.id === id) setReply(null);
+                await refresh();
+            }
         } catch (failure) { if (mounted.current) setError(funError(failure)); }
         finally { mutation.current = false; if (mounted.current) setBusy(false); }
     }
@@ -141,17 +154,23 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
     return <section ref={section} aria-labelledby="comments-heading" className="mt-4 scroll-mt-2">
         <hr className="border-0 border-t-[3px] border-sky-200 dark:border-sky-800" />
         <div className="relative flex min-h-12 items-center justify-center px-12">
-            <h2 id="comments-heading" className="tellme-section-title text-center">{t("Commentaires")}</h2>
+            <h2 id="comments-heading" className="tellme-section-title text-center">{t("Commentaires")}{total !== undefined && <span className="ml-2 text-base font-medium text-slate-500 dark:text-slate-400">{total}</span>}</h2>
             <button type="button" onClick={onClose} aria-label={t("Fermer les commentaires")} className="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"><X size={20} /></button>
         </div>
         <article aria-label={t("Storytime commentée")} style={{ background: palette.background, color: palette.color }} className="flex min-h-44 max-h-96 flex-col overflow-y-auto rounded-2xl px-6 py-6 sm:px-10">
             <p className="mb-4 text-xs font-semibold opacity-70">{t(STORY_TOPICS[story.theme].label)} · {elapsedTime(story.created_at)}</p>
+            {!expired && quote && <div className="mb-4"><StoryCommentQuote quote={quote} compact /></div>}
             <p className="my-auto whitespace-pre-wrap break-words text-center text-xl font-medium leading-relaxed [overflow-wrap:anywhere] sm:text-2xl">{expired ? t("Cette Storytime a expiré.") : story.content}</p>
         </article>
         {!expired && <div className="relative mt-4 rounded-2xl bg-white px-3 py-2 dark:bg-slate-800 sm:px-5">
             <form onSubmit={event => void send(event)} className="mb-3 pb-1">
+                {reply && <div className="relative mb-2 border-l-2 border-sky-500 bg-sky-50 px-3 py-2 pr-12 text-sm dark:bg-sky-950/50">
+                    <p className="font-semibold text-sky-700 dark:text-sky-300">{t("Réponse à {name}", { name: reply.display_prefix })}</p>
+                    <p className="mt-1 line-clamp-2 break-words">{reply.content}</p>
+                    <button type="button" disabled={busy} aria-label={t("Annuler la réponse")} onClick={() => setReply(null)} className="absolute right-1 top-1 flex h-10 w-10 items-center justify-center"><X size={17} /></button>
+                </div>}
                 <div className="flex items-end gap-2 rounded-2xl bg-slate-100 p-2 dark:bg-slate-900">
-                    <textarea aria-label={t("Ton commentaire")} placeholder={t("Ajoute ton commentaire…")} value={text} onChange={event => setText(event.target.value)} maxLength={600} rows={2} readOnly={busy} disabled={expired}
+                    <textarea ref={composer} aria-label={t("Ton commentaire")} placeholder={t(reply ? "Ta réponse…" : "Ajoute ton commentaire…")} value={text} onChange={event => setText(event.target.value)} maxLength={600} rows={2} readOnly={busy} disabled={expired}
                         className="min-h-11 max-h-36 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base leading-6 outline-none" />
                     <button type="submit" disabled={busy || expired || !text.trim()} aria-label={t("Envoyer le commentaire")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-700 text-white disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700"><Send size={18} /></button>
                 </div>
@@ -163,12 +182,15 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
                 <ul className="divide-y divide-slate-100 dark:divide-slate-700/60">
                     {comments.map(comment => {
                         const style = profileAvatarStyle(comment.color);
-                        return <li key={comment.id} className="flex gap-3 px-1 py-4">
+                        return <li key={comment.id} id={`comment-${comment.id}`} className={`flex gap-3 px-1 py-4 ${comment.parent_id ? "ml-3 border-l-2 border-sky-100 pl-3 dark:border-sky-900" : ""}`}>
                             <span aria-label={comment.display_prefix} style={{ color: style.backgroundColor, background: style.color === "#000000" ? "#0F172A" : "#F1F5F9" }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-bold">{comment.display_prefix}</span>
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400"><span>{elapsedTime(comment.created_at)}</span>{comment.own && <span className="font-semibold">{t("Toi")}</span>}</div>
+                                {comment.reply_to && <div className="mt-2"><StoryCommentQuote quote={comment.reply_to} compact /></div>}
                                 <p className="mt-1.5 whitespace-pre-wrap break-words text-sm leading-6 [overflow-wrap:anywhere]">{comment.content}</p>
                                 <div className="mt-2 flex flex-wrap items-center gap-1">
+                                    <button type="button" disabled={busy || expired} onClick={() => { setReply(comment); composer.current?.focus({ preventScroll: true }); composer.current?.scrollIntoView({ behavior: "smooth", block: "center" }); }} className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-xs font-semibold text-sky-700 hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-sky-950"><Reply size={15} />{t("Répondre")}</button>
+                                    <Link to={`/fun/story/new?comment=${comment.id}`} aria-label={t("Répondre en Story")} className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-2 text-xs font-semibold text-sky-700 hover:bg-sky-50 dark:text-sky-300 dark:hover:bg-sky-950"><BookOpen size={15} />{t("En Story")}</Link>
                                     {reactions.map(({ key, icon: Icon, label }) => <button key={key} type="button" aria-label={t(label)} aria-pressed={comment.my_reaction === key} disabled={busy || expired} onClick={() => void react(comment, key)}
                                         className={`inline-flex min-h-9 min-w-11 items-center justify-center gap-1.5 rounded-full px-2 text-xs transition-colors disabled:opacity-50 ${comment.my_reaction === key ? "bg-sky-100 font-semibold text-sky-800 dark:bg-sky-950 dark:text-sky-200" : "text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"}`}>
                                         <Icon size={15} /><span>{Number(comment[`${key}_count`])}</span>

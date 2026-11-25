@@ -11,6 +11,7 @@ import AccountGuard from "./components/AccountGuard";
 import "./index.css";
 import { initializeTheme } from "./services/theme";
 import { prepareWebPush } from "./services/pushNotifications";
+import StoryNotificationCenter from "./components/StoryNotificationCenter";
 
 //ca Charge le thème enregistré avant l'affichage
 await restoreDevicePreferences().catch(() => { console.error("Could not restore app preferences."); });
@@ -22,7 +23,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
             <NativeNavigation />
-            <LanguageRoot><AccountGuard><DeliveryTracker /><App /></AccountGuard></LanguageRoot>
+            <LanguageRoot><AccountGuard><DeliveryTracker /><StoryNotificationCenter /><App /></AccountGuard></LanguageRoot>
         </BrowserRouter>
     </React.StrictMode>
 );

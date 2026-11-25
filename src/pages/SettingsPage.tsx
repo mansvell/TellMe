@@ -10,6 +10,7 @@ import {
     Shield,
     ShieldCheck,
     UserPen,
+    Volume2,
     X,
 } from "lucide-react";
 
@@ -20,6 +21,7 @@ import type { SettingsTabContext } from "../components/AppTabsLayout";
 import usePushNotifications from "../hooks/usePushNotifications";
 
 import { updateInvitationsEnabled } from "../services/invitations";
+import { notificationSoundEnabled, setNotificationSound } from "../services/notificationSound";
 
 import {
     applyTheme,
@@ -54,6 +56,7 @@ export default function SettingsPage() {
     const navigate = useNavigate();
     const { profile, updateProfile, retryProfile } = useOutletContext<SettingsTabContext>();
     const push = usePushNotifications();
+    const [sounds, setSounds] = useState(notificationSoundEnabled);
 
     const [darkMode, setDarkMode] =
         useState(
@@ -472,7 +475,6 @@ export default function SettingsPage() {
                 <SettingsTitle>
                      {t("Compte")} </SettingsTitle>
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
-
                     <Row
                         icon={<UserPen size={21}/>}
                         title={t("Pseudo")}
@@ -508,6 +510,9 @@ export default function SettingsPage() {
                         loading={push.saving || push.status === "checking"}
                         onChange={value => void push.change(value)}
                     />
+                    <SwitchRow icon={<Volume2 size={21} />} title={t("Sons des notifications")}
+                        description={t("Un son discret quand TellMe est ouvert. En arrière-plan, le son dépend des réglages de ton téléphone.")}
+                        checked={sounds} onChange={value => { setSounds(value); setNotificationSound(value); }} />
                     {push.error && <p role="alert" className="px-5 pb-3 text-sm text-red-600 dark:text-red-300">{push.error}</p>}
                     {push.status === "unavailable" && (
                         <button type="button" onClick={push.retry} className="ml-5 mb-3 text-sm font-semibold text-sky-700 dark:text-sky-300">
@@ -579,7 +584,7 @@ export default function SettingsPage() {
 
                 <p className="pb-2 text-center text-xm leading-5 text-slate-400">
                      {t("TellMe, l'App qui révolutionne l'Anonymat et le Fun")} </p>
-                <p className="pt-2 pb-2 text-center text-xs text-slate-500 dark:text-slate-400">Version 1.0.3</p>
+                <p className="pt-2 pb-2 text-center text-xs text-slate-500 dark:text-slate-400">Version 1.0.4</p>
 
             </section>}
 

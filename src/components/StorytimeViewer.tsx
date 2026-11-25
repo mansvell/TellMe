@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ArrowLeft, Flag, MessageCircle, Pause, Play, X } from "lucide-react";
 import { t } from "../i18n/runtime";
-import { elapsedTime, funError, readStorytime, reportStorytime, type Storytime } from "../services/fun";
+import { elapsedTime, funError, getStorytime, readStorytime, reportStorytime, type Storytime } from "../services/fun";
 import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
+import StoryCommentQuote from "./StoryCommentQuote";
 
 export default function StorytimeViewer({ stories, initialId, onRead, onMore, onClose, onComment }: {
     stories: Storytime[]; initialId: string; onRead: (id: string) => void;
@@ -75,6 +76,14 @@ function StoryScene({ story, position, total, loading, error, onRead, onNext, on
     const [failure, setFailure] = useState("");
     const [expired, setExpired] = useState(() => Date.parse(story.expires_at) <= Date.now());
     const [dragY, setDragY] = useState(0);
+    const [commentCount, setCommentCount] = useState<number | undefined>(story.comment_count);
+    const [quote, setQuote] = useState(story.comment_quote ?? null);
+    useEffect(() => {
+        let active = true;
+        const refresh = () => { if (!document.hidden) void getStorytime(story.id).then(value => { if (active) { setCommentCount(Number(value.comment_count ?? 0)); setQuote(value.comment_quote ?? null); } }).catch(() => {}); };
+        refresh(); const timer = setInterval(refresh, 15_000);
+        return () => { active = false; clearInterval(timer); };
+    }, [story.id]);
     const [closing, setClosing] = useState(false);
     const reader = useRef<HTMLDivElement>(null);
     const gesture = useRef<{ x: number; y: number; time: number; top: number; pull: number; moved: boolean } | null>(null);
@@ -170,7 +179,8 @@ function StoryScene({ story, position, total, loading, error, onRead, onNext, on
                 if (x < .3) onPrevious(); else if (x > .7) onNext(); else setPaused(value => !value);
             }}
             onPointerCancel={cancelGesture} onLostPointerCapture={() => { if (gesture.current) cancelGesture(); }}>
-            <div className="flex min-h-full items-center justify-center">
+            <div className="flex min-h-full flex-col items-center justify-center gap-7">
+                {!expired && quote && <div className="w-full max-w-xl"><StoryCommentQuote quote={quote} /></div>}
                 <p className="whitespace-pre-wrap break-words text-center text-2xl font-medium leading-relaxed [overflow-wrap:anywhere] sm:text-3xl">{expired ? t("Cette Storytime a expiré.") : story.content}</p>
             </div>
             {paused && <span aria-hidden="true" className="pointer-events-none sticky bottom-2 mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-black/15"><Play size={25} /></span>}
@@ -190,7 +200,7 @@ function StoryScene({ story, position, total, loading, error, onRead, onNext, on
             </div>}
             <div className="flex items-center justify-between gap-3">
                 <span className="min-w-0 text-xs text-white/85">{t(STORY_TOPICS[story.theme].label)}</span>
-                <button type="button" disabled={expired} onClick={onComment} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white/15 px-4 text-sm font-semibold hover:bg-white/25 disabled:opacity-50"><MessageCircle size={19} />{t("Commentaires")}</button>
+                <button type="button" disabled={expired} onClick={onComment} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white/15 px-4 text-sm font-semibold hover:bg-white/25 disabled:opacity-50"><MessageCircle size={19} />{t("Commentaires")}{commentCount !== undefined && <span>{commentCount}</span>}</button>
             </div>
         </footer>
     </div>;

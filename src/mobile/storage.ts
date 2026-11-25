@@ -1,7 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import { Preferences } from "@capacitor/preferences";
 
-const DEVICE_KEYS = ["tellme-theme", "tellme-language", "tellme-known-account"];
+const DEVICE_KEYS = ["tellme-theme", "tellme-language", "tellme-known-account", "tellme-notification-sound"];
 
 export async function restoreDevicePreferences(): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;

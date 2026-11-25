@@ -2,11 +2,12 @@ import { Info } from "lucide-react";
 import { t } from "../i18n/runtime";
 import { CARD_THEMES } from "../services/fun";
 import { STORY_BACKGROUNDS, STORY_TOPICS } from "../data/storytimes";
+import { CompetitionRules } from "./MonthlyCompetition";
 
 export default function StorytimeInfo() {
     return <div className="text-sm leading-6 text-slate-500 dark:text-slate-400">
         <h2 className="flex items-center gap-2 font-semibold"><Info size={17} />{t("À propos des Storytimes")}</h2>
-        <p className="mt-2">{t("Les Storytimes sont anonymes et visibles par tous les utilisateurs de TellMe. Elles disparaissent du fil après 24 heures.")}</p>
+        <p className="mt-2">{t("Les Storytimes sont anonymes et visibles par tous les utilisateurs de TellMe. Elles disparaissent du fil après 4 jours.")}</p>
         <p className="mt-2">{t("Tu peux avoir 5 Storytimes actives et en publier 10 par jour. Une histoire peut contenir jusqu’à 2 000 caractères.")}</p>
         <h3 className="mt-4 font-medium">{t("Une couleur, un thème")}</h3>
         <p className="mt-2">{t("Le jaune « Privé » annonce un secret personnel révélé anonymement.")}</p>
@@ -18,5 +19,7 @@ export default function StorytimeInfo() {
         </ul>
         <p className="mt-3">{t("Le contour coloré indique une histoire non lue. Un contour gris indique une histoire déjà consultée.")}</p>
         <p className="mt-2">{t("Seul l’auteur peut consulter le nombre de vues et la liste des personnes qui ont vu son histoire.")}</p>
+        <p className="mt-2">{t("Tu peux commenter une Story, répondre à un commentaire ou le citer dans une nouvelle Story. Le compteur inclut les commentaires et leurs réponses. Les personnes concernées reçoivent une notification.")}</p>
+        <CompetitionRules />
     </div>;
 }

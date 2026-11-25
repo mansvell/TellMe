@@ -7,6 +7,10 @@ self.addEventListener("activate", event => {
 });
 
 function notificationPath(data) {
+    const uuid = value => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value ?? "");
+    if (data?.type === "story" && uuid(data.storyId)) {
+        return `/storys?story=${data.storyId}${uuid(data.commentId) ? `&comment=${data.commentId}` : ""}`;
+    }
     if (data?.type === "secret" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.secretId ?? "")) {
         return `/fun?secret=${data.secretId}`;
     }
@@ -26,18 +30,29 @@ self.addEventListener("push", event => {
 
     const { title, body, groupId } = payload;
     const url = notificationPath(payload);
-    event.waitUntil(self.registration.showNotification(
+    event.waitUntil((async () => {
+        if (payload.type === "story") {
+            const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+            const visible = windows.filter(client => client.visibilityState === "visible");
+            if (visible.length) {
+                visible.forEach(client => client.postMessage({ type: "tellme-story-push" }));
+                return;
+            }
+        }
+        return self.registration.showNotification(
         typeof title === "string" && title.trim() ? title : "TellMe",
         {
             body: typeof body === "string" && body.trim() ? body : "Tu as reçu un nouveau message.",
             icon: "/tellme-icon-192.png",
             badge: "/tellme-icon-192.png",
-            tag: payload.type === "secret" ? "tellme-secret" : url === "/home" ? "tellme-message" : `tellme-chat-${groupId}`,
+            tag: payload.type === "story" ? `tellme-story-${payload.storyId}` : payload.type === "secret" ? "tellme-secret" : url === "/home" ? "tellme-message" : `tellme-chat-${groupId}`,
             renotify: true,
             vibrate: [150, 80, 150],
-            data: { groupId, type: payload.type, secretId: payload.secretId },
+            silent: false,
+            data: { groupId, type: payload.type, secretId: payload.secretId, storyId: payload.storyId, commentId: payload.commentId },
         },
-    ));
+        );
+    })());
 });
 
 self.addEventListener("notificationclick", event => {
