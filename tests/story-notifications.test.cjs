@@ -5,7 +5,7 @@ const vm = require("node:vm");
 const ts = require("typescript");
 const id = n => "00000000-0000-4000-8000-" + String(n).padStart(12, "0");
 
-function fixture({ enabled = true, expired = false, read = false, kind = "reply", deadDevice = false } = {}) {
+function fixture({ enabled = true, expired = false, read = false, kind = "reply", actor = null, deadDevice = false } = {}) {
     const deliveries = [], removed = [];
     let handler;
     const env = { FUN_WEBHOOK_SECRET: "a".repeat(40), SUPABASE_URL: "https://project.supabase.co", SUPABASE_SERVICE_ROLE_KEY: "server-only", VAPID_PUBLIC_KEY: "public", VAPID_PRIVATE_KEY: "private", VAPID_SUBJECT: "mailto:test@example.com" };
@@ -15,7 +15,7 @@ function fixture({ enabled = true, expired = false, read = false, kind = "reply"
             select() { return query; }, eq(key, value) { filters.push([key, value]); return query; },
             delete() { removed.push({ table, filters }); return query; }, limit() { return query; },
             async maybeSingle() {
-                return { error: null, data: table === "story_notifications" ? { id: id(1), recipient_id: "saved-owner", story_id: id(2), comment_id: id(3), kind, read_at: read ? new Date().toISOString() : null }
+                return { error: null, data: table === "story_notifications" ? { id: id(1), recipient_id: "saved-owner", story_id: id(2), comment_id: id(3), kind, actor_name: actor, read_at: read ? new Date().toISOString() : null }
                     : table === "storytimes" ? { expires_at: new Date(Date.now() + (expired ? -1000 : 100000)).toISOString() } : { notifications_enabled: enabled, language: "de" } };
             },
             then(resolve, reject) { return Promise.resolve({ error: null, data: table === "push_subscriptions" ? [
@@ -90,3 +90,9 @@ test("foreground sound requires a user gesture and respects mute, hidden state a
     document.hidden = true; exports.setNotificationSound(true); exports.playNotificationSound(); assert.equal(notes, 2);
     cleanup(); assert.equal(events.size, 0);
 });
+
+ test("Story push names the saved actor rather than trusting a forged webhook name", async () => {
+ const server = fixture({ actor: "Alex", kind: "comment" });
+ assert.equal((await server.invoke()).status, 200);
+ assert.equal(server.deliveries[0].payload.body, "Alex hat deine Story kommentiert.");
+ });

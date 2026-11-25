@@ -47,7 +47,7 @@ Deno.serve(async request => {
 
     try {
         const db = createClient(apiUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-        const { data: notification, error } = await db.from("story_notifications").select("id,recipient_id,story_id,comment_id,kind,read_at").eq("id", event.record.id).maybeSingle();
+        const { data: notification, error } = await db.from("story_notifications").select("id,recipient_id,story_id,comment_id,kind,read_at,actor_name").eq("id", event.record.id).maybeSingle();
         if (error) throw error;
         if (!notification || notification.read_at) return response(200, { sent: 0 });
 
@@ -67,6 +67,15 @@ Deno.serve(async request => {
             en: { comment: "New comment on your Story.", reply: "Someone replied to your comment.", story_reply: "Someone replied to your comment in a Story." },
             de: { comment: "Neuer Kommentar zu deiner Story.", reply: "Jemand hat auf deinen Kommentar geantwortet.", story_reply: "Jemand hat in einer Story auf deinen Kommentar geantwortet." },
         };
+        const named: Record<string, Record<string, string>> = {
+            fr: { comment: "{name} a commenté ta Story.", reply: "{name} a répondu à ton commentaire.", story_reply: "{name} a répondu à ton commentaire en Story." },
+            en: { comment: "{name} commented on your Story.", reply: "{name} replied to your comment.", story_reply: "{name} replied to your comment in a Story." },
+            de: { comment: "{name} hat deine Story kommentiert.", reply: "{name} hat auf deinen Kommentar geantwortet.", story_reply: "{name} hat in einer Story auf deinen Kommentar geantwortet." },
+        };
+        const language = profile.data.language in messages ? profile.data.language : "fr";
+        const body = notification.actor_name?.trim()
+            ? (named[language][notification.kind] ?? named.fr.comment).replace("{name}", notification.actor_name)
+            : messages[language][notification.kind] ?? messages.fr.comment;
         webpush.setVapidDetails(subject, publicKey, privateKey);
         let sent = 0, failed = 0;
         for (const device of devices.data ?? []) {
@@ -77,7 +86,7 @@ Deno.serve(async request => {
                     keys: { p256dh: device.p256dh, auth: device.auth },
                 }, JSON.stringify({
                     title: "TellMe",
-                    body: (messages[profile.data.language] ?? messages.fr)[notification.kind] ?? messages.fr.comment,
+                    body,
                     type: "story",
                     storyId: notification.story_id,
                     commentId: notification.comment_id,

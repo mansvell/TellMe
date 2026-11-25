@@ -65,13 +65,13 @@ L’ouverture des commentaires ferme explicitement le lecteur et garde un seul �
 
 ### Activation sur le projet Supabase existant
 
-1. Appliquer `supabase/migrations/20261125_story_threads_rewards.sql` après les migrations précédentes. Le script est réexécutable. Les Storys encore actives passent à quatre jours à compter de leur publication ; les Storys expirées ne réapparaissent pas.
+1. Appliquer `supabase/migrations/20261125_story_threads_rewards.sql`, puis `supabase/migrations/20261125_story_threads_ui.sql`, après les migrations précédentes. Le script est réexécutable. Les Storys encore actives passent à quatre jours à compter de leur publication ; les Storys expirées ne réapparaissent pas.
 2. Déployer `supabase/functions/notify-story/index.ts` sur le même projet : `supabase functions deploy notify-story`. Cette fonction réutilise les mêmes secrets VAPID et `FUN_WEBHOOK_SECRET` que `notify-secret` ; ne jamais les mettre dans le code client.
 3. Créer un Database Webhook sur `public.story_notifications`, événement **INSERT**, vers `notify-story`, avec l’en-tête `x-tellme-hook` égal à `FUN_WEBHOOK_SECRET`. La vérification JWT est désactivée pour cette fonction, mais son secret partagé reste obligatoire et vérifié côté serveur.
-4. Si `pg_cron` est actif, la migration programme le nettoyage des Storys expirées toutes les heures et la clôture mensuelle à 00 h UTC le premier. Sinon, activer cette extension dans Supabase puis relancer la migration. Les RPC bloquent immédiatement l’accès aux Storys expirées, même avant le nettoyage physique.
+4. Si `pg_cron` est actif, la migration programme le nettoyage des Storys expirées toutes les heures et la clôture mensuelle à 00 h UTC le premier. Sinon, activer cette extension dans Supabase puis relancer ces deux migrations dans le même ordre. Les RPC bloquent immédiatement l’accès aux Storys expirées, même avant le nettoyage physique.
 5. Fusionner `version-1.0.4` vers la branche de production après activation du SQL. Vercel déploie ensuite la version habituelle du site.
 
-Les commentaires et réponses restent dans la même liste chronologique ; une réponse cite son parent, même si celui-ci n’est pas dans la page de vingt commentaires chargée. Supprimer un parent conserve les réponses, sans continuer d’afficher son texte. Le compteur inclut toutes les réponses. Le champ reste au-dessus de la liste défilante. « En Story » ouvre la page de publication avec le commentaire accroché ; seul son préfixe de pseudo et sa couleur apparaissent. Le serveur valide le commentaire source, son accès et l’expiration. La citation disparaît si son commentaire est supprimé ou expire avec sa Story source.
+Les commentaires principaux et leurs réponses sont paginés séparément. Chaque réponse apparaît sous son véritable parent, avec un décalage limité pour rester lisible sur téléphone. Le texte du parent n’est plus répété. « Voir les X autres commentaires » affiche progressivement les réponses masquées. Supprimer un parent conserve les réponses, devenues commentaires principaux. Le compteur inclut toutes les réponses et le champ reste au-dessus de la liste défilante. « En Story » ouvre la publication avec le commentaire accroché, son préfixe de pseudo et sa couleur. Le serveur valide la source et son expiration ; la citation disparaît si la source est supprimée ou expirée.
 
 La cloche dans Storys affiche les notifications et ouvre la Story concernée. L’auteur est informé des nouveaux commentaires ; l’auteur d’un commentaire est informé d’une réponse ou d’une citation en Story. Une personne ne reçoit pas de notification pour sa propre action et un même destinataire ne reçoit pas deux notifications pour une réponse qui concerne à la fois sa Story et son commentaire. Les commentaires ne sont jamais exposés dans les push système. Les envois répétés avec le même identifiant ne créent ni commentaire, ni notification, ni point supplémentaires.
 
@@ -85,7 +85,7 @@ Supprimer volontairement sa Story ou son commentaire annule son point du mois co
 
 Les points sont calculés uniquement par des fonctions privées côté serveur. Le client ne peut pas écrire dans le registre. Chaque mois UTC commence avec un nouveau score. Les égalités sont départagées par la première attribution du score, puis par un ordre stable. Seules les cinq premières positions sont montrées, avec des scores réels et sans identités ; chaque personne voit aussi sa propre position réelle, même hors top 5. Une place sans participant reste libre.
 
-Les trois premières positions sont fixes : **Gold / 20 €**, **Silver / 15 €**, **Bronze / 10 €**. Les quatrième et cinquième positions sont finalistes sans récompense en argent. Le budget est donc **45 € par mois complet avec trois gagnants**. Les versements ne sont pas automatisés : l’organisateur doit réellement les effectuer. Aucun paiement n’est simulé ou marqué versé par l’app.
+Les trois premières positions sont fixes : **Gold / 30 €**, **Silver / 20 €**, **Bronze / 15 €**. Les quatrième et cinquième positions sont finalistes sans récompense en argent. Le budget est donc **65 € par mois complet avec trois gagnants éligibles**. Les versements ne sont pas automatisés : l’organisateur doit réellement les effectuer. Aucun paiement n’est simulé ou marqué versé par l’app.
 
 Les résultats des mois terminés sont archivés dans `tellme_private.monthly_results`, inaccessible aux utilisateurs. L’administration peut les consulter depuis SQL Editor et organiser les versements :
 
@@ -100,3 +100,11 @@ Après un versement réel uniquement, l’administration peut changer `payment_s
 ### Vérifications de la version
 
 `npm run test:fun` couvre les fils de réponses, les citations, les compteurs, les destinataires et droits des notifications, le retrait des points, les anti-doublons, les quotas, le vrai top 5, les archives mensuelles, les push et le son. Les vérifications mobiles, des accusés de lecture et le build restent inclus dans les contrôles habituels.
+
+### Ajustement des fils et des récompenses
+
+Après `20261125_story_threads_rewards.sql`, appliquer aussi `supabase/migrations/20261125_story_threads_ui.sql`, puis redéployer `notify-story`. Les commentaires principaux et les réponses sont paginés séparément : deux réponses affichées au départ, puis dix à chaque ouverture de « Voir les X autres commentaires ». Une réponse à une réponse reste sous son véritable parent. Le texte du parent n’est plus répété dans la réponse ; les citations dans une Story sont conservées.
+
+Le trophée garde le top 5, avec une présentation plus compacte. Les règles figurent uniquement dans Infos, dans la section Récompenses séparée de Storytimes. Il faut **au moins 200 points** pour recevoir un gain. Les nouvelles clôtures attribuent **30 €, 20 € et 15 €** aux trois premières positions uniquement si le score atteint 200 ; sinon la récompense est de zéro et le versement est `not_applicable`. Les résultats des mois déjà clôturés ne sont pas modifiés. Le classement reste visible sous ce seuil et aucun faux concurrent n’est ajouté.
+
+Les notifications affichent désormais le pseudo réel enregistré de la personne qui a commenté ou répondu, par exemple « Alex a commenté ta Story ». Ce nom est calculé dans la base, jamais choisi par l’appelant du webhook. Il est visible uniquement par les destinataires concernés ; le texte du commentaire reste absent des push. Cette visibilité du pseudo est expliquée dans Infos.

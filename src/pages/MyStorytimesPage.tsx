@@ -55,7 +55,7 @@ export default function MyStorytimesPage() {
                 <p className="mt-4 text-xs opacity-75">{publicationDate(story.created_at)}</p>
                 <p className="mt-1 text-xs opacity-75">{expiryTime(story.expires_at, now)}</p>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                    <Link to={`/storys?story=${story.id}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-black/10 px-3 py-2 text-sm font-medium"><MessageCircle size={17} />{t("Commentaires")} {story.comment_count ?? 0}</Link>
+                    <Link to={`/storys?story=${story.id}`} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-black/10 px-3 py-2 text-sm font-medium"><MessageCircle size={17} />{t("Commentaires")} : {story.comment_count ?? 0}</Link>
                     <button type="button" disabled={viewCounts?.[story.id] === undefined} onClick={() => setSelected(story.id)} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-black/10 px-3 py-2 text-sm font-medium disabled:opacity-50">
                         <Eye size={17} />{viewCounts?.[story.id] === undefined ? t("Vues") : viewCounts[story.id] === 1 ? t("1 vue") : t("{count} vues", { count: viewCounts[story.id] })}
                     </button>

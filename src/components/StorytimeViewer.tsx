@@ -200,7 +200,7 @@ function StoryScene({ story, position, total, loading, error, onRead, onNext, on
             </div>}
             <div className="flex items-center justify-between gap-3">
                 <span className="min-w-0 text-xs text-white/85">{t(STORY_TOPICS[story.theme].label)}</span>
-                <button type="button" disabled={expired} onClick={onComment} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white/15 px-4 text-sm font-semibold hover:bg-white/25 disabled:opacity-50"><MessageCircle size={19} />{t("Commentaires")}{commentCount !== undefined && <span>{commentCount}</span>}</button>
+                <button type="button" disabled={expired} onClick={onComment} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white/15 px-4 text-sm font-semibold hover:bg-white/25 disabled:opacity-50"><MessageCircle size={19} />{t("Commentaires")} : {commentCount !== undefined && <span>{commentCount}</span>}</button>
             </div>
         </footer>
     </div>;

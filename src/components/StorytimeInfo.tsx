@@ -6,7 +6,7 @@ import { CompetitionRules } from "./MonthlyCompetition";
 
 export default function StorytimeInfo() {
     return <div className="text-sm leading-6 text-slate-500 dark:text-slate-400">
-        <h2 className="flex items-center gap-2 font-semibold"><Info size={17} />{t("À propos des Storytimes")}</h2>
+        <h2 className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100"><Info size={17} />{t("Storytimes")}</h2>
         <p className="mt-2">{t("Les Storytimes sont anonymes et visibles par tous les utilisateurs de TellMe. Elles disparaissent du fil après 4 jours.")}</p>
         <p className="mt-2">{t("Tu peux avoir 5 Storytimes actives et en publier 10 par jour. Une histoire peut contenir jusqu’à 2 000 caractères.")}</p>
         <h3 className="mt-4 font-medium">{t("Une couleur, un thème")}</h3>
@@ -20,6 +20,7 @@ export default function StorytimeInfo() {
         <p className="mt-3">{t("Le contour coloré indique une histoire non lue. Un contour gris indique une histoire déjà consultée.")}</p>
         <p className="mt-2">{t("Seul l’auteur peut consulter le nombre de vues et la liste des personnes qui ont vu son histoire.")}</p>
         <p className="mt-2">{t("Tu peux commenter une Story, répondre à un commentaire ou le citer dans une nouvelle Story. Le compteur inclut les commentaires et leurs réponses. Les personnes concernées reçoivent une notification.")}</p>
+        <p className="mt-2">{t("Les notifications de commentaires affichent le pseudo de leur auteur.")}</p>
         <CompetitionRules />
     </div>;
 }

@@ -56,6 +56,7 @@ export type StoryComment = {
     id: string; content: string; created_at: string; display_prefix: string; color: string; own: boolean;
     like_count: number; dislike_count: number; laugh_count: number; my_reaction: StoryReaction | null;
     parent_id?: string | null; reply_to?: CommentQuote | null;
+    reply_count?: number; replies?: StoryComment[];
 };
 export type StoryReaction = "like" | "dislike" | "laugh";
 export async function getStorytimeGroups(cursor?: StoryGroup) {
@@ -64,10 +65,15 @@ export async function getStorytimeGroups(cursor?: StoryGroup) {
 }
 export async function getStoryComments(id: string, cursor?: Cursor) {
     const [rows, story] = await Promise.all([
-        rpc<StoryComment[]>("get_storytime_comments_v2", { target_id: id, ...cursorArgs(cursor) }), getStorytime(id),
+        rpc<StoryComment[]>("get_storytime_threads", { target_id: id, ...cursorArgs(cursor) }), getStorytime(id),
     ]);
     return { rows: rows.slice(0, 20).reverse(), hasMore: rows.length > 20, total: Number(story.comment_count ?? 0), quote: story.comment_quote ?? null };
 }
+export async function getStoryReplies(id: string, parent: string, cursor?: Cursor) {
+    const rows = await rpc<StoryComment[]>("get_storytime_replies", { target_id: id, parent_comment_id: parent, after_time: cursor?.created_at ?? null, after_id: cursor?.id ?? null });
+    return { rows: rows.slice(0, 10), hasMore: rows.length > 10 };
+}
+export const getStoryCommentNode = (id: string, comment: string) => rpc<StoryComment>("get_storytime_comment_node", { target_id: id, target_comment_id: comment });
 async function activity<T>(result: Promise<T>): Promise<T> {
     const value = await result;
     window.dispatchEvent(new Event("tellme-activity-changed"));
@@ -91,7 +97,7 @@ export const readStorytime = (id: string) => rpc<void>("read_storytime", { targe
 export const deleteStorytime = (id: string) => activity(rpc<void>("delete_storytime", { target_id: id }));
 export const reportStorytime = (id: string, reason: string) => rpc<void>("report_storytime", { target_id: id, report_reason: reason });
 
-export type StoryNotification = { id: string; story_id: string; comment_id: string; kind: "comment" | "reply" | "story_reply"; created_at: string; read_at: string | null };
+export type StoryNotification = { id: string; story_id: string; comment_id: string; kind: "comment" | "reply" | "story_reply"; created_at: string; read_at: string | null; actor_name?: string | null };
 export const getStoryNotifications = () => rpc<StoryNotification[]>("get_story_notifications");
 export const readStoryNotification = (id: string) => rpc<void>("read_story_notification", { target_id: id });
 export type Standing = { position: number; points: number; is_me: boolean };
@@ -100,7 +106,9 @@ export type MonthlyStandings = {
     previous_reward: { month: string; position: number; points: number; reward_eur: number; payment_status: "pending" | "paid" | "not_applicable" } | null;
 };
 export const getMonthlyStandings = () => rpc<MonthlyStandings>("get_monthly_standings");
-export const storyNotificationText = (kind: StoryNotification["kind"]) => t(kind === "reply" ? "Quelqu’un a répondu à ton commentaire." : kind === "story_reply" ? "Quelqu’un a répondu à ton commentaire en Story." : "Nouveau commentaire sur ta Story.");
+export const storyNotificationText = (kind: StoryNotification["kind"], actor?: string | null) => actor?.trim()
+    ? t(kind === "reply" ? "{name} a répondu à ton commentaire." : kind === "story_reply" ? "{name} a répondu à ton commentaire en Story." : "{name} a commenté ta Story.", { name: actor })
+    : t(kind === "reply" ? "Quelqu’un a répondu à ton commentaire." : kind === "story_reply" ? "Quelqu’un a répondu à ton commentaire en Story." : "Nouveau commentaire sur ta Story.");
 
 export async function getSecretLink(): Promise<string> {
     const rows = await rpc<{ public_token: string }[]>("get_secret_box");

@@ -56,7 +56,7 @@ export default function StoryNotificationCenter() {
     }, [received]);
     if (!received || !userId) return null;
     return <div role="status" className="fixed left-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[60] flex max-w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl bg-white p-4 text-slate-900 shadow-lg dark:bg-slate-700 dark:text-white md:left-auto md:right-3">
-        <Link to={`/storys?story=${received.story_id}&comment=${received.comment_id}`} onClick={() => { void readStoryNotification(received.id).then(() => window.dispatchEvent(new Event("tellme-story-notifications-changed"))).catch(() => {}); setReceived(null); }} className="text-sm font-medium">{storyNotificationText(received.kind)}</Link>
+        <Link to={`/storys?story=${received.story_id}&comment=${received.comment_id}`} onClick={() => { void readStoryNotification(received.id).then(() => window.dispatchEvent(new Event("tellme-story-notifications-changed"))).catch(() => {}); setReceived(null); }} className="text-sm font-medium">{storyNotificationText(received.kind, received.actor_name)}</Link>
         <button type="button" onClick={() => setReceived(null)} aria-label={t("Fermer")} className="flex h-9 w-9 items-center justify-center"><X size={18} /></button>
     </div>;
 }

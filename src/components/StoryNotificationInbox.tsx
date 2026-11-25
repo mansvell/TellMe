@@ -32,7 +32,7 @@ export default function StoryNotificationInbox() {
             {!error && !rows.length && <p className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">{t("Aucune notification pour le moment.")}</p>}
             <ul className="divide-y divide-slate-100 dark:divide-slate-700">
                 {rows.map(row => <li key={row.id}><Link to={`/storys?story=${row.story_id}&comment=${row.comment_id}`} onClick={() => { setOpen(false); void read(row.id); }} className={`block rounded-xl px-3 py-4 text-sm hover:bg-sky-50 dark:hover:bg-sky-950 ${!row.read_at ? "font-semibold text-sky-800 dark:text-sky-200" : "text-slate-600 dark:text-slate-300"}`}>
-                    <p>{storyNotificationText(row.kind)}</p><p className="mt-1 text-xs font-normal text-slate-500 dark:text-slate-400">{elapsedTime(row.created_at)}</p>
+                    <p>{storyNotificationText(row.kind, row.actor_name)}</p><p className="mt-1 text-xs font-normal text-slate-500 dark:text-slate-400">{elapsedTime(row.created_at)}</p>
                 </Link></li>)}
             </ul>
         </FunDialog>}
