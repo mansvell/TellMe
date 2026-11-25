@@ -70,25 +70,60 @@ test("Story push opens the right comments; foreground delivery avoids a duplicat
     callbacks.notificationclick({ notification: { close() {}, data: shown.at(-1).data }, waitUntil: value => { completion = value; } }); await completion;
     assert.equal(destination, "https://tellme.example/home");
 });
-test("foreground sound requires a user gesture and respects mute, hidden state and throttling", () => {
-    const events = new Map(), saved = new Map(); let notes = 0;
+function soundFixture({ idle = true, muted = false } = {}) {
+    const events = new Map(), documentEvents = new Map(), jobs = new Map(), saved = new Map();
+    const contexts = []; let notes = 0, clock = 10000, sequence = 0, duringGesture = false;
+    if (muted) saved.set("tellme-notification-sound", "off");
     class AudioContext {
-        state = "running"; currentTime = 0; destination = {};
+        state = "suspended"; currentTime = 0; destination = {}; listeners = new Set();
+        constructor() { assert.equal(duringGesture, false, "audio initialization must never run inside an input handler"); contexts.push(this); }
+        addEventListener(name, fn) { this.listeners.add(fn); }
+        removeEventListener(name, fn) { this.listeners.delete(fn); }
+        resume() { this.state = "running"; this.listeners.forEach(fn => fn()); return Promise.resolve(); }
         createOscillator() { return { frequency: {}, connect() {}, start() { notes++; }, stop() {} }; }
         createGain() { return { gain: { setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} }, connect() {} }; }
     }
-    const exports = {}, document = { hidden: false };
+    const exports = {}, document = { hidden: false, addEventListener: (name, fn) => documentEvents.set(name, fn), removeEventListener: name => documentEvents.delete(name) };
+    const window = {
+        AudioContext, addEventListener: (name, fn) => events.set(name, fn), removeEventListener: name => events.delete(name), dispatchEvent: event => events.get(event.type)?.(),
+        setTimeout: fn => { jobs.set(++sequence, fn); return sequence; }, clearTimeout: key => jobs.delete(key),
+    };
+    if (idle) { window.requestIdleCallback = fn => { jobs.set(++sequence, fn); return sequence; }; window.cancelIdleCallback = key => jobs.delete(key); }
     vm.runInNewContext(ts.transpileModule(fs.readFileSync("src/services/notificationSound.ts", "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText, {
-        exports, document, localStorage: { getItem: key => saved.get(key) }, Event,
-        window: { AudioContext, addEventListener: (name, fn) => events.set(name, fn), removeEventListener: name => events.delete(name), dispatchEvent() {} },
+        exports, document, localStorage: { getItem: key => saved.get(key) }, Event, window, Date: { now: () => clock },
         require() { return { setDevicePreference: (key, value) => saved.set(key, value) }; },
     });
-    const cleanup = exports.prepareNotificationSound(); exports.playNotificationSound(); assert.equal(notes, 0);
-    events.get("pointerdown")(); exports.playNotificationSound(); assert.equal(notes, 2);
-    exports.playNotificationSound(); assert.equal(notes, 2);
-    exports.setNotificationSound(false); assert.equal(exports.notificationSoundEnabled(), false); exports.playNotificationSound(); assert.equal(notes, 2);
-    document.hidden = true; exports.setNotificationSound(true); exports.playNotificationSound(); assert.equal(notes, 2);
-    cleanup(); assert.equal(events.size, 0);
+    return { api: exports, contexts, events, documentEvents, jobs, document, notes: () => notes, advance: () => { clock += 2000; },
+        flush() { for (const [key, fn] of [...jobs]) { jobs.delete(key); fn(); } },
+        gesture(name = "click") { duringGesture = true; try { events.get(name)?.(); } finally { duringGesture = false; } },
+    };
+}
+test("audio initialization stays outside input handlers and keeps gesture unlock, mute, hidden state and throttling", () => {
+    const f = soundFixture(), cleanup = f.api.prepareNotificationSound();
+    assert.equal(f.contexts.length, 0); assert(!f.events.has("pointerdown"));
+    f.gesture(); assert.equal(f.contexts.length, 0);
+    f.flush(); assert.equal(f.contexts.length, 1); f.api.playNotificationSound(); assert.equal(f.notes(), 0);
+    f.gesture(); f.api.playNotificationSound(); assert.equal(f.notes(), 2); assert(!f.events.has("click")); assert(!f.events.has("keydown"));
+    f.api.playNotificationSound(); assert.equal(f.notes(), 2);
+    f.api.setNotificationSound(false); f.advance(); f.api.playNotificationSound(); assert.equal(f.notes(), 2);
+    f.document.hidden = true; f.api.setNotificationSound(true); f.api.playNotificationSound(); assert.equal(f.notes(), 2);
+    f.document.hidden = false; f.api.playNotificationSound(); assert.equal(f.notes(), 4);
+    cleanup(); assert.equal(f.events.size, 0); assert.equal(f.documentEvents.size, 0); assert.equal(f.contexts[0].listeners.size, 0);
+});
+test("audio warmup supports browsers without idle callbacks and cancels cleanly on unmount", () => {
+    const f = soundFixture({ idle: false }); let cleanup = f.api.prepareNotificationSound();
+    assert.equal(f.jobs.size, 1); cleanup(); f.flush(); assert.equal(f.contexts.length, 0);
+    cleanup = f.api.prepareNotificationSound(); f.flush(); f.gesture("keydown"); f.api.playNotificationSound(); assert.equal(f.notes(), 2);
+    const context = f.contexts[0]; context.state = "suspended"; context.listeners.forEach(fn => fn());
+    assert(f.events.has("click")); f.gesture(); assert.equal(context.state, "running"); assert.equal(f.contexts.length, 1);
+    cleanup(); assert.equal(f.events.size, 0);
+});
+test("muted or hidden startup creates no audio context; enabling sound prepares it asynchronously", () => {
+    const f = soundFixture({ muted: true }), cleanup = f.api.prepareNotificationSound();
+    f.flush(); assert.equal(f.contexts.length, 0);
+    f.document.hidden = true; f.api.setNotificationSound(true); f.flush(); assert.equal(f.contexts.length, 0);
+    f.document.hidden = false; f.documentEvents.get("visibilitychange")(); assert.equal(f.contexts.length, 0);
+    f.flush(); f.gesture(); assert.equal(f.contexts.length, 1); cleanup();
 });
 
  test("Story push names the saved actor rather than trusting a forged webhook name", async () => {

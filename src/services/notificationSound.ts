@@ -9,17 +9,73 @@ export function setNotificationSound(enabled: boolean) {
     window.dispatchEvent(new Event("tellme-sound-preference"));
 }
 export function prepareNotificationSound() {
-    const unlock = () => {
-        if (!notificationSoundEnabled()) return;
+    let active = true;
+    let attached = false;
+    let idle: number | undefined;
+    let timer: number | undefined;
+    let observed: AudioContext | undefined;
+    const options = { capture: true, passive: true };
+    function listen(enabled: boolean) {
+        if (enabled === attached) return;
+        attached = enabled;
+        if (enabled) {
+            window.addEventListener("click", unlock, options);
+            window.addEventListener("keydown", unlock, options);
+        } else {
+            window.removeEventListener("click", unlock, options);
+            window.removeEventListener("keydown", unlock, options);
+        }
+    }
+    const changed = () => {
+        if (active) listen(notificationSoundEnabled() && context?.state !== "running");
+    };
+    function observe() {
+        if (observed !== context) {
+            observed?.removeEventListener("statechange", changed);
+            observed = context;
+            observed?.addEventListener("statechange", changed);
+        }
+        changed();
+    }
+    function initialize() {
+        idle = undefined; timer = undefined;
+        if (!active || !notificationSoundEnabled() || document.hidden) return;
         try {
             const Audio = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-            if (Audio) context ??= new Audio();
-            if (context?.state === "suspended") void context.resume().catch(() => {});
+            if (Audio && (!context || context.state === "closed")) context = new Audio();
+            observe();
+        } catch { /* L'app reste utilisable si le moteur audio est indisponible. */ }
+    }
+    function prepare() {
+        if (!active || !notificationSoundEnabled()) { listen(false); return; }
+        if (context && context.state !== "closed") { observe(); return; }
+        if (idle !== undefined || timer !== undefined) return;
+        // La construction peut ouvrir le périphérique audio : jamais dans un
+        // pointerdown/clic, où elle retarderait l'affichage du bouton touché.
+        if (typeof window.requestIdleCallback === "function") idle = window.requestIdleCallback(initialize, { timeout: 1500 });
+        else timer = window.setTimeout(initialize, 250);
+    }
+    const unlock = () => {
+        if (!active || !notificationSoundEnabled()) return;
+        try {
+            // Le geste utilisateur autorise seulement la reprise du contexte
+            // déjà préparé ; sa construction ne bloque pas l'interaction.
+            if (context && context.state !== "running" && context.state !== "closed") void context.resume().catch(() => {});
         } catch { /* L'audio ne doit jamais bloquer une notification. */ }
     };
-    window.addEventListener("pointerdown", unlock, { capture: true });
-    window.addEventListener("keydown", unlock, { capture: true });
-    return () => { window.removeEventListener("pointerdown", unlock, { capture: true }); window.removeEventListener("keydown", unlock, { capture: true }); };
+    const visible = () => { if (!document.hidden) prepare(); };
+    const preference = () => { changed(); prepare(); };
+    window.addEventListener("tellme-sound-preference", preference);
+    document.addEventListener("visibilitychange", visible);
+    prepare();
+    return () => {
+        active = false; listen(false);
+        if (idle !== undefined) window.cancelIdleCallback(idle);
+        if (timer !== undefined) window.clearTimeout(timer);
+        observed?.removeEventListener("statechange", changed);
+        window.removeEventListener("tellme-sound-preference", preference);
+        document.removeEventListener("visibilitychange", visible);
+    };
 }
 export function playNotificationSound() {
     if (!notificationSoundEnabled() || document.hidden || !context || context.state !== "running" || Date.now() - lastSound < 1500) return;
