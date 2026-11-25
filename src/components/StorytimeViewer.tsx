@@ -16,13 +16,15 @@ export default function StorytimeViewer({ stories, initialId, onRead, onMore, on
     const advancing = useRef(false);
     const active = useRef(true);
     const story = playlist[index];
+    const handingOff = useRef(false);
     useEffect(() => {
         active.current = true;
-        dialog.current?.showModal();
-        return () => { active.current = false; };
+        const node = dialog.current;
+        node?.showModal();
+        return () => { active.current = false; if (node?.open) node.close(); };
     }, []);
     const next = useCallback(async () => {
-        if (advancing.current) return;
+        if (!active.current || handingOff.current || advancing.current) return;
         let following = index + 1;
         while (following < playlist.length && Date.parse(playlist[following].expires_at) <= Date.now()) following++;
         if (following < playlist.length) { setIndex(following); return; }
@@ -36,16 +38,23 @@ export default function StorytimeViewer({ stories, initialId, onRead, onMore, on
         finally { advancing.current = false; if (active.current) setLoading(false); }
     }, [index, playlist, onMore, onClose]);
     const previous = () => {
-        if (loading) return;
+        if (!active.current || handingOff.current || loading) return;
         let preceding = index - 1;
         while (preceding >= 0 && Date.parse(playlist[preceding].expires_at) <= Date.now()) preceding--;
         if (preceding >= 0) setIndex(preceding);
     };
+    function openComments() {
+        if (!story || handingOff.current) return;
+        handingOff.current = true;
+        active.current = false;
+        dialog.current?.close();
+        onComment({ ...story });
+    }
     const authorStories = playlist.filter(row => row.group_key === story?.group_key);
     return <dialog ref={dialog} aria-label={t("Lecture des Storytimes")} onCancel={onClose}
         className="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none overflow-hidden border-0 bg-transparent p-0 backdrop:bg-slate-950/90">
         {story && <StoryScene key={story.id} story={story} position={authorStories.findIndex(row => row.id === story.id)} total={authorStories.length} loading={loading} error={error}
-            onRead={onRead} onNext={() => void next()} onPrevious={previous} onClose={onClose} onComment={() => onComment(story)} />}
+            onRead={onRead} onNext={() => void next()} onPrevious={previous} onClose={onClose} onComment={openComments} />}
     </dialog>;
 }
 

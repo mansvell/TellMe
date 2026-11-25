@@ -138,9 +138,9 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
         finally { mutation.current = false; if (mounted.current) setBusy(false); }
     }
 
-    return <section ref={section} aria-labelledby="comments-heading" className="mt-7 scroll-mt-4">
+    return <section ref={section} aria-labelledby="comments-heading" className="mt-4 scroll-mt-2">
         <hr className="border-0 border-t-[3px] border-sky-200 dark:border-sky-800" />
-        <div className="relative flex min-h-20 items-center justify-center px-12">
+        <div className="relative flex min-h-12 items-center justify-center px-12">
             <h2 id="comments-heading" className="tellme-section-title text-center">{t("Commentaires")}</h2>
             <button type="button" onClick={onClose} aria-label={t("Fermer les commentaires")} className="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full text-slate-500 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800"><X size={20} /></button>
         </div>
@@ -149,6 +149,14 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
             <p className="my-auto whitespace-pre-wrap break-words text-center text-xl font-medium leading-relaxed [overflow-wrap:anywhere] sm:text-2xl">{expired ? t("Cette Storytime a expiré.") : story.content}</p>
         </article>
         {!expired && <div className="relative mt-4 rounded-2xl bg-white px-3 py-2 dark:bg-slate-800 sm:px-5">
+            <form onSubmit={event => void send(event)} className="mb-3 pb-1">
+                <div className="flex items-end gap-2 rounded-2xl bg-slate-100 p-2 dark:bg-slate-900">
+                    <textarea aria-label={t("Ton commentaire")} placeholder={t("Ajoute ton commentaire…")} value={text} onChange={event => setText(event.target.value)} maxLength={600} rows={2} readOnly={busy} disabled={expired}
+                        className="min-h-11 max-h-36 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base leading-6 outline-none" />
+                    <button type="submit" disabled={busy || expired || !text.trim()} aria-label={t("Envoyer le commentaire")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-700 text-white disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700"><Send size={18} /></button>
+                </div>
+                <p className="mt-1 text-right text-xs text-slate-500 dark:text-slate-400">{text.length}/600</p>
+            </form>
             {hasMore && <button type="button" disabled={loading || busy} onClick={() => void older()} className="mx-auto mb-2 block min-h-10 px-3 text-sm font-semibold text-sky-700 disabled:opacity-50 dark:text-sky-300">{t("Commentaires précédents")}</button>}
             <div ref={list} onScroll={measure} role="log" aria-label={t("Commentaires de la Storytime")} aria-live="polite" className="story-comments-scroll max-h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:thin]">
                 {!loading && !comments.length && !error && <p className="px-2 py-8 text-center text-sm text-slate-500 dark:text-slate-400">{t("Le premier mot est pour toi.")}</p>}
@@ -175,14 +183,7 @@ export default function StoryComments({ story, onClose, onRead }: { story: Story
             {loading && <p role="status" className="py-3 text-center text-sm text-slate-500">{t("Chargement...")}</p>}
             {scrollState.overflow && <div className="flex justify-end py-2"><button type="button" onClick={() => list.current?.scrollTo({ top: scrollState.bottom ? 0 : list.current.scrollHeight, behavior: "smooth" })} aria-label={t(scrollState.bottom ? "Remonter les commentaires" : "Aller aux derniers commentaires")} className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200">{scrollState.bottom ? <ArrowUp size={19} /> : <ArrowDown size={19} />}</button></div>}
             {error && <p role="alert" className="my-3 text-sm text-red-600 dark:text-red-300">{error}<button type="button" onClick={() => void refresh()} className="ml-2 underline">{t("Réessayer")}</button></p>}
-            <form onSubmit={event => void send(event)} className="mt-2 pb-2">
-                <div className="flex items-end gap-2 rounded-2xl bg-slate-100 p-2 dark:bg-slate-900">
-                    <textarea aria-label={t("Ton commentaire")} placeholder={t("Ajoute ton commentaire…")} value={text} onChange={event => setText(event.target.value)} maxLength={600} rows={2} readOnly={busy} disabled={expired}
-                        className="min-h-11 max-h-36 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base leading-6 outline-none" />
-                    <button type="submit" disabled={busy || expired || !text.trim()} aria-label={t("Envoyer le commentaire")} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-700 text-white disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700"><Send size={18} /></button>
-                </div>
-                <p className="mt-1 text-right text-xs text-slate-500 dark:text-slate-400">{text.length}/600</p>
-            </form>
+
         </div>}
     </section>;
 }

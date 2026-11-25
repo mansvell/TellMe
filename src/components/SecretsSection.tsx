@@ -163,8 +163,12 @@ export default function SecretsSection() {
             {loading && <p role="status" className="mt-4 text-sm text-slate-500 dark:text-slate-300">{t("Chargement...")}</p>}
             {error && <div role="alert" className="mt-4 text-sm text-red-600 dark:text-red-300"><p>{error}</p>
                 <button type="button" onClick={() => { setLoading(true); setAttempt(value => value + 1); }} className="mt-2 underline">{t("Réessayer")}</button></div>}
-            {!loading && !error && !visible.length && <p className="py-7 text-center text-sm text-slate-500 dark:text-slate-300">{t("Aucun Secret à afficher.")}</p>}
-            <ul className="mt-3 divide-y divide-slate-200 dark:divide-slate-700">
+            <div className="fun-inbox relative isolate mt-3 min-h-64 overflow-hidden rounded-2xl">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                    {Array.from({ length: 6 }, (_, index) => <span key={index} className="fun-inbox-bubble" />)}
+                </div>
+            {!loading && !error && !visible.length && <div className="flex min-h-64 items-center justify-center px-4 text-center"><p className="text-sm text-slate-500 dark:text-slate-300">{t("Aucun Secret à afficher.")}</p></div>}
+            {visible.length > 0 && <ul className="mt-3 divide-y divide-slate-200 dark:divide-slate-700">
                 {visible.map(secret => <li key={secret.id}>
                     <button type="button" onClick={() => { setSelected(secret); setReplying(false); setConfirmDelete(false); setDialogError(""); }}
                         className="flex w-full items-center gap-3 py-4 text-left">
@@ -176,8 +180,10 @@ export default function SecretsSection() {
                         {!secret.read_at && <span aria-label={t("Non lu")} className="h-2 w-2 shrink-0 rounded-full bg-sky-600" />}
                     </button>
                 </li>)}
-            </ul>
+            </ul>}
             {hasMore && <button type="button" disabled={loading} onClick={() => void more()} className="mt-3 rounded-lg px-3 py-2 text-sm font-semibold text-sky-700 dark:text-sky-300 disabled:opacity-50">{t("Voir plus")}</button>}
+
+            </div>
 
             {showSharePreview && <FunDialog title={t("Partager le lien")} onClose={() => setShowSharePreview(false)} busy={sharing}>
                 <div className="mx-auto aspect-[9/16] w-full max-w-64 overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800">
