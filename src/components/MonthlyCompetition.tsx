@@ -14,7 +14,7 @@ export function CompetitionRules() {
         <ul className="mt-3 grid grid-cols-3 gap-2">
             {places.map((place, i) => <li key={place.title} className={`rounded-xl px-2 py-3 text-center ${place.style}`}><Award size={20} className="mx-auto mb-1" /><strong className="block">{i + 1} · {place.title}</strong><span className="text-base font-bold">{place.reward} €</span></li>)}
         </ul>
-        <p className="mt-3 font-semibold text-slate-700 dark:text-slate-200">{t("Minimum 800 points pour être éligible à un gain.")}</p>
+        <p className="mt-3 font-semibold text-slate-700 dark:text-slate-200">{t("Minimum 500 points pour être éligible à un gain.")}</p>
         <p className="mt-2">{t("1 point par Story, commentaire, réponse ou réaction au commentaire d’autrui. Limites par jour UTC : 10 Storys, 20 commentaires/réponses et 10 réactions.")}</p>
         <p className="mt-2">{t("Doublons et réactions à soi-même : 0 point. Supprimer son action retire son point ; l’expiration automatique le conserve.")}</p>
         <p className="mt-2">{t("Les Storytimes doivent respecter le thème de TellMe et les règles de la communauté.")}</p>

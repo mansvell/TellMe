@@ -39,6 +39,12 @@ const  navigate = useNavigate();
 
             <section className="mx-auto max-w-3xl space-y-5 p-5">
 
+                <PrivacyCard icon={<LockKeyhole size={21} />} title={t("Retrouver mon compte")}>
+                    {t("Si tu sécurises ton compte, ton adresse e-mail est gérée par Supabase Auth pour la confirmation et la connexion. Elle n’est pas ajoutée à ton profil public. N’utilise pas une adresse partagée et ne communique jamais ton mot de passe ni ton code de confirmation.")}
+                </PrivacyCard>
+                <PrivacyCard icon={<ShieldCheck size={21} />} title={t("Publicités")}>
+                    {t("Lorsque la publicité est activée et que tu y consens, Google AdSense peut traiter des identifiants, des cookies et des données de navigation pour diffuser et mesurer les annonces. Tu peux modifier ton choix dans le gestionnaire de consentement. Les messages privés ne sont pas transmis par TellMe comme données publicitaires. Regarder ou cliquer une annonce ne rapporte aucun point.")}
+                </PrivacyCard>
                 {/* Introduction */}
 
                 <div className="rounded-[2rem] bg-sky-500 p-7 text-white shadow-sm">

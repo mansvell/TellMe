@@ -1,3 +1,4 @@
+import { AdvertisingConsentGuard } from "./components/SponsoredAd";
 import DeliveryTracker from "./components/DeliveryTracker";
 import { Capacitor } from "@capacitor/core";
 import NativeNavigation from "./components/NativeNavigation";
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
             <NativeNavigation />
+            <AdvertisingConsentGuard />
             <LanguageRoot><AccountGuard><DeliveryTracker /><StoryNotificationCenter /><App /></AccountGuard></LanguageRoot>
         </BrowserRouter>
     </React.StrictMode>

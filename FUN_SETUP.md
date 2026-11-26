@@ -120,3 +120,8 @@ Les plafonds d’actions et la limite de cinq Storys actives restent inchangés.
 La création d’`AudioContext` est préparée hors des événements d’entrée, dans une tâche de temps libre ou un minuteur de repli. Le premier geste utilisateur reprend uniquement le contexte déjà préparé ; aucun moteur audio n’est construit dans `pointerdown` ou dans le clic. Les écouteurs d’activation sont retirés quand le son fonctionne, puis réarmés si le navigateur suspend le contexte. Les préparations sont annulées au démontage et respectent le réglage muet et l’arrière-plan.
 
 Ce correctif réduit un traitement évitable au premier appui après rechargement. Une capture INP ciblant un SVG `path` ne permet pas à elle seule d’attribuer tout le ralentissement à l’audio ou au SQL. La préparation hors clic et l’activation du son ont été vérifiées dans le navigateur et par des tests de cycle de vie. Aucun SQL supplémentaire n’est nécessaire pour ce correctif audio.
+
+
+## Version 1.0.5 : comptes multi-appareils et invitations
+
+Le seuil courant est désormais **500 points**, après application de `supabase/migrations/20261126_reward_threshold_500.sql`. Les indications de 800 points ci-dessus décrivent l’ancienne version 1.0.4. Aucun résultat clôturé n’est modifié. Voir [UPDATE_1.0.5.md](UPDATE_1.0.5.md) pour l’activation de la récupération facultative du compte, les limites iOS et la préparation AdSense (désactivée sans compte approuvé et CMP).

@@ -1,3 +1,5 @@
+import JoinInvitation from "../components/JoinInvitation";
+import SponsoredAd from "../components/SponsoredAd";
 import { ChevronRight, MailPlus, Plus, Search, UserRoundPlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -116,11 +118,12 @@ export default function HomePage() {
                     </div>
                     <div className="flex items-center justify-between gap-3 pb-2 pt-4">
                         <h2 id="discussions-title" className="text-lg font-bold">{t("Discussions")}</h2>
+                        <div className="flex items-center gap-2"><JoinInvitation />
                         <button type="button" onClick={() => setShowNewGroup(true)} aria-label={t("Créer un groupe")} title={t("Créer un groupe")}
                             className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-700 px-3 font-semibold text-white hover:bg-sky-800">
                             <Plus size={21} aria-hidden="true" />
                             <span className="hidden text-sm md:inline">{t("Créer un groupe")}</span>
-                        </button>
+                        </button></div>
                     </div>
                 </div>
 
@@ -164,6 +167,7 @@ export default function HomePage() {
                             {t(query ? "Aucun résultat" : "Aucun groupe")}
                         </p>
                     )}
+                    <SponsoredAd />
                 </div>
             </section>
 

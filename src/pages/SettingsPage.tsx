@@ -496,6 +496,12 @@ export default function SettingsPage() {
 
                 </div>
 
+                <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
+                    <Row icon={<ShieldCheck size={21} />} title={t("Retrouver mon compte")}
+                        description={t("Garde le même pseudo, tes groupes et tes points sur tous tes appareils.")}
+                        onClick={() => navigate("/account")} />
+                </div>
+
                 <SettingsTitle>
                      {t("Préférences")} </SettingsTitle>
 
@@ -521,7 +527,7 @@ export default function SettingsPage() {
                     )}
                     {push.status === "install" && (
                         <p className="px-5 pb-4 text-xs leading-5 text-slate-500 dark:text-slate-300">
-                            {t("Un compte créé dans Safari reste lié à Safari. L’inscription depuis l’icône crée un compte distinct.")}
+                            {t("Avant de changer de navigateur ou d’installer TellMe, sécurise ton compte pour le retrouver depuis l’icône.")}
                         </p>
                     )}
 
@@ -584,7 +590,7 @@ export default function SettingsPage() {
 
                 <p className="pb-2 text-center text-xm leading-5 text-slate-400">
                      {t("TellMe, l'App qui révolutionne l'Anonymat et le Fun")} </p>
-                <p className="pt-2 pb-2 text-center text-xs text-slate-500 dark:text-slate-400">Version 1.0.4</p>
+                <p className="pt-2 pb-2 text-center text-xs text-slate-500 dark:text-slate-400">Version 1.0.5</p>
 
             </section>}
 

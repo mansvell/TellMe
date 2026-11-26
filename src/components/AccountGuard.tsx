@@ -83,7 +83,8 @@ export default function AccountGuard({ children }: { children: ReactNode }) {
         };
     }, [pathname, retry]);
 
-    if (status === "allowed") return children;
+    // La récupération ne donne accès à aucune donnée sans authentification valide.
+    if (status === "allowed" || pathname === "/login") return children;
     // Un seul chargement initial. Les vérifications de navigation restent en arrière-plan.
     if (status === "checking") return (
         <main className="flex min-h-dvh items-center justify-center bg-slate-50 dark:bg-slate-950" aria-label={t("Chargement...")}>

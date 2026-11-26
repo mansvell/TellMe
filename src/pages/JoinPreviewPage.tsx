@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
 import { t } from "../i18n/runtime";
 import {
     LoaderCircle,
     Lock,
     Users,
+    Copy,
 } from "lucide-react";
 
 import {
@@ -66,6 +68,15 @@ export default function JoinPreviewPage() {
     const [errorMessage, setErrorMessage] =
         useState("");
 
+
+    const [copied, setCopied] = useState(false);
+    const [copyFailed, setCopyFailed] = useState(false);
+    const installed = window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    const appleMobile = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    async function copyInvitation() {
+        try { await navigator.clipboard.writeText(inviteCode); setCopied(true); setCopyFailed(false); }
+        catch { setCopyFailed(true); }
+    }
 
     // Charge uniquement les informations publiques du groupe.
     const invalidInvite = !inviteCode;
@@ -165,7 +176,7 @@ export default function JoinPreviewPage() {
     }
 
 
-    if (loading) {
+    if (loading && !invalidInvite) {
 
         return (
             <main className="flex min-h-screen items-center justify-center bg-slate-100">
@@ -254,6 +265,13 @@ export default function JoinPreviewPage() {
                         </div>
 
 
+                        {!installed && appleMobile && <section className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-700">
+                            <h2 className="font-semibold">{t("TellMe est déjà sur ton écran d’accueil ?")}</h2>
+                            <p className="mt-1">{t("Copie cette invitation, ouvre l’icône TellMe, puis choisis « Rejoindre avec un lien » dans Accueil.")}</p>
+                            <button type="button" onClick={() => void copyInvitation()} className="mt-3 flex min-h-11 items-center gap-2 font-semibold text-sky-700"><Copy size={18} />{t(copied ? "Invitation copiée" : "Copier l’invitation")}</button>
+                            {copyFailed && <p role="status" className="break-all">{t("Copie ce code manuellement :")} <code className="select-all">{inviteCode}</code></p>}
+                        </section>}
+                        <Link to={`/login?invite=${encodeURIComponent(inviteCode)}`} className="mt-4 flex min-h-11 items-center justify-center text-sm font-semibold text-sky-700">{t("J’ai déjà un compte")}</Link>
                         <button
                             type="button"
                             disabled={joining}

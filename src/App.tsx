@@ -1,3 +1,4 @@
+import AccountAccessPage from "./pages/AccountAccessPage";
 import {Routes, Route, Navigate} from "react-router-dom";
 
 import DiscoverPage from "./pages/DiscoverPage";
@@ -37,6 +38,8 @@ export default function App() {
           <Route path="/" element={<SplashPage />} />
 
           <Route path="/welcome" element={<PublicOnlyRoute><WelcomePage /></PublicOnlyRoute>} />
+          <Route path="/login" element={<AccountAccessPage />} />
+          <Route path="/account" element={<ProtectedRoute><AccountAccessPage setup /></ProtectedRoute>} />
           <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
           <Route path="/notif" element={<ProtectedRoute><NotificationPage /></ProtectedRoute>} />
