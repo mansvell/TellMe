@@ -39,7 +39,7 @@ export default function AccountGuard({ children }: { children: ReactNode }) {
                 const { data: { user }, error: userError } = await supabase.auth.getUser();
                 if (userError) {
                     if ([401, 403].includes(userError.status ?? 0) ||
-                        ["user_not_found", "session_not_found", "refresh_token_not_found", "refresh_token_already_used"].includes(userError.code ?? "")) {
+                        ["account_transfer_missing", "user_not_found", "session_not_found", "refresh_token_not_found", "refresh_token_already_used"].includes(userError.code ?? "")) {
                         setDevicePreference(ACCOUNT_KEY, session.user.id);
                         update("missing");
                         return;
@@ -55,7 +55,7 @@ export default function AccountGuard({ children }: { children: ReactNode }) {
             } catch (error) {
                 const authError = error as { status?: number; code?: string } | null;
                 const missing = [401, 403].includes(authError?.status ?? 0) ||
-                    ["user_not_found", "session_not_found", "refresh_token_not_found", "refresh_token_already_used"].includes(authError?.code ?? "");
+                    ["account_transfer_missing", "user_not_found", "session_not_found", "refresh_token_not_found", "refresh_token_already_used"].includes(authError?.code ?? "");
                 // Une panne réseau ne signifie pas que le compte a été supprimé.
                 update(missing ? "missing" : "error");
             } finally {
@@ -84,7 +84,7 @@ export default function AccountGuard({ children }: { children: ReactNode }) {
     }, [pathname, retry]);
 
     // La récupération ne donne accès à aucune donnée sans authentification valide.
-    if (status === "allowed" || pathname === "/login") return children;
+    if (status === "allowed" || pathname === "/login" || pathname === "/transfer") return children;
     // Un seul chargement initial. Les vérifications de navigation restent en arrière-plan.
     if (status === "checking") return (
         <main className="flex min-h-dvh items-center justify-center bg-slate-50 dark:bg-slate-950" aria-label={t("Chargement...")}>

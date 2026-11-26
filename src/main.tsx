@@ -1,3 +1,4 @@
+import AccountTransferWatcher from "./components/AccountTransferWatcher";
 import { AdvertisingConsentGuard } from "./components/SponsoredAd";
 import DeliveryTracker from "./components/DeliveryTracker";
 import { Capacitor } from "@capacitor/core";
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BrowserRouter>
             <NativeNavigation />
+            <AccountTransferWatcher />
             <AdvertisingConsentGuard />
             <LanguageRoot><AccountGuard><DeliveryTracker /><StoryNotificationCenter /><App /></AccountGuard></LanguageRoot>
         </BrowserRouter>

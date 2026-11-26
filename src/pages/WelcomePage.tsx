@@ -31,6 +31,7 @@ export default function WelcomePage() {
                         {t("S'enregistrer")}
                     </Link>
                     <Link to="/login" className="mt-3 inline-flex min-h-11 w-full items-center justify-center text-sm font-semibold text-sky-700 dark:text-sky-300">{t("J’ai déjà un compte")}</Link>
+                    <Link to="/transfer" className="inline-flex min-h-11 w-full items-center justify-center text-sm font-semibold text-sky-700 dark:text-sky-300">{t("Saisir mon code de transfert")}</Link>
                     {initialPushStatus() === "install" && (
                         <p className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-300">
                             {t("Pour recevoir les notifications, ajoute TellMe à l’écran d’accueil avant de t’inscrire.")}

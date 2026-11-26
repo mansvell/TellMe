@@ -13,7 +13,7 @@
     "mobile:ios": "npm run mobile:sync && cap open ios",
     "mobile:run:android": "npm run mobile:sync && cap run android",
     "mobile:run:ios": "npm run mobile:sync && cap run ios",
-    "test:mobile": "node --test tests/mobile.test.cjs tests/push.test.cjs tests/account-access.test.cjs tests/advertising.test.cjs",
+    "test:mobile": "node --test tests/mobile.test.cjs tests/push.test.cjs tests/account-access.test.cjs tests/advertising.test.cjs tests/transfer-session.test.cjs tests/account-transfer.test.mjs",
     "test:receipts": "node --test tests/receipts.test.cjs",
     "test:fun": "node --test tests/fun.test.mjs tests/story-comments.test.mjs tests/secret-push.test.cjs tests/story-upgrade.test.mjs tests/story-notifications.test.cjs tests/story-thread-layout.test.mjs tests/monthly-ranking.test.mjs"
   },

@@ -125,3 +125,5 @@ Ce correctif réduit un traitement évitable au premier appui après rechargemen
 ## Version 1.0.5 : comptes multi-appareils et invitations
 
 Le seuil courant est désormais **500 points**, après application de `supabase/migrations/20261126_reward_threshold_500.sql`. Les indications de 800 points ci-dessus décrivent l’ancienne version 1.0.4. Aucun résultat clôturé n’est modifié. Voir [UPDATE_1.0.5.md](UPDATE_1.0.5.md) pour l’activation de la récupération facultative du compte, les limites iOS et la préparation AdSense (désactivée sans compte approuvé et CMP).
+
+Le transfert **sans e-mail** utilise désormais `supabase/migrations/20261126_account_transfer.sql`. Il est indépendant de la sauvegarde facultative par e-mail : Paramètres → Transférer mon compte, puis Saisir mon code de transfert depuis l’icône TellMe. Code à usage unique de 5 minutes ; même utilisateur Supabase, déconnexion locale de la source après consommation. Voir la section 5 du guide 1.0.5 avant activation.

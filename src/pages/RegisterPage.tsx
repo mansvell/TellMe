@@ -186,6 +186,7 @@ export default function RegisterPage() {
                     </div>
 
                     <form onSubmit={handleSubmit} className="flex flex-col justify-center p-6 sm:p-10 lg:p-14">
+                        <button type="button" onClick={() => navigate(inviteToken ? `/transfer?invite=${encodeURIComponent(inviteToken)}` : "/transfer")} className="mb-3 min-h-11 text-sm font-semibold text-sky-700 dark:text-sky-300">{t("Saisir mon code de transfert")}</button>
                         <button type="button" onClick={() => navigate(inviteToken ? `/login?invite=${encodeURIComponent(inviteToken)}` : "/login")} className="mb-5 min-h-11 text-sm font-semibold text-sky-700 dark:text-sky-300">{t("J’ai déjà un compte")}</button>
                         <div className="flex items-center justify-center gap-4 lg:hidden">
                             <img

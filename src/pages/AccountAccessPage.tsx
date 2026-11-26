@@ -88,6 +88,7 @@ export default function AccountAccessPage({ setup = false }: { setup?: boolean }
             <h1 className="mt-4 text-2xl font-semibold">{t(setup ? "Sauvegarder mon compte" : "J’ai déjà un compte")}</h1>
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{t(setup ? "TellMe reste utilisable avec ton pseudo. Si tu le souhaites, associe une adresse e-mail privée pour retrouver ce même compte sur un autre téléphone." : "Connecte-toi avec l’adresse et le mot de passe configurés dans Paramètres → Sauvegarder mon compte.")}</p>
             {!setup && <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t("Pas encore configuré ? Ouvre TellMe là où ton compte existe et sécurise-le d’abord. Ton pseudo seul ne permet pas de récupérer un compte.")}</p>}
+            <Link to={returnPath ? `/transfer?invite=${encodeURIComponent(returnPath)}` : "/transfer"} className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-sky-700 dark:text-sky-300">{t("Saisir mon code de transfert")}</Link>
             {!setup && alreadySignedIn && <div className="mt-4 rounded-xl bg-sky-100 p-4 text-sm leading-6 dark:bg-sky-950">
                 <p>{t("Un compte est déjà ouvert ici. Se connecter à un autre compte ne fusionne pas leurs données.")}</p>
                 <Link to={returnPath ?? "/home"} className="mt-2 block font-semibold text-sky-700 dark:text-sky-300">{t("Continuer avec le compte actuel")}</Link>

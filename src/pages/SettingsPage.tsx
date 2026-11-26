@@ -9,6 +9,7 @@ import {
     Moon,
     Shield,
     ShieldCheck,
+    Smartphone,
     UserPen,
     Volume2,
     X,
@@ -497,6 +498,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
+                    <Row icon={<Smartphone size={21} />} title={t("Transférer mon compte")}
+                        description={t("Vers l’icône TellMe ou un autre appareil, avec un code et sans e-mail.")}
+                        onClick={() => navigate("/account/transfer")} />
                     <Row icon={<ShieldCheck size={21} />} title={t("Sauvegarder mon compte")}
                         description={t("Facultatif : retrouve ton pseudo, tes groupes et tes points si tu changes de téléphone.")}
                         onClick={() => navigate("/account")} />

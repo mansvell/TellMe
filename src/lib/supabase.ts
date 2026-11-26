@@ -1,5 +1,4 @@
-import { Capacitor } from "@capacitor/core";
-import { nativeAuthStorage } from "../mobile/storage";
+import { AUTH_STORAGE_KEY, transferAuthStorage } from "./transferStorage";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -10,5 +9,5 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { storage: Capacitor.isNativePlatform() ? nativeAuthStorage : undefined },
+    auth: { storageKey: AUTH_STORAGE_KEY, storage: transferAuthStorage },
 });

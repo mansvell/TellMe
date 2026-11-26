@@ -9,7 +9,7 @@ Le seuil devient **500 points** pour les trois premiers : 30 €, 20 €, 15 €
 
 ## 2. Retrouver le même compte dans Safari et depuis l’icône
 
-L’ajout à l’écran d’accueil ne copie pas le localStorage dans lequel Supabase conserve la session. Aucune session n’est exportée dans un lien, un cookie ou une table publique.
+L’ajout à l’écran d’accueil ne copie pas le localStorage dans lequel Supabase conserve la session. Aucune session n’est exportée dans un lien, un cookie ou une table publique. Le transfert sans e-mail décrit ci-dessous utilise une enveloppe chiffrée dans un schéma privé.
 
 **L’inscription reste sous pseudo, sans e-mail ni mot de passe obligatoire.** La sauvegarde est proposée uniquement à la demande dans les paramètres : elle n’est pas nécessaire pour publier, discuter ou gagner des points.
 
@@ -72,3 +72,31 @@ La politique de confidentialité de l’app précise l’e-mail de récupératio
 - Les tests automatisés et la préversion ne remplacent pas la vérification de Safari installé ni de l’envoi réel d’e-mails.
 
 Sources : [WebKit sur l’isolation des données](https://webkit.org/blog/14787/webkit-features-in-safari-17-2/), [limites de capture des liens PWA iOS](https://github.com/WICG/pwa-url-handler/blob/main/explainer.md), [Supabase : conversion d’un compte anonyme](https://supabase.com/docs/guides/auth/auth-anonymous), [CMP Google](https://support.google.com/adsense/answer/13554020), [règles AdSense](https://support.google.com/adsense/answer/48182).
+
+
+## 5. Transfert par code, sans e-mail
+
+Appliquer **`supabase/migrations/20261126_account_transfer.sql`** dans le SQL Editor avant d’utiliser cette option. Elle ne requiert ni fournisseur e-mail ni Edge Function, et ne modifie ni les profils ni les groupes existants.
+
+Parcours :
+
+1. Dans la version où le compte existe, ouvrir **Paramètres → Transférer mon compte → Générer mon code**.
+2. Copier le code de 20 caractères (cinq groupes de quatre), valable **5 minutes**.
+3. Ouvrir l’icône TellMe ou l’autre appareil, choisir **Saisir mon code de transfert** et saisir le code.
+4. Le même utilisateur Supabase est restauré : même pseudo, mêmes appartenances aux groupes et mêmes points. Le stockage source est vidé de la session déplacée dès la consommation du code. La version source revient sur « Compte transféré ».
+
+L’inscription reste sous pseudo. L’e-mail est une sauvegarde facultative séparée, utile si tous les appareils connectés sont perdus. Le code temporaire nécessite encore l’accès au compte d’origine. Il ne fusionne pas deux comptes déjà créés. Si un compte est déjà ouvert à destination, une confirmation explicite est demandée avant de remplacer sa session locale.
+
+### Garanties techniques
+
+- Code aléatoire de **100 bits**, non dérivé du pseudo. Il n’est pas envoyé dans une URL. Il doit rester privé comme un moyen d’accès au compte.
+- Le serveur conserve uniquement une empreinte du code, le propriétaire et une enveloppe **AES-256-GCM/HKDF**. Les jetons de session ne sont jamais stockés en clair dans la table de transfert. Le code qui permet de déchiffrer reste dans l’onglet émetteur et chez son destinataire.
+- Création réservée au propriétaire d’un profil existant, limitée à 5 codes par 10 minutes ; tables privées et aucune lecture directe pour anon/authenticated. Réclamation atomique à usage unique, expiration contrôlée par PostgreSQL. Après une réponse réseau perdue, seule la même installation peut reprendre sa réclamation pendant 10 minutes.
+- Le navigateur source contrôle le reçu public avant toute lecture/rotation de la session déplacée, y compris après fermeture ou suspension. Il ne fait pas de déconnexion serveur, qui révoquerait aussi la session reçue. Un nouveau login indépendant, même pour le même utilisateur, est distingué par son identifiant de session et reste connecté.
+- Un code expiré ou annulé ne déconnecte pas le compte source. Annuler et réclamer se disputent le même verrou de ligne : une fois réclamé, le code n’est plus annulable.
+- Les reçus claimed sont conservés pour empêcher la réactivation tardive de l’ancien navigateur. **Ne pas supprimer la table ni ses reçus pour nettoyer les données.** Les enveloppes sont effacées à la finalisation, ou nettoyées lors d’une génération ultérieure si elles ont expiré ; les RPC ne les rendent jamais après leur délai autorisé.
+- Le code est généré après renouvellement de la session ; il faut une durée restante d’au moins 7 minutes. Les réglages JWT usuels d’une heure conviennent. Aucune désactivation de la protection de réutilisation des refresh tokens n’est demandée.
+- Mettre à jour/recharger les onglets TellMe avant le transfert : une ancienne version de l’app ne possède pas ce contrôle de stockage. Vérifier sur un vrai iPhone/iPad le retour de Safari après transfert depuis l’icône.
+- Une panne du contrôle du reçu bloque la lecture du jeton source plutôt que de réutiliser une session potentiellement déplacée. Réessayer avec une connexion, ou récupérer un compte sécurisé via la page de connexion.
+
+Validation supplémentaire : chiffrement réel WebCrypto, mauvais code/propriétaire/intégrité, absence de jetons en clair, renouvellement interdit après transfert sur stockage web et natif, expiration sans perte de compte, erreur réseau, identifiants de session indépendants, concurrence de réclamation, code non réutilisable, reprises après perte de réponse, et suppression du propriétaire, avec PostgreSQL/PGlite.

@@ -1,3 +1,4 @@
+import AccountTransferPage from "./pages/AccountTransferPage";
 import AccountAccessPage from "./pages/AccountAccessPage";
 import {Routes, Route, Navigate} from "react-router-dom";
 
@@ -38,6 +39,8 @@ export default function App() {
           <Route path="/" element={<SplashPage />} />
 
           <Route path="/welcome" element={<PublicOnlyRoute><WelcomePage /></PublicOnlyRoute>} />
+          <Route path="/transfer" element={<AccountTransferPage />} />
+          <Route path="/account/transfer" element={<ProtectedRoute><AccountTransferPage send /></ProtectedRoute>} />
           <Route path="/login" element={<AccountAccessPage />} />
           <Route path="/account" element={<ProtectedRoute><AccountAccessPage setup /></ProtectedRoute>} />
           <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
