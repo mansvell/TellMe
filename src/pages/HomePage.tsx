@@ -94,36 +94,42 @@ export default function HomePage() {
                     <div className="flex items-center gap-3">
                         <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-lg bg-slate-100 px-3
                             focus-within:ring-2 focus-within:ring-sky-500 dark:bg-slate-900">
-                            <Search size={18} aria-hidden="true" className="shrink-0 text-slate-500 dark:text-slate-400" />
-                            <input type="search" aria-label={t("Rechercher un groupe...")} placeholder={t("Rechercher un groupe...")}
-                                value={search} onChange={event => setSearch(event.target.value)}
-                                className="min-w-0 flex-1 bg-transparent text-sm outline-none [&::-webkit-search-cancel-button]:appearance-none" />
+                            <Search size={18} aria-hidden="true"
+                                    className="shrink-0 text-slate-500 dark:text-slate-400"/>
+                            <input type="search" aria-label={t("Rechercher un groupe...")}
+                                   placeholder={t("Rechercher un groupe...")}
+                                   value={search} onChange={event => setSearch(event.target.value)}
+                                   className="min-w-0 flex-1 bg-transparent text-sm outline-none [&::-webkit-search-cancel-button]:appearance-none"/>
                             {search && (
-                                <button type="button" aria-label={t("Effacer la recherche")} onClick={() => setSearch("")}
-                                    className="rounded p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white">
-                                    <X size={17} />
+                                <button type="button" aria-label={t("Effacer la recherche")}
+                                        onClick={() => setSearch("")}
+                                        className="rounded p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white">
+                                    <X size={17}/>
                                 </button>
                             )}
                         </div>
                         <Link to="/invit" aria-label={t("Invitations")} title={t("Invitations")}
-                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-300 px-3 text-sm font-semibold text-black transition-colors hover:bg-sky-400 dark:bg-sky-300 dark:hover:bg-sky-200">
-                            <MailPlus size={21} aria-hidden="true" />
+                              className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-300 px-3 text-sm font-semibold text-black transition-colors hover:bg-sky-400 dark:bg-sky-300 dark:hover:bg-sky-200">
+                            <MailPlus size={21} aria-hidden="true"/>
                             <span className="hidden md:inline">{t("Invitations")}</span>
                         </Link>
-                        <Link to="/discover" aria-label={t("Trouver d’autres utilisateurs")} title={t("Trouver d’autres utilisateurs")}
-                            className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-green-300 px-3 font-semibold text-black transition-colors hover:bg-green-400 dark:bg-green-300 dark:hover:bg-green-200">
-                            <UserRoundPlus size={22} aria-hidden="true" />
+                        <Link to="/discover" aria-label={t("Trouver d’autres utilisateurs")}
+                              title={t("Trouver d’autres utilisateurs")}
+                              className="flex h-11 shrink-0 items-center gap-2 rounded-lg bg-green-300 px-3 font-semibold text-black transition-colors hover:bg-green-400 dark:bg-green-300 dark:hover:bg-green-200">
+                            <UserRoundPlus size={22} aria-hidden="true"/>
                             <span className="hidden text-sm md:inline">{t("Autres utilisateurs")}</span>
                         </Link>
+                        <button type="button" onClick={() => setShowNewGroup(true)} aria-label={t("Créer un groupe")}
+                                title={t("Créer un groupe")}
+                                className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-700 px-3 font-semibold text-white hover:bg-sky-800">
+                            <Plus size={21} aria-hidden="true"/>
+                            <span className="hidden text-sm md:inline">{t("Créer un groupe")}</span>
+                        </button>
                     </div>
                     <div className="flex items-center justify-between gap-3 pb-2 pt-4">
                         <h2 id="discussions-title" className="text-lg font-bold">{t("Discussions")}</h2>
-                        <div className="flex items-center gap-2"><JoinInvitation />
-                        <button type="button" onClick={() => setShowNewGroup(true)} aria-label={t("Créer un groupe")} title={t("Créer un groupe")}
-                            className="flex min-h-11 shrink-0 items-center gap-2 rounded-lg bg-sky-700 px-3 font-semibold text-white hover:bg-sky-800">
-                            <Plus size={21} aria-hidden="true" />
-                            <span className="hidden text-sm md:inline">{t("Créer un groupe")}</span>
-                        </button></div>
+                        <div className="flex items-center gap-2"><JoinInvitation/>
+                        </div>
                     </div>
                 </div>
 
