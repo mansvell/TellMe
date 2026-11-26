@@ -11,6 +11,8 @@ Le seuil devient **500 points** pour les trois premiers : 30 €, 20 €, 15 €
 
 L’ajout à l’écran d’accueil ne copie pas le localStorage dans lequel Supabase conserve la session. Aucune session n’est exportée dans un lien, un cookie ou une table publique.
 
+**L’inscription reste sous pseudo, sans e-mail ni mot de passe obligatoire.** La sauvegarde est proposée uniquement à la demande dans les paramètres : elle n’est pas nécessaire pour publier, discuter ou gagner des points.
+
 La récupération facultative ajoute une identité e-mail vérifiée à l’utilisateur Supabase existant. Elle conserve son UUID, son pseudo, ses groupes et ses points. Aucun nouvel utilisateur n’est inscrit par le formulaire de connexion.
 
 Configurer dans **Supabase → Authentication** :
@@ -22,7 +24,7 @@ Configurer dans **Supabase → Authentication** :
 
 Parcours :
 
-- Ouvrir **la version où le compte existe déjà**, puis Paramètres → Retrouver mon compte.
+- Ouvrir **la version où le compte existe déjà**, puis Paramètres → Sauvegarder mon compte.
 - Saisir son adresse privée, suivre le lien de confirmation reçu, puis revenir dans cette version et cliquer « J’ai confirmé mon adresse ». Un code peut aussi être saisi si le modèle d’e-mail l’inclut.
 - Choisir un mot de passe d’au moins 10 caractères. Attendre la confirmation « Ton compte est prêt ».
 - Depuis l’icône TellMe : **J’ai déjà un compte**, puis la même adresse et le même mot de passe.

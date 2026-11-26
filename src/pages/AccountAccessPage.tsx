@@ -85,8 +85,8 @@ export default function AccountAccessPage({ setup = false }: { setup?: boolean }
         </header>
         <section className="mx-auto max-w-md px-5 pb-10 pt-5">
             <ShieldCheck size={32} className="text-sky-600 dark:text-sky-400" />
-            <h1 className="mt-4 text-2xl font-semibold">{t(setup ? "Retrouver mon compte" : "J’ai déjà un compte")}</h1>
-            <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{t(setup ? "Associe une adresse e-mail privée à ton compte actuel. Tu gardes ton pseudo, tes groupes et tes points, dans Safari comme depuis l’icône TellMe." : "Connecte-toi avec l’adresse et le mot de passe configurés dans Paramètres → Retrouver mon compte.")}</p>
+            <h1 className="mt-4 text-2xl font-semibold">{t(setup ? "Sauvegarder mon compte" : "J’ai déjà un compte")}</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">{t(setup ? "TellMe reste utilisable avec ton pseudo. Si tu le souhaites, associe une adresse e-mail privée pour retrouver ce même compte sur un autre téléphone." : "Connecte-toi avec l’adresse et le mot de passe configurés dans Paramètres → Sauvegarder mon compte.")}</p>
             {!setup && <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t("Pas encore configuré ? Ouvre TellMe là où ton compte existe et sécurise-le d’abord. Ton pseudo seul ne permet pas de récupérer un compte.")}</p>}
             {!setup && alreadySignedIn && <div className="mt-4 rounded-xl bg-sky-100 p-4 text-sm leading-6 dark:bg-sky-950">
                 <p>{t("Un compte est déjà ouvert ici. Se connecter à un autre compte ne fusionne pas leurs données.")}</p>

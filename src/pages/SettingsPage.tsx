@@ -497,8 +497,8 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="overflow-hidden rounded-3xl bg-white shadow-sm dark:bg-slate-700">
-                    <Row icon={<ShieldCheck size={21} />} title={t("Retrouver mon compte")}
-                        description={t("Garde le même pseudo, tes groupes et tes points sur tous tes appareils.")}
+                    <Row icon={<ShieldCheck size={21} />} title={t("Sauvegarder mon compte")}
+                        description={t("Facultatif : retrouve ton pseudo, tes groupes et tes points si tu changes de téléphone.")}
                         onClick={() => navigate("/account")} />
                 </div>
 
@@ -527,7 +527,7 @@ export default function SettingsPage() {
                     )}
                     {push.status === "install" && (
                         <p className="px-5 pb-4 text-xs leading-5 text-slate-500 dark:text-slate-300">
-                            {t("Avant de changer de navigateur ou d’installer TellMe, sécurise ton compte pour le retrouver depuis l’icône.")}
+                            {t("Pour retrouver ton compte depuis l’icône, tu peux activer la sauvegarde facultative dans les paramètres.")}
                         </p>
                     )}
 
